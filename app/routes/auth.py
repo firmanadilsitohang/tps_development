@@ -10,6 +10,9 @@ from app import db
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth.route('/')
+## Belum ditambahkan halaman
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:

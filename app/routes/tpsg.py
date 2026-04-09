@@ -126,10 +126,16 @@ def import_excel():
                 df.columns = [str(c).strip().upper() for c in df.columns]
                 
                 for _, row in df.iterrows():
+                    # Cari NOREG/NPK, apabila file excel tidak punya kolom tersebut, pakai kolom NAMA.
                     noreg = str(row.get('NOREG', row.get('NPK', ''))).strip()
-                    if noreg == 'nan' or not noreg: continue
-                    
                     raw_name = str(row.get('NAMA', '')).strip()
+                    
+                    if (not noreg or noreg == 'nan') and raw_name and raw_name != 'nan':
+                        noreg = raw_name  # Jadikan NAMA sebagai ID apabila NPK tidak ada
+                        
+                    if not noreg or noreg == 'nan': 
+                        continue
+                    
                     valid_name = raw_name if (raw_name and raw_name != 'nan') else f"User {noreg}"
 
                     emp = Employee.query.filter_by(username=noreg).first()
@@ -142,11 +148,76 @@ def import_excel():
                     else:
                         emp.name = valid_name
 
-                    emp.batch = str(row.get('BATCH', 'No Batch')).strip()
-                    kp = str(row.get('KP_ID', '')).upper()
-                    if 'KP 4' in kp: emp.current_tps_level = 'TPS KEY PERSON 4'
-                    elif 'KP 3' in kp: emp.current_tps_level = 'TPS KEY PERSON 3'
-                    elif 'ADVANCE' in kp: emp.current_tps_level = 'TPS ADVANCE'
+                    # --- BATCH ---
+                    batch_val = str(row.get('BATCH', '')).strip()
+                    if batch_val and batch_val != 'nan': 
+                        emp.batch = batch_val
+
+                    # --- FOTO ---
+                    foto_val = str(row.get('FOTO', '')).strip()
+                    if foto_val and foto_val != 'nan': 
+                        emp.photo = foto_val
+
+                    # --- JABATAN ---
+                    jabatan_val = str(row.get('JABATAN', '')).strip()
+                    if jabatan_val and jabatan_val != 'nan': 
+                        emp.position = jabatan_val
+
+                    # --- TAHUN LAHIR ---
+                    tahun_lahir = row.get('TAHUN LAHIR')
+                    if pd.notna(tahun_lahir):
+                        try:
+                            # Parse tahun (misal: "1990", 1990, atau 1990.0)
+                            year_int = int(float(tahun_lahir))
+                            # Validasi wajar
+                            if 1900 <= year_int <= date.today().year:
+                                emp.birth_date = date(year_int, 1, 1)
+                        except Exception:
+                            pass
+
+                    # --- DIVISI ---
+                    div_name = str(row.get('DIVISI', '')).strip()
+                    if div_name and div_name != 'nan':
+                        division = Division.query.filter_by(name=div_name).first()
+                        if not division:
+                            division = Division(name=div_name)
+                            db.session.add(division); db.session.flush()
+                        emp.division_id = division.id
+
+                    # --- DEPARTEMEN ---
+                    dept_name = str(row.get('DEPARTEMEN', '')).strip()
+                    if dept_name and dept_name != 'nan':
+                        department = Department.query.filter_by(name=dept_name).first()
+                        if not department:
+                            department = Department(name=dept_name)
+                            db.session.add(department); db.session.flush()
+                        emp.department_id = department.id
+                        
+                    # --- PLANT ---
+                    plant_name = str(row.get('PLANT_ID', '')).strip()
+                    if plant_name and plant_name != 'nan':
+                        plant = Plant.query.filter_by(name=plant_name).first()
+                        if not plant:
+                            plant = Plant(name=plant_name)
+                            db.session.add(plant); db.session.flush()
+                        emp.plant_id = plant.id
+
+                    # --- TPS LEVEL / PROSES ---
+                    # Berdasarkan request: Jika ada judul kolom PROSES_ID (berasal dari sheet TPS Advance)
+                    # Maka semua datanya otomatis diset menjadi TPS ADVANCE
+                    if 'PROSES_ID' in df.columns:
+                        emp.current_tps_level = 'TPS ADVANCE'
+                        
+                        # Tetap simpan nilai di dalam cell-nya (misal: Finish) sebagai riwayat
+                        proses_val = str(row.get('PROSES_ID', '')).strip()
+                        if proses_val and proses_val != 'nan':
+                            emp.last_activity_type = proses_val
+                    else:
+                        # Jika tidak ada PROSES_ID, asumsikan ini sheet biasa dengan kolom KP_ID
+                        kp = str(row.get('KP_ID', '')).upper()
+                        if 'KP 4' in kp: emp.current_tps_level = 'TPS KEY PERSON 4'
+                        elif 'KP 3' in kp: emp.current_tps_level = 'TPS KEY PERSON 3'
+                        elif 'ADVANCE' in kp: emp.current_tps_level = 'TPS ADVANCE'
                     
                     thn = row.get('TAHUN LULUS')
                     if pd.notna(thn):
@@ -171,6 +242,37 @@ def import_excel():
 def employees():
     all_participants = Employee.query.filter_by(status='active').all()
     return render_template('tpsg/employees.html', employees=all_participants)
+
+@tpsg.route('/employee/<int:id>')
+@login_required
+@tpsg_required
+def detail_employee(id):
+    employee = Employee.query.get_or_404(id)
+    return render_template('tpsg/detail_employee.html', employee=employee)
+
+@tpsg.route('/bulk-delete-employees', methods=['POST'])
+@login_required
+@tpsg_required
+def bulk_delete_employees():
+    employee_ids = request.form.getlist('employee_ids')
+    if employee_ids:
+        try:
+            from app.models.development import Activity
+            # Hapus data anak terlebih dahulu untuk menghindari constraint foreign key
+            Activity.query.filter(Activity.employee_id.in_(employee_ids)).delete(synchronize_session=False)
+            WorkshopActivity.query.filter(WorkshopActivity.employee_id.in_(employee_ids)).delete(synchronize_session=False)
+            User.query.filter(User.employee_id.in_(employee_ids)).delete(synchronize_session=False)
+            
+            # Hapus Karyawan
+            Employee.query.filter(Employee.id.in_(employee_ids)).delete(synchronize_session=False)
+            db.session.commit()
+            flash(f'{len(employee_ids)} Karyawan beserta datanya berhasil dihapus.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Gagal menghapus data: {str(e)}', 'danger')
+    else:
+        flash('Tidak ada data yang dipilih untuk dihapus.', 'warning')
+    return redirect(url_for('tpsg.employees'))
 
 @tpsg.route('/manage-news')
 @login_required
