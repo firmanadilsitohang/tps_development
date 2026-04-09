@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard | TPS-G{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =========================================================
+       1. RUNNING TEXT CSS (TMMIN)
+    ========================================================= */
+    .tmmin-running-text-container {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        padding: 12px 0;
+        margin-bottom: 5px;
+        border-radius: 8px;
+        border-left: 4px solid #ed1c24;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    }
+    .tmmin-running-text {
+        display: inline-block; white-space: nowrap; font-weight: bold; color: #ff0000;
+        font-size: 14px; letter-spacing: 1px; text-transform: uppercase;
+        animation: scroll-left 25s linear infinite;
+    }
+    @keyframes scroll-left {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+
+    /* =========================================================
+       2. PANEL CARDS & GRID
+    ========================================================= */
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; margin-top: 25px; }
+    
+    .panel-card {
+        background: linear-gradient(160deg, #050a14 0%, rgba(3, 86, 197, 0.3) 150%);
+        border: 1px solid var(--border-glass); border-radius: 16px; padding: 30px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+        position: relative; overflow: hidden; transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+    }
+    .panel-card:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 25px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1); border-color: var(--accent-cyan);
+    }
+    .panel-header { font-family: 'Oswald', sans-serif; font-size: 16px; color: #fff; margin-top: 0; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-glass); padding-bottom: 12px;}
+    
+    .btn-sm { 
+        background: rgba(10, 116, 255, 0.1); color: var(--accent-cyan); padding: 6px 14px; border-radius: 6px; font-size: 10px; font-weight: bold; text-decoration: none; text-transform: uppercase; border: 1px solid rgba(10, 116, 255, 0.3); transition: all 0.3s ease; cursor: pointer; display: inline-block;
+    }
+    .btn-sm:hover { background: var(--accent-cyan); color: #fff; box-shadow: 0 0 15px rgba(10, 116, 255, 0.5);}
+
+    /* =========================================================
+       3. PROFIL & INFO BADGES
+    ========================================================= */
+    .profile-large { text-align: center; }
+    .profile-large img { 
+        width: 120px; height: 120px; border-radius: 50%; object-fit: cover; 
+        border: 3px solid rgba(255,255,255,0.1); margin-bottom: 15px; padding: 5px; 
+        background: var(--color-dark); box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: 0.4s ease;
+    }
+    .profile-large h3 { font-family: 'Oswald', sans-serif; font-size: 20px; margin: 0 0 5px 0; color: #fff; letter-spacing: 0.5px;}
+    .profile-large p { color: var(--text-muted); font-family: monospace; font-size: 13px; margin: 0 0 20px 0; }
+    
+    .status-badge { display: inline-block; background: rgba(98, 202, 2, 0.808); color: #ffffff; padding: 6px 20px; border-radius: 20px; font-weight: 800; font-size: 11px; border: 1px solid rgba(251, 251, 250, 0.71); letter-spacing: 1px;}
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .info-item label { display: block; font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+    .info-item div { font-size: 14px; color: #fff; font-weight: 600; padding-bottom: 6px; border-bottom: 1px dashed var(--border-glass); }
+    
+    .badge-blue { display: inline-block; background: rgba(84, 131, 179, 0.1); color: #7DA0CA; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 11px; border: 1px solid #7DA0CA; letter-spacing: 0.5px; }
+    .badge-gold { display: inline-block; background: rgba(245, 158, 11, 0.1); color: var(--accent-gold); padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 11px; border: 1px solid var(--accent-gold); letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+
+    /* =========================================================
+       4. ROADMAP SYSTEM 
+    ========================================================= */
+    .roadmap-container { position: relative; margin: 0 15px; padding: 5px 0; }
+    .roadmap-line { position: absolute; top: 12px; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.15); z-index: 1; }
+    .roadmap-steps { display: flex; justify-content: space-between; position: relative; z-index: 2; }
+    .step { display: flex; flex-direction: column; align-items: center; width: 16%; }
+    .step-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--color-dark); border: 3px solid #fff; transition: all 0.5s ease; z-index: 3; }
+    
+    .step.active .step-dot { background: var(--accent-cyan); animation: breath-blue 3s infinite alternate; }
+    .step.active.vip-gold .step-dot { background: var(--accent-gold); animation: breath-gold 3s infinite alternate; }
+    .step.passed .step-dot { background: var(--accent-cyan); box-shadow: 0 0 8px rgba(10, 116, 255, 0.4); }
+
+    @keyframes breath-blue { 0% { box-shadow: 0 0 5px rgba(10, 116, 255, 0.4); } 100% { box-shadow: 0 0 15px rgba(10, 116, 255, 0.8); } }
+    @keyframes breath-gold { 0% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.4); } 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.8); } }
+
+    .step-label { font-family: 'Oswald', sans-serif; font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; margin-top: 8px; text-align: center; }
+    .step.active .step-label { color: #fff; font-weight: bold; }
+    .step.active.vip-gold .step-label { color: var(--accent-gold); font-weight: bold; }
+
+    /* =========================================================
+       5. WIDGET LISTS
+    ========================================================= */
+    .widget-list { display: flex; flex-direction: column; gap: 12px; }
+    .widget-item { background: rgba(255, 255, 255, 0.02); border-left: 3px solid var(--border-glass); padding: 15px; border-radius: 0 10px 10px 0; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+    .widget-item:hover { background: rgba(10, 116, 255, 0.05); border-left-color: var(--accent-cyan); transform: translateX(6px); }
+    .widget-item.urgent { border-left-color: var(--accent-gold); }
+    .widget-item-title { color: #fff; font-size: 13px; margin: 0 0 5px 0; font-weight: 600;}
+
+    .news-badge { padding: 3px 8px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: inline-block;}
+    .news-badge-news { background: rgba(10, 116, 255, 0.15); color: #0A74FF; border: 1px solid #0A74FF; }
+    .news-badge-schedule { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+    .news-badge-private { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; margin-left: 5px;}
+
+    /* =========================================================
+       6. MODAL BOX UNTUK EDIT PROFIL
+    ========================================================= */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+        display: flex; align-items: center; justify-content: center; z-index: 1000;
+        opacity: 0; visibility: hidden; transition: 0.3s ease;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-content {
+        background: var(--bg-deep-navy); border: 1px solid var(--border-glass);
+        padding: 30px; border-radius: 12px; width: 400px; max-width: 90%;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.5); transform: translateY(-20px); transition: 0.3s ease;
+    }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .close-btn { float: right; cursor: pointer; color: var(--accent-red); font-size: 18px; transition: 0.3s; }
+    .close-btn:hover { transform: scale(1.2); }
+    
+    .form-input-dark {
+        width: 100%; padding: 10px; background: rgba(255,255,255,0.05); 
+        border: 1px solid var(--border-glass); color: #fff; border-radius: 6px;
+        font-family: 'Poppins', sans-serif; font-size: 13px; margin-bottom: 15px; outline: none;
+    }
+    .form-input-dark:focus { border-color: var(--accent-cyan); background: rgba(10, 116, 255, 0.05); }
+
+    .profile-glow-blue { border-color: var(--accent-cyan) !important; animation: breath-blue 3s infinite alternate !important; }
+    .profile-glow-gold { border-color: var(--accent-gold) !important; animation: breath-gold 3s infinite alternate !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tmmin-running-text-container">
+    <div class="tmmin-running-text">
+        PT TOYOTA MOTOR MANUFACTURING INDONESIA (TMMIN) — DRIVE YOUR AMBITION — We Make People Before Make Product —
+        PT TOYOTA MOTOR MANUFACTURING INDONESIA (TMMIN) — DRIVE YOUR AMBITION — We Make People Before Make Product
+    </div>
+</div>
+
+<h2 style="font-family: 'Oswald'; text-transform: uppercase; margin: 30px 0 20px 0; letter-spacing: 1px; color: #fff;">MY DEVELOPMENT JOURNEY</h2>
+
+<div class="panel-card" style="margin-bottom: 25px; padding: 20px 30px;">
+    <div class="roadmap-container">
+        <div class="roadmap-line"></div>
+        <div class="roadmap-steps">
+            {% set my_level = employee.current_tps_level | string | upper if employee else '' %}
+            {% set tracker = namespace(idx=-1) %}
+            
+            {% if 'BASIC' in my_level %}{% set tracker.idx = 0 %}
+            {% elif 'SW' in my_level %}{% set tracker.idx = 1 %}
+            {% elif 'STEP UP' in my_level %}{% set tracker.idx = 2 %}
+            {% elif 'ADVANCE' in my_level %}{% set tracker.idx = 3 %}
+            {% elif 'KEY PERSON 3' in my_level or 'KP3' in my_level or 'KP 3' in my_level %}{% set tracker.idx = 4 %}
+            {% elif 'KEY PERSON 4' in my_level or 'KP4' in my_level or 'KP 4' in my_level %}{% set tracker.idx = 5 %}
+            {% endif %}
+
+            {% set roadmap_nodes = [
+                {'label': 'BASIC', 'index': 0},
+                {'label': 'SW', 'index': 1},
+                {'label': 'STEP UP', 'index': 2},
+                {'label': 'ADVANCE', 'index': 3},
+                {'label': 'KP 3', 'index': 4},
+                {'label': 'KP 4', 'index': 5}
+            ] %}
+
+            {% for node in roadmap_nodes %}
+                <div class="step {% if node.index < tracker.idx %}passed{% elif node.index == tracker.idx %}active {% if node.index == 5 %}vip-gold{% endif %}{% endif %}">
+                    <div class="step-dot"></div>
+                    <div class="step-label">TPS {{ node.label }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="panel-card" style="margin-bottom: 25px; border-left: 4px solid var(--accent-cyan); padding: 20px 30px;">
+    <h3 class="panel-header" style="margin-bottom: 15px;"><i class="fas fa-bullhorn" style="margin-right: 8px;"></i> Informasi & Pengumuman Terbaru</h3>
+    <div class="widget-list">
+        {% for news in news_events %}
+        <div class="widget-item {% if news.target_type == 'specific' %}urgent{% endif %}">
+            <div style="flex-grow: 1; padding-right: 20px;">
+                <span class="news-badge news-badge-{{ news.category | lower }}">{{ news.category }}</span>
+                {% if news.target_type == 'specific' %}
+                    <span class="news-badge news-badge-private"><i class="fas fa-envelope-open-text"></i> Pesan Khusus</span>
+                {% endif %}
+                
+                <h4 class="widget-item-title" style="margin-top: 5px;">{{ news.title }}</h4>
+                <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 5px 0;">
+                    <i class="far fa-clock" style="margin-right: 4px;"></i> Diterbitkan: {{ news.created_at.strftime('%d %b %Y, %H:%M') }}
+                </p>
+                <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">{{ news.content }}</div>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 10px;">
+            <i class="far fa-bell-slash" style="font-size: 20px; color: #475569; margin-bottom: 8px; display: block;"></i>
+            <p style="color: #64748b; font-size: 12px; margin: 0;">Belum ada pengumuman terbaru untuk Anda saat ini.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="panel-card profile-large">
+        {% set check_lvl = employee.current_tps_level | string | upper if employee else '' %}
+        {% set glow_class = 'profile-glow-gold' if ('KEY PERSON 4' in check_lvl or 'KP 4' in check_lvl or 'KP4' in check_lvl) else 'profile-glow-blue' %}
+
+        {% if employee and employee.photo %}
+            {% if 'http' in employee.photo %}
+                <img src="{{ employee.photo.strip() }}" class="{{ glow_class }}" alt="Profile Photo" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default_avatar.png') }}';">
+            {% else %}
+                <img src="{{ url_for('static', filename='uploads/photos/' ~ employee.photo.strip()) }}" class="{{ glow_class }}" alt="Profile Photo" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default_avatar.png') }}';">
+            {% endif %}
+        {% else %}
+            <div class="{{ glow_class }}" style="width: 120px; height: 120px; border-radius: 50%; background: #000; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; margin: 0 auto 15px; border: 3px solid rgba(255,255,255,0.1); transition: 0.4s ease;">
+                <i class="fas fa-user"></i>
+            </div>
+        {% endif %}
+        <h3>{{ employee.name if employee else 'User' }}</h3>
+        <p>NIK: {{ current_user.username }}</p>
+        <span class="status-badge" style="margin-bottom: 15px;">STATUS: {{ employee.status | upper if employee else 'UNKNOWN' }}</span>
+        
+        <br>
+        <button onclick="openEditModal()" class="btn-sm"><i class="fas fa-user-edit"></i> Edit Data Profil</button>
+    </div>
+
+    <div class="panel-card">
+        <h3 class="panel-header">Informasi Kompetensi & Profil</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Area Kerja / Plant</label>
+                <div>{{ employee.plant.name if employee and employee.plant else '-' }}</div>
+            </div>
+            <div class="info-item">
+                <label>Division / Dept</label>
+                <div>{{ employee.division.name if employee and employee.division else '-' }} / {{ employee.department.name if employee and employee.department else '-' }}</div>
+            </div>
+            
+            <div class="info-item">
+                <label>Level TPS Saat Ini</label>
+                {% set check_lvl = employee.current_tps_level | string | upper if employee else '' %}
+                {% if 'KEY PERSON 4' in check_lvl or 'KP 4' in check_lvl or 'KP4' in check_lvl %}
+                    <div class="badge-gold">{{ employee.current_tps_level }}</div>
+                {% else %}
+                    <div class="badge-blue">{{ employee.current_tps_level if employee else '-' }}</div>
+                {% endif %}
+            </div>
+            <div class="info-item">
+                <label>Tema Aktivitas Terakhir</label>
+                <div>{{ employee.last_activity_theme if employee and employee.last_activity_theme else 'Belum ada data aktivitas' }}</div>
+            </div>
+
+            <div class="info-item">
+                <label>Usia Saat Ini</label>
+                <div>
+                    {% if umur %}
+                        {{ umur }} Tahun
+                    {% else %}
+                        <span style="color: #ef4444; font-size: 11px; font-style: italic;"><i class="fas fa-exclamation-circle"></i> Belum diatur</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-item">
+                <label>Estimasi Tahun Pensiun</label>
+                <div>
+                    {% if tahun_pensiun %}
+                        {{ tahun_pensiun }} <span style="font-size: 10px; color: var(--text-muted);">(Usia 55)</span>
+                    {% else %}
+                        <span style="color: #ef4444; font-size: 11px; font-style: italic;"><i class="fas fa-exclamation-circle"></i> Belum diatur</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card" style="margin-top: 25px;">
+    <h3 class="panel-header"><i class="fas fa-tasks" style="margin-right: 8px;"></i> Progres Aktivitas (Kaizen) Terbaru</h3>
+    <div class="widget-list">
+        {% for activity in activities %}
+        <div class="widget-item">
+            <div style="flex-grow: 1;">
+                <h4 class="widget-item-title">{{ activity.theme_title }}</h4>
+                <p style="font-size: 11px; color: var(--accent-gold); margin: 0;">STATUS: {{ activity.status | upper }}</p>
+            </div>
+            <a href="{{ url_for('participant.activity') }}" class="btn-sm">Detail Aktivitas</a>
+        </div>
+        {% else %}
+        <p style="color: #64748b; font-size: 12px; margin: 0; padding: 10px; text-align: center;">Belum ada aktivitas yang berjalan.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="editProfileModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeEditModal()"><i class="fas fa-times"></i></span>
+        <h3 style="color: #fff; font-family: 'Oswald'; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;">
+            <i class="fas fa-user-cog" style="margin-right: 8px;"></i> Perbarui Profil
+        </h3>
+        
+        <form action="{{ url_for('participant.update_profile') }}" method="POST">
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">NAMA LENGKAP</label>
+            <input type="text" name="name" class="form-input-dark" value="{{ employee.name }}" required>
+
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">TANGGAL LAHIR (Tentukan Usia & Pensiun)</label>
+            <input type="date" name="birth_date" class="form-input-dark" value="{{ employee.birth_date.strftime('%Y-%m-%d') if employee.birth_date else '' }}" required>
+
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">TEMA AKTIVITAS TERAKHIR</label>
+            <input type="text" name="last_activity_theme" class="form-input-dark" value="{{ employee.last_activity_theme if employee.last_activity_theme else '' }}" placeholder="Contoh: Pengurangan Defect Area A">
+
+            <button type="submit" style="width: 100%; background: linear-gradient(135deg, #0A74FF 0%, #0356C5 100%); color: #fff; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                SIMPAN PERUBAHAN
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function openEditModal() {
+        document.getElementById('editProfileModal').classList.add('active');
+    }
+    function closeEditModal() {
+        document.getElementById('editProfileModal').classList.remove('active');
+    }
+</script>
+{% endblock %}

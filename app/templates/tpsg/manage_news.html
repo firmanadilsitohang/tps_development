@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Pengumuman | TPS-G Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Container Styling */
+    .news-container { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
+
+    /* Card Styling */
+    .glass-card {
+        background: rgba(5, 10, 20, 0.95); border: 1px solid var(--border-glass);
+        border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .card-title {
+        font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px;
+        color: var(--accent-cyan); margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding-bottom: 10px; display: flex; align-items: center; gap: 10px;
+    }
+
+    /* Form Elements */
+    .form-group { margin-bottom: 15px; }
+    .form-group label.title-label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; }
+    
+    .form-control {
+        width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px; padding: 12px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; transition: 0.3s;
+    }
+    .form-control:focus { border-color: var(--accent-cyan); outline: none; background: rgba(10, 116, 255, 0.05); }
+
+    .btn-submit {
+        width: 100%; background: linear-gradient(135deg, #0A74FF 0%, #0356C5 100%);
+        color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700;
+        text-transform: uppercase; cursor: pointer; transition: 0.3s; margin-top: 10px;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(10, 116, 255, 0.4); }
+
+    /* Table & Badges */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { text-align: left; font-size: 11px; color: var(--text-muted); text-transform: uppercase; padding: 12px; border-bottom: 2px solid rgba(255,255,255,0.05); }
+    td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; vertical-align: top; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .badge-news { background: rgba(10, 116, 255, 0.15); color: #0A74FF; border: 1px solid #0A74FF; }
+    .badge-schedule { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+    .btn-delete { color: var(--accent-red); background: none; border: none; cursor: pointer; font-size: 14px; transition: 0.3s; }
+    .btn-delete:hover { transform: scale(1.2); color: #ff4d4d; }
+
+    /* Custom Checkbox Scroll Area & Search */
+    .search-participant-wrapper { position: relative; margin-bottom: 8px; }
+    .search-participant-wrapper i { position: absolute; left: 10px; top: 10px; color: #64748b; font-size: 12px; }
+    .search-participant-input {
+        width: 100%; background: #0f172a; border: 1px solid #1e293b; padding: 8px 10px 8px 30px;
+        border-radius: 6px; color: #fff; font-size: 11px; outline: none; transition: 0.3s;
+    }
+    .search-participant-input:focus { border-color: #0A74FF; }
+
+    .checkbox-list {
+        max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2);
+        padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    }
+    .checkbox-item {
+        display: flex; align-items: center; gap: 10px; font-size: 12px; color: #e2e8f0;
+        padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.02); cursor: pointer;
+    }
+    .checkbox-item:hover { background: rgba(10, 116, 255, 0.1); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 25px;">
+    <h2 style="font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 1px; color: #fff;">Broadcast Center</h2>
+    <p style="color: var(--text-muted); font-size: 13px;">Kelola pengumuman berita dan jadwal kegiatan untuk partisipan.</p>
+</div>
+
+<div class="news-container">
+    <div class="glass-card">
+        <h3 class="card-title"><i class="fas fa-plus-circle"></i> Buat Baru</h3>
+        <form action="{{ url_for('tpsg.manage_news') }}" method="POST">
+            <div class="form-group">
+                <label class="title-label">Judul Pengumuman</label>
+                <input type="text" name="title" class="form-control" placeholder="Contoh: Jadwal Ujian Batch 5" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="title-label">Kategori</label>
+                <select name="category" class="form-control">
+                    <option value="News">Berita / Informasi</option>
+                    <option value="Schedule">Jadwal Kegiatan</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="title-label">Target Penerima</label>
+                <div style="display: flex; gap: 20px; font-size: 12px; color: #fff; margin-top: 8px;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                        <input type="radio" name="target_type" value="all" checked onchange="toggleTarget()"> Semua Partisipan
+                    </label>
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                        <input type="radio" name="target_type" value="specific" onchange="toggleTarget()"> Partisipan Tertentu
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group" id="participant-selection" style="display: none;">
+                <label class="title-label" style="color: #f59e0b;">Cari & Pilih Partisipan</label>
+                
+                <div class="search-participant-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchParticipantInput" class="search-participant-input" placeholder="Ketik nama atau NPK..." onkeyup="filterParticipants()">
+                </div>
+
+                <div class="checkbox-list" id="participantCheckboxList">
+                    {% for emp in employees %}
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="target_users" value="{{ emp.username }}">
+                        <span class="p-name">{{ emp.name }}</span> <span style="color: var(--text-muted); font-family: monospace;" class="p-nik">({{ emp.username }})</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="title-label">Isi Konten</label>
+                <textarea name="content" class="form-control" rows="5" placeholder="Tuliskan detail pengumuman di sini..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Terbitkan Sekarang</button>
+        </form>
+    </div>
+
+    <div class="glass-card">
+        <h3 class="card-title"><i class="fas fa-list-ul"></i> Riwayat Pengumuman</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Info & Target</th>
+                    <th>Judul & Konten</th>
+                    <th style="text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in all_news %}
+                <tr>
+                    <td style="width: 130px;">
+                        <span class="badge badge-{{ item.category | lower }}">{{ item.category }}</span>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px; margin-bottom: 5px;">
+                            {{ item.created_at.strftime('%d %b %Y') }}
+                        </div>
+                        {% if item.target_type == 'specific' %}
+                            <span style="font-size: 9px; color: #f59e0b; border: 1px dashed #f59e0b; padding: 2px 4px; border-radius: 3px;"><i class="fas fa-user-lock"></i> Private</span>
+                        {% else %}
+                            <span style="font-size: 9px; color: #10b981; border: 1px dashed #10b981; padding: 2px 4px; border-radius: 3px;"><i class="fas fa-globe"></i> Publik</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong style="display: block; color: #fff; margin-bottom: 5px;">{{ item.title }}</strong>
+                        <div style="color: var(--text-muted); font-size: 12px; line-height: 1.4;">
+                            {{ item.content[:100] }}{% if item.content|length > 100 %}...{% endif %}
+                        </div>
+                    </td>
+                    <td style="text-align: center; width: 50px;">
+                        <form action="{{ url_for('tpsg.delete_news', id=item.id) }}" method="POST" onsubmit="return confirm('Hapus pengumuman ini?')">
+                            <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 40px;">Belum ada pengumuman yang diterbitkan.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Menyembunyikan/memunculkan daftar partisipan
+    function toggleTarget() {
+        const specificRadio = document.querySelector('input[name="target_type"][value="specific"]');
+        const participantBox = document.getElementById('participant-selection');
+        const searchInput = document.getElementById('searchParticipantInput');
+        
+        if (specificRadio.checked) {
+            participantBox.style.display = 'block';
+        } else {
+            participantBox.style.display = 'none';
+            // Bersihkan input pencarian dan uncheck semua jika kembali ke "Semua"
+            searchInput.value = '';
+            filterParticipants(); // Reset filter
+            const checkboxes = document.querySelectorAll('input[name="target_users"]');
+            checkboxes.forEach(box => box.checked = false);
+        }
+    }
+
+    // Fungsi pencarian partisipan
+    function filterParticipants() {
+        let input = document.getElementById('searchParticipantInput').value.toUpperCase();
+        let labels = document.querySelectorAll('.checkbox-item');
+
+        labels.forEach(label => {
+            // Ambil teks dari nama dan NPK yang ada di dalam label
+            let text = label.textContent.toUpperCase();
+            
+            if (text.includes(input)) {
+                label.style.display = 'flex'; // Munculkan jika cocok
+            } else {
+                label.style.display = 'none'; // Sembunyikan jika tidak cocok
+            }
+        });
+    }
+</script>
+{% endblock %}

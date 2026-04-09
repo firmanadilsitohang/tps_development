@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Import Excel | TPS-G{% endblock %}
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; background: #080f1e; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <i class="fas fa-file-excel" style="font-size: 50px; color: #10b981; margin-bottom: 15px;"></i>
+        <h2 style="font-family: 'Oswald', sans-serif; color: #fff; margin: 0; letter-spacing: 1px;">IMPORT DATA MASSAL</h2>
+        <p style="color: #64748b; font-size: 13px; margin-top: 5px;">Upload file mentahan (.xlsx / .csv) untuk mendaftarkan ratusan partisipan sekaligus.</p>
+    </div>
+
+    <form action="{{ url_for('tpsg.import_excel') }}" method="POST" enctype="multipart/form-data">
+        <div style="border: 2px dashed #334155; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 25px; background: rgba(255,255,255,0.02);">
+            <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required style="width: 100%; color: #94a3b8;">
+        </div>
+
+        <div style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; padding: 15px; border-radius: 0 8px 8px 0; font-size: 13px; color: #fbbf24; margin-bottom: 30px;">
+            <i class="fas fa-bolt" style="margin-right: 5px;"></i> <strong>Otomasi:</strong> Akun login akan dibuatkan otomatis dengan password <code>tmmin123</code>.
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <a href="{{ url_for('tpsg.employees') }}" style="flex: 1; padding: 12px; text-align: center; background: #1e293b; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold;">Batal</a>
+            <button type="submit" style="flex: 2; padding: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px;"><i class="fas fa-cloud-upload-alt"></i> Eksekusi Import</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

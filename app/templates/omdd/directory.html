@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Master Directory | TPS-G{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Badge Level */
+   .lvl-badge { 
+        display: inline-block; padding: 6px 12px; border-radius: 4px; font-size: 11px;
+        font-weight: bold; border: 1px solid transparent; white-space: nowrap; text-align: center; min-width: 80px; line-height: 1.2;
+    }
+    .lvl-basic { background: rgba(100, 116, 139, 0.1); color: #0485f5; border-color: #475569; }
+    .lvl-kp4 { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
+
+    /* Incomplete Badge untuk Foto */
+    .incomplete-badge {
+        position: absolute; top: -2px; right: -2px; background: #fff; color: #ef4444; 
+        border-radius: 50%; font-size: 12px; box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+        width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Tabel dan Filter */
+    .table-container { background: #050a14; border: 1px solid var(--border-glass); border-radius: 12px; overflow: hidden; margin-top: 20px;}
+    .table-header-tools { padding: 20px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+    .filter-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; flex: 1;}
+    .search-input { background: #0f172a; border: 1px solid #1e293b; padding: 8px 15px; border-radius: 6px; color: #fff; font-size: 12px; width: 220px; outline: none; transition: 0.3s; }
+    .search-input:focus { border-color: var(--accent-cyan); }
+    .filter-select { background: #0f172a; border: 1px solid #1e293b; padding: 8px 15px; border-radius: 6px; color: #fff; font-size: 12px; outline: none; width: 150px; cursor: pointer; }
+
+    table { width: 100%; border-collapse: collapse; color: #fff; font-size: 13px; table-layout: auto; }
+    th { background: rgba(255,255,255,0.03); text-align: center; padding: 15px 10px; text-transform: uppercase; font-size: 11px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;}
+    td { padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+    tbody tr:hover td { background: rgba(10, 116, 255, 0.05); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 style="font-family: 'Oswald'; text-transform: uppercase; margin: 0; letter-spacing: 1px; color: #fff;">OMDD MASTER DIRECTORY</h2>
+    <div style="color: var(--text-muted); font-size: 12px;">Development Participants</div>
+</div>
+
+<div class="table-container">
+    <div class="table-header-tools">
+        <h3 style="margin: 0; color: #fff; font-family: 'Oswald'; text-transform: uppercase; font-size: 16px;">Employee Master Data</h3>
+        <div class="filter-group">
+            <select id="divisionFilter" class="filter-select"><option value="">-- Semua Divisi --</option></select>
+            <select id="departmentFilter" class="filter-select"><option value="">-- Semua Dept --</option></select>
+            <select id="levelFilter" class="filter-select"><option value="">-- Semua Level --</option></select>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search NIK or Name...">
+        </div>
+    </div>
+    <table id="employeeTable">
+        <thead>
+            <tr>
+                <th style="text-align: center; width: 80px;">FOTO</th>
+                <th style="text-align: left;">PARTISIPAN</th>
+                <th style="text-align: center;">STATUS</th>
+                <th style="text-align: center;">PLANT / DIV / DEPT</th>
+                <th style="text-align: center;">CURRENT LEVEL</th>
+                <th style="text-align: center;">BATCH</th>
+                <th style="text-align: center;">UMUR</th>
+                <th style="text-align: center;">ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employees %}
+            {% set check_lvl = emp.current_tps_level | upper %}
+            <tr>
+                <td style="text-align: center;">
+                    {% set is_incomplete = not emp.birth_date or not emp.position or not emp.current_tps_level or not emp.photo %}
+                    <div style="position: relative; display: inline-block;">
+                        {% if emp.photo %}
+                            <img src="{{ emp.photo if emp.photo.startswith('http') else url_for('static', filename='uploads/photos/' + emp.photo) }}" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #1e293b;">
+                        {% else %}
+                            <div style="width: 45px; height: 45px; border-radius: 50%; background: #1e293b; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; color: #fff; font-size: 18px;">{{ emp.name[0] | upper }}</div>
+                        {% endif %}
+                        {% if is_incomplete %}
+                            <div class="incomplete-badge" title="Data belum lengkap!"><i class="fas fa-exclamation"></i></div>
+                        {% endif %}
+                    </div>
+                </td>
+
+                <td style="text-align: left;">
+                    <span style="display: block; font-weight: bold; font-size: 14px; color: #fff; margin-bottom: 2px;">{{ emp.name }}</span>
+                    <span style="font-family: monospace; color: #10b981; font-size: 12px; font-weight: bold;">
+                        <i class="fas fa-id-badge" style="margin-right: 4px;"></i>{{ "%08d" | format(emp.username|int) if emp.username.isdigit() else emp.username }}
+                    </span>
+                </td>
+
+                <td style="text-align: center;">
+                    {% set status_color = '#f59e0b' if emp.status == 'pending' else '#10b981' %}
+                    {% set dot_style = "height: 10px; width: 10px; border-radius: 50%; display: inline-block; background-color: " ~ status_color ~ "; box-shadow: 0 0 8px " ~ status_color ~ ";" %}
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span style="{{ dot_style }}"></span>
+                        <span style="color: #fff; text-transform: capitalize; font-size: 12px;">{{ emp.status | default('Active') }}</span>
+                    </div>
+                </td>
+                
+                <td style="text-align: center;">
+                    <span style="display: block; font-weight: bold; color: #fff;">{{ emp.plant.name if emp.plant else '-' }}</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">
+                        <span class="div-text">{{ emp.division.name if emp.division else '-' }}</span> - 
+                        <span class="dept-text">{{ emp.department.name if emp.department else '-' }}</span>
+                    </span>
+                </td>
+                
+                <td style="text-align: center;">
+                    {% if 'PERSON 4' in check_lvl or 'KP 4' in check_lvl or 'KP4' in check_lvl %}
+                        <span class="lvl-badge lvl-kp4">{{ emp.current_tps_level }}</span>
+                    {% else %}
+                        <span class="lvl-badge lvl-basic">{{ emp.current_tps_level }}</span>
+                    {% endif %}
+                </td>
+                
+                <td style="text-align: center; color: #0A74FF; font-weight: bold;">{{ emp.batch if emp.batch else '-' }}</td>
+                
+                <td style="text-align: center; color: #94a3b8; font-size: 13px; font-weight: bold;">{{ emp.age ~ ' Thn' if emp.age else '-' }}</td>
+                
+                <td style="text-align: center;">
+                    <div style="display: flex; justify-content: center; gap: 5px;">
+                        <a href="{{ url_for('omdd.detail_employee', id=emp.id) }}" style="font-size: 10px; padding: 6px 10px; border: 1px solid #0A74FF; color: #0A74FF; text-decoration: none; border-radius: 4px; font-weight: bold; transition: 0.3s;" onmouseover="this.style.background='#0A74FF'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#0A74FF';"><i class="fas fa-id-card"></i> Detail</a>
+                        <a href="{{ url_for('omdd.view_log', emp_id=emp.id) }}" style="font-size: 10px; padding: 6px 10px; border: 1px solid #f59e0b; color: #f59e0b; text-decoration: none; border-radius: 4px; font-weight: bold; transition: 0.3s;" onmouseover="this.style.background='#f59e0b'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#f59e0b';">Log</a>
+                        
+                        {% if '4' not in check_lvl %}
+                        <a href="{{ url_for('omdd.assess_employee', id=emp.id) }}" style="font-size: 10px; padding: 6px 10px; border: 1px solid #10b981; color: #10b981; text-decoration: none; border-radius: 4px; font-weight: bold; transition: 0.3s;" onmouseover="this.style.background='#10b981'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#10b981';">Assess</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const tableRows = document.querySelectorAll("#employeeTable tbody tr");
+        const searchInput = document.getElementById("searchInput");
+        const divisionFilter = document.getElementById("divisionFilter");
+        const departmentFilter = document.getElementById("departmentFilter");
+        const levelFilter = document.getElementById("levelFilter"); 
+
+        let divDeptMap = {};
+        let levels = new Set(); 
+
+        tableRows.forEach(row => {
+            if(!row.cells[1]) return; // Index berubah karena Name dan NIK gabung
+            
+            let divSpan = row.querySelector(".div-text");
+            let deptSpan = row.querySelector(".dept-text");
+            let lvlSpan = row.querySelector(".lvl-badge"); 
+            let divName = divSpan ? divSpan.textContent.trim() : "";
+            let deptName = deptSpan ? deptSpan.textContent.trim() : "";
+            let lvlName = lvlSpan ? lvlSpan.textContent.trim() : "";
+
+            if (divName && divName !== '-') {
+                if (!divDeptMap[divName]) divDeptMap[divName] = new Set();
+                if (deptName && deptName !== '-') divDeptMap[divName].add(deptName);
+            }
+            if (lvlName && lvlName !== '-') levels.add(lvlName);
+        });
+
+        Object.keys(divDeptMap).sort().forEach(div => { divisionFilter.appendChild(new Option(div, div.toUpperCase())); });
+        Array.from(levels).sort().forEach(lvl => { levelFilter.appendChild(new Option(lvl, lvl.toUpperCase())); });
+
+        function updateDepartmentDropdown() {
+            let selectedDiv = divisionFilter.options[divisionFilter.selectedIndex]?.text;
+            let currentDeptValue = departmentFilter.value; 
+            departmentFilter.innerHTML = '<option value="">-- Semua Dept --</option>';
+            let deptsToAdd = new Set();
+            
+            if (divisionFilter.value === "") {
+                Object.values(divDeptMap).forEach(deptSet => { deptSet.forEach(d => deptsToAdd.add(d)); });
+            } else {
+                if (divDeptMap[selectedDiv]) { divDeptMap[selectedDiv].forEach(d => deptsToAdd.add(d)); }
+            }
+            
+            Array.from(deptsToAdd).sort().forEach(dept => { departmentFilter.appendChild(new Option(dept, dept.toUpperCase())); });
+            if (Array.from(deptsToAdd).map(d => d.toUpperCase()).includes(currentDeptValue)) { departmentFilter.value = currentDeptValue; }
+        }
+
+        updateDepartmentDropdown();
+
+        function filterTable() {
+            let searchText = searchInput.value.toUpperCase();
+            let divValue = divisionFilter.value;
+            let deptValue = departmentFilter.value;
+            let lvlValue = levelFilter.value;
+
+            tableRows.forEach(row => {
+                if(!row.cells[1]) return;
+                
+                // Ambil teks dari kolom Partisipan yang baru (Index 1 sekarang)
+                let participantData = row.cells[1].textContent.toUpperCase(); 
+                
+                let divName = row.querySelector(".div-text") ? row.querySelector(".div-text").textContent.trim().toUpperCase() : "";
+                let deptName = row.querySelector(".dept-text") ? row.querySelector(".dept-text").textContent.trim().toUpperCase() : "";
+                let lvlName = row.querySelector(".lvl-badge") ? row.querySelector(".lvl-badge").textContent.trim().toUpperCase() : "";
+
+                // Cek apakah NIK atau Nama cocok dengan kolom Partisipan
+                let matchSearch = participantData.includes(searchText);
+                let matchDiv = divValue === "" || divName === divValue;
+                let matchDept = deptValue === "" || deptName === deptValue;
+                let matchLvl = lvlValue === "" || lvlName === lvlValue; 
+
+                if (matchSearch && matchDiv && matchDept && matchLvl) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        searchInput.addEventListener("keyup", filterTable);
+        divisionFilter.addEventListener("change", function() { updateDepartmentDropdown(); filterTable(); });
+        departmentFilter.addEventListener("change", filterTable);
+        levelFilter.addEventListener("change", filterTable); 
+    });
+</script>
+{% endblock %}

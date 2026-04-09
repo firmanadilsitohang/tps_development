@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola E-Learning Modul | OMDD{% endblock %}
+
+{% block extra_css %}
+<style>
+    .panel-card {
+        background: linear-gradient(160deg, #050a14 0%, rgba(3, 86, 197, 0.2) 150%);
+        border: 1px solid var(--border-glass); border-radius: 12px; padding: 30px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4); margin-bottom: 30px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px; }
+    .form-control { width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 12px 15px; border-radius: 8px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; transition: 0.3s; }
+    .form-control:focus { border-color: var(--accent-cyan); background: rgba(10, 116, 255, 0.05); }
+    
+    /* Membuat kotak utama Dropdown menjadi transparan */
+    select.form-control {
+        background-color: transparent;
+        appearance: none; /* Menghilangkan panah bawaan browser untuk gaya yang lebih bersih */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%238bb4d8" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+    }
+
+    /* Membuat daftar pilihan (Options) menjadi warna gelap khas aplikasi kita */
+    select.form-control option {
+        background-color: var(--color-dark); /* Warna biru dongker sangat gelap */
+        color: #fff;
+        padding: 10px;
+    }
+
+    .btn-submit { background: var(--accent-cyan); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Poppins'; }
+    .btn-submit:hover { box-shadow: 0 0 15px rgba(10, 116, 255, 0.5); transform: translateY(-2px); }
+
+    table { width: 100%; border-collapse: collapse; color: #fff; font-size: 13px; margin-top: 20px; }
+    th { background: rgba(255,255,255,0.05); text-align: left; padding: 15px; text-transform: uppercase; font-size: 11px; color: var(--text-muted); }
+    td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .badge-level { background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid #f59e0b; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 style="font-family: 'Oswald'; text-transform: uppercase; margin-top: 0; color: #fff; letter-spacing: 1px;">Manajemen Modul E-Learning</h2>
+<p style="color: var(--text-muted); font-size: 13px; margin-bottom: 30px;">Unggah materi pembelajaran, presentasi, atau referensi kaizen untuk partisipan.</p>
+
+<div class="panel-card">
+    <h3 style="margin-top: 0; border-bottom: 1px solid var(--border-glass); padding-bottom: 15px; margin-bottom: 20px; color: #0A74FF;"><i class="fas fa-upload"></i> Unggah Modul Baru</h3>
+    
+    <form action="{{ url_for('omdd.manage_modules') }}" method="POST" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>Judul Materi / Modul</label>
+                <input type="text" name="title" class="form-control" required placeholder="Contoh: Standar Pembuatan Yamazumi">
+            </div>
+            <div class="form-group">
+                <label>Kategori Level TPS</label>
+                <select name="tps_level" class="form-control" required>
+                    <option value="All Level">Semua Level (Publik)</option>
+                    <option value="TPS BASIC">TPS BASIC</option>
+                    <option value="TPS SW">TPS SW</option>
+                    <option value="TPS STEP UP">TPS STEP UP</option>
+                    <option value="TPS ADVANCE">TPS ADVANCE</option>
+                    <option value="TPS KEY PERSON 3">TPS KEY PERSON 3</option>
+                    <option value="TPS KEY PERSON 4">TPS KEY PERSON 4</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Deskripsi Singkat</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Jelaskan isi singkat dari modul ini..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Pilih File (PDF, PPT, DOC, Excel)</label>
+            <input type="file" name="file" class="form-control" required style="padding: 9px 15px;">
+        </div>
+
+        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Simpan & Publikasikan Modul</button>
+    </form>
+</div>
+
+<div class="panel-card">
+    <h3 style="margin-top: 0; border-bottom: 1px solid var(--border-glass); padding-bottom: 15px; margin-bottom: 10px; color: #fff;"><i class="fas fa-list"></i> Daftar Modul Terunggah</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Judul & Deskripsi</th>
+                <th>Target Level</th>
+                <th>Tanggal Upload</th>
+                <th>File / Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for module in modules %}
+            <tr>
+                <td>
+                    <strong style="color: #fff; font-size: 14px;">{{ module.title }}</strong><br>
+                    <span style="color: #64748b; font-size: 12px;">{{ module.description[:50] }}...</span>
+                </td>
+                <td><span class="badge-level">{{ module.tps_level }}</span></td>
+                <td style="color: #94a3b8;">{{ module.created_at.strftime('%d %b %Y') }}</td>
+                <td>
+                    <a href="{{ url_for('static', filename='uploads/modules/' + module.file_name) }}" target="_blank" style="color: #10b981; text-decoration: none; font-weight: bold; font-size: 12px;"><i class="fas fa-external-link-alt"></i> Cek File</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: #64748b; padding: 20px;">Belum ada modul yang diunggah.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

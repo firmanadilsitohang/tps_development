@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Detail Partisipan | TPS-G{% endblock %}
+{% block extra_css %}
+<style>
+    .form-section { background: #080f1e; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 30px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .section-title { font-family: 'Oswald', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; letter-spacing: 1px; font-size: 18px; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+    .form-label { color: #94a3b8; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; display: block; letter-spacing: 0.5px;}
+    .form-control, .form-select { width: 100%; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 12px 15px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; transition: 0.3s; }
+    .form-control:focus, .form-select:focus { border-color: #0A74FF; outline: none; box-shadow: 0 0 0 3px rgba(10, 116, 255, 0.2); }
+    .form-control:disabled { background: rgba(255,255,255,0.02); color: #64748b; cursor: not-allowed; }
+    
+    /* Ganti warna opsi dropdown agar terlihat di mode gelap */
+    option { background: #0f172a; color: #fff; padding: 10px; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set umur_ns = namespace(value=0, pensiun=0) %}
+{% if emp.birth_date %}
+    {% set birth_year = emp.birth_date.year %}
+    {% set current_year = 2026 %}
+    {% set umur_ns.value = current_year - birth_year %}
+    {% set umur_ns.pensiun = birth_year + 55 %}
+{% endif %}
+
+<div style="max-width: 1000px; margin: 30px auto;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <a href="{{ url_for('tpsg.employees') }}" style="color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: bold; transition: 0.3s;"><i class="fas fa-arrow-left"></i> Kembali ke Direktori</a>
+        <h3 style="font-family: 'Oswald', sans-serif; color: #fff; margin: 0; letter-spacing: 1px; font-size: 22px;">PENGATURAN PROFIL PARTISIPAN</h3>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #050a14 100%); padding: 30px; border-radius: 16px; border: 1px solid #1e293b; display: flex; align-items: center; gap: 30px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        {% if emp.photo %}
+            <img src="{{ emp.photo if emp.photo.startswith('http') else url_for('static', filename='uploads/photos/' + emp.photo) }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #0A74FF;">
+        {% else %}
+            <div style="width: 100px; height: 100px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #fff; border: 4px solid #334155;">{{ emp.name[0] | upper }}</div>
+        {% endif %}
+        <div>
+            <h2 style="color: #fff; margin: 0 0 12px 0; font-size: 26px;">{{ emp.name }}</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <span style="background: rgba(10, 116, 255, 0.1); color: #38bdf8; padding: 5px 12px; border-radius: 6px; font-family: monospace; font-weight: bold; font-size: 13px;"><i class="fas fa-fingerprint"></i> NIK: {{ emp.username }}</span>
+                <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 13px;"><i class="fas fa-check-circle"></i> {{ emp.status | capitalize }}</span>
+                
+                <span style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 13px;">
+                    <i class="fas fa-birthday-cake"></i> Usia: {{ umur_ns.value ~ ' Thn' if emp.birth_date else 'Belum Diatur' }}
+                </span>
+                <span style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 13px;">
+                    <i class="fas fa-hourglass-half"></i> Pensiun: {{ umur_ns.pensiun if emp.birth_date else 'Belum Diatur' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <form action="{{ url_for('tpsg.detail_employee', id=emp.id) }}" method="POST" enctype="multipart/form-data">
+        
+        <div class="form-section">
+            <h4 class="section-title"><i class="fas fa-user-tie" style="color: #0A74FF;"></i> Data Personal & Jabatan</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" name="name" class="form-control" value="{{ emp.name }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">NIK Karyawan</label>
+                    <input type="text" name="username" class="form-control" value="{{ emp.username }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tanggal Lahir (Penentu Usia)</label>
+                    <input type="date" name="birth_date" class="form-control" value="{{ emp.birth_date.strftime('%Y-%m-%d') if emp.birth_date else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Jabatan Saat Ini</label>
+                    <input type="text" name="position" class="form-control" value="{{ emp.position if emp.position else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Area Kerja (Plant)</label>
+                    <select name="plant" class="form-select">
+                        <option value="" {% if not emp.plant %}selected{% endif %}>-- Pilih Area Kerja --</option>
+                        {% set areas = ['Sunter 1', 'Sunter 2', 'Karawang 1', 'Karawang 2', 'Karawang 3', 'HO (Head Office)'] %}
+                        {% for area in areas %}
+                            <option value="{{ area }}" {% if emp.plant and emp.plant.name == area %}selected{% endif %}>{{ area }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Division</label>
+                    <input type="text" name="division" class="form-control" value="{{ emp.division.name if emp.division else '' }}" placeholder="Contoh: Production Division">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Department</label>
+                    <input type="text" name="department" class="form-control" value="{{ emp.department.name if emp.department else '' }}" placeholder="Contoh: Assy Production Dept">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Reset Password Akun</label>
+                    <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin merubah password saat ini">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h4 class="section-title"><i class="fas fa-medal" style="color: #f59e0b;"></i> Kompetensi & Activity TPS</h4>
+            <div class="row">
+                {% set tps_levels = ['TPS BASIC', 'TPS SW', 'TPS STEP UP', 'TPS ADVANCE', 'TPS KEY PERSON 3', 'TPS KEY PERSON 4', 'Belum Ada'] %}
+                
+                <div class="col-md-6">
+                    <label class="form-label">Level TPS Sebelumnya</label>
+                    <select name="previous_tps_level" class="form-select">
+                        <option value="">-- Pilih Level Sebelumnya --</option>
+                        {% for lvl in tps_levels %}
+                            <option value="{{ lvl }}" {% if emp.previous_tps_level == lvl %}selected{% endif %}>{{ lvl }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tahun Lulus Level Sebelumnya</label>
+                    <input type="text" name="tahun_lulus_terakhir" class="form-control" value="{{ emp.tahun_lulus_terakhir if emp.tahun_lulus_terakhir else '' }}" placeholder="Contoh: 2022">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Level TPS Saat Ini</label>
+                    <select name="current_tps_level" class="form-select">
+                        <option value="">-- Pilih Level Sekarang --</option>
+                        {% for lvl in tps_levels %}
+                            <option value="{{ lvl }}" {% if emp.current_tps_level == lvl %}selected{% endif %}>{{ lvl }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tahun Lulus Level Saat Ini</label>
+                    <input type="text" name="tahun_lulus_saat_ini" class="form-control" value="{{ emp.tahun_lulus_saat_ini if emp.tahun_lulus_saat_ini else '' }}" placeholder="Contoh: 2024">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Tipe Aktivitas Terakhir</label>
+                    <select name="last_activity_type" class="form-select">
+                        <option value="">-- Pilih Tipe --</option>
+                        {% set act_types = ['Kaizen', 'Jishuken', 'Problem Solving', 'QCC', 'Belum Ada'] %}
+                        {% for t in act_types %}
+                            <option value="{{ t }}" {% if emp.last_activity_type == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tema Activity Terakhir</label>
+                    <input type="text" name="last_activity_theme" class="form-control" value="{{ emp.last_activity_theme if emp.last_activity_theme else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Batch Workshop (Dev TPS)</label>
+                    <input type="text" name="batch" class="form-control" value="{{ emp.batch if emp.batch else '' }}" placeholder="Contoh: #01">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h4 class="section-title"><i class="fas fa-folder-open" style="color: #10b981;"></i> Upload Dokumen</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Ubah Pas Foto (JPG/PNG)</label>
+                    <input type="file" name="photo" class="form-control" accept=".jpg, .jpeg, .png">
+                    {% if emp.photo and not emp.photo.startswith('http') %}
+                        <div style="font-size: 11px; color: #10b981; margin-top: -5px;"><i class="fas fa-check"></i> Foto lokal sudah tersimpan.</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Upload Sertifikat TPS Terakhir (JPG/PDF)</label>
+                    <input type="file" name="certificate" class="form-control" accept=".jpg, .jpeg, .png, .pdf">
+                    {% if emp.certificate %}
+                        <div style="font-size: 11px; color: #10b981; margin-top: -5px;">
+                            <i class="fas fa-file-alt"></i> Sertifikat tersimpan: <a href="{{ url_for('static', filename='uploads/certificates/' + emp.certificate) }}" target="_blank" style="color: #38bdf8;">Lihat File</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: right; margin-bottom: 50px;">
+            <button type="submit" style="padding: 15px 40px; background: linear-gradient(135deg, #0A74FF 0%, #0056CC 100%); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; box-shadow: 0 5px 15px rgba(10, 116, 255, 0.4); transition: 0.3s;">
+                <i class="fas fa-save" style="margin-right: 8px;"></i> Simpan Semua Perubahan
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

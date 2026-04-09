@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Master Data Modul | Admin TPS-G{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header { margin-bottom: 30px; border-bottom: 1px solid rgba(55,138,221,0.2); padding-bottom: 15px; }
+    
+    .card-panel { 
+        background: var(--navy-mid); 
+        border: 1px solid rgba(55,138,221,0.1); 
+        border-radius: 12px; 
+        padding: 30px; 
+        margin-bottom: 30px;
+    }
+
+    /* Form Styling */
+    .form-group { margin-bottom: 20px; }
+    .form-group label { 
+        display: block; font-size: 11px; color: #8bb4d8; 
+        text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 8px; 
+    }
+    .form-control { 
+        width: 100%; padding: 12px 15px; background: rgba(6, 19, 34, 0.6); 
+        border: 1px solid rgba(55,138,221,0.2); border-radius: 8px; 
+        color: white; font-family: 'Segoe UI', sans-serif; box-sizing: border-box;
+    }
+    .form-control:focus { outline: none; border-color: var(--navy-light); }
+    
+    .btn-submit { 
+        background: var(--toyota-red); color: white; border: none; 
+        padding: 12px 25px; border-radius: 8px; font-weight: bold; 
+        cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .btn-submit:hover { background: #c90819; box-shadow: 0 4px 15px rgba(235, 10, 30, 0.4); }
+
+    /* Table Styling */
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .data-table th { 
+        background: rgba(55,138,221,0.1); color: #8bb4d8; padding: 12px 15px; 
+        text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; 
+    }
+    .data-table td { 
+        padding: 15px; border-bottom: 1px solid rgba(55,138,221,0.1); 
+        color: #e8f4fd; font-size: 13px; 
+    }
+    .badge-level { 
+        background: rgba(55,138,221,0.2); color: var(--navy-light); 
+        padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2 style="font-family: 'Oswald'; text-transform: uppercase; margin: 0; letter-spacing: 1px;">Manajemen Master Data E-Learning</h2>
+    <p style="color: #8bb4d8; margin: 5px 0 0 0; font-size: 14px;">Upload dan kelola modul materi untuk partisipan.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+    <div class="card-panel">
+        <h3 style="font-family: 'Oswald'; margin-top: 0; color: var(--navy-light); border-bottom: 1px solid rgba(55,138,221,0.1); padding-bottom: 10px;">Upload Modul Baru</h3>
+        
+        <form action="{{ url_for('tpsg.manage_modules') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Judul Materi</label>
+                <input type="text" name="title" class="form-control" required placeholder="Contoh: Dasar-Dasar Jishuken">
+            </div>
+            
+            <div class="form-group">
+                <label>Level TPS (Peruntukan)</label>
+                <select name="tps_level" class="form-control" required>
+                    <option value="STEP UP">TPS STEP UP</option>
+                    <option value="ADVANCE">TPS ADVANCE</option>
+                    <option value="KP3">TPS KP3</option>
+                    <option value="KP4">TPS KP4</option>
+                    <option value="ALL">SEMUA LEVEL (ALL)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Deskripsi Singkat</label>
+                <textarea name="description" class="form-control" rows="3" placeholder="Jelaskan isi singkat materi ini..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>File Dokumen / Video</label>
+                <input type="file" name="file" class="form-control" required style="padding: 9px 15px;">
+                <small style="color: #4a7a9e; font-size: 10px; margin-top: 5px; display: block;">* Format PDF, PPTX, atau MP4.</small>
+            </div>
+
+            <button type="submit" class="btn-submit"><i class="fas fa-upload mr-2"></i> Upload Sekarang</button>
+        </form>
+    </div>
+
+    <div class="card-panel">
+        <h3 style="font-family: 'Oswald'; margin-top: 0; color: var(--navy-light); border-bottom: 1px solid rgba(55,138,221,0.1); padding-bottom: 10px;">Daftar Modul Tersimpan</h3>
+        
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Judul Materi</th>
+                    <th>Level</th>
+                    <th>Nama File</th>
+                    <th>Tanggal Upload</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for modul in modules %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td style="font-weight: 600;">{{ modul.title }}</td>
+                    <td><span class="badge-level">{{ modul.tps_level }}</span></td>
+                    <td style="color: #8bb4d8; font-family: monospace;">{{ modul.file_name }}</td>
+                    <td>{{ modul.created_at.strftime('%d-%m-%Y') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px; color: #4a7a9e;">
+                        Belum ada modul yang diunggah. Silakan upload melalui form di sebelah kiri.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

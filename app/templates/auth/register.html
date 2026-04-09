@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi Partisipan | TPS-G System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --toyota-red: #e3000f;
+            --navy-blue: #1A4B84;
+            --text-dark: #1f2937;
+            --text-muted: #4b5563;
+            --accent-cyan: #0A74FF;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 40px 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            
+            background-image: url("{{ url_for('static', filename='image/bg_login.png') }}");
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.03); 
+            z-index: -1;
+        }
+
+        .reg-card {
+            background: rgba(255, 255, 255, 0.35); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            width: 100%; max-width: 900px; padding: 50px; 
+            position: relative; overflow: hidden;
+        }
+
+        .header, .form-container { position: relative; z-index: 1; }
+
+        .header { 
+            text-align: center; margin-bottom: 40px; 
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
+            padding-bottom: 25px; 
+        }
+        .company-name { 
+            font-family: 'Oswald', sans-serif; color: var(--toyota-red); 
+            font-size: 16px; letter-spacing: 2px; text-transform: uppercase; 
+            margin-bottom: 8px; font-weight: 700;
+        }
+        
+        .brand-logo { 
+            font-size: 40px; font-weight: 700; margin: 10px 0; 
+            font-family: 'Oswald', sans-serif; 
+            letter-spacing: 2.5px; color: var(--navy-blue); 
+            text-shadow: 
+                -1.5px -1.5px 0 var(--toyota-red),  
+                 1.5px -1.5px 0 var(--toyota-red),
+                -1.5px  1.5px 0 var(--toyota-red),
+                 1.5px  1.5px 0 var(--toyota-red);
+        }
+        .brand-logo span { 
+            color: var(--toyota-red); 
+            text-shadow: 
+                -1.5px -1.5px 0 var(--navy-blue),  
+                 1.5px -1.5px 0 var(--navy-blue),
+                -1.5px  1.5px 0 var(--navy-blue),
+                 1.5px  1.5px 0 var(--navy-blue);
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--navy-blue);
+            margin: 30px 0 20px 0; border-left: 4px solid var(--toyota-red);
+            padding-left: 12px; text-transform: uppercase; letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        
+        label { 
+            display: block; font-size: 11px; color: var(--text-dark); 
+            margin-bottom: 8px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; 
+        }
+        
+        /* =========================================================
+           INPUT & SELECT FIELD
+        ========================================================= */
+        input, select {
+            width: 100%; padding: 12px 14px; 
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid rgba(0, 0, 0, 0.15); border-radius: 8px;
+            color: var(--text-dark); font-size: 14px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            outline: none; transition: all 0.3s ease;
+        }
+        
+        input::placeholder { color: #888; font-weight: 500;}
+        
+        select:invalid {
+            color: #888;
+            font-weight: 500;
+        }
+        
+        select option {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        input:hover, select:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 4px rgba(10, 116, 255, 0.25);
+            background: #ffffff;
+        }
+
+        input[type="date"] { color-scheme: light; } 
+        
+        /* =========================================================
+           KUSTOMISASI INPUT FILE
+        ========================================================= */
+        input[type="file"] { 
+            padding: 8px; 
+            background: rgba(255, 255, 255, 0.7); 
+            border: 2px dashed var(--navy-blue); 
+            border-radius: 8px;
+            cursor: pointer; 
+            color: var(--text-dark); 
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        input[type="file"]::file-selector-button {
+            background-color: #ffffff; 
+            color: var(--navy-blue);
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            padding: 8px 14px;
+            margin-right: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background-color: var(--accent-cyan);
+            color: #ffffff;
+            border-color: var(--accent-cyan);
+        }
+        
+        .btn-reg {
+            width: 100%; padding: 16px; background: var(--toyota-red);
+            color: white; border: none; border-radius: 8px; font-weight: 700;
+            cursor: pointer; transition: 0.3s; margin-top: 35px; text-transform: uppercase; 
+            font-family: 'Oswald', sans-serif; letter-spacing: 2px;
+            box-shadow: 0 4px 12px rgba(227, 0, 15, 0.3);
+        }
+        .btn-reg:hover { 
+            background: #c1081a; 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 18px rgba(227, 0, 15, 0.5);
+        }
+        
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 25px; font-size: 13.5px; text-align: center; font-weight: 600;}
+        .alert-danger { background: rgba(227, 0, 15, 0.1); border: 1px solid rgba(227, 0, 15, 0.3); color: var(--toyota-red); }
+        .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; }
+
+        .link-login {
+            color: var(--navy-blue); text-decoration: none; font-size: 14px; font-weight: 700; transition: 0.3s;
+        }
+        .link-login:hover { color: var(--toyota-red); }
+    </style>
+</head>
+<body>
+
+    <div class="reg-card">
+        <div class="header">
+            <div class="company-name">PT TOYOTA MOTOR MANUFACTURING INDONESIA</div>
+            <div class="brand-logo">TPS-<span>G</span> REGISTRATION</div>
+        </div>
+
+        <div class="form-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' }}">
+                      {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('auth.register') }}" method="POST" enctype="multipart/form-data">
+                
+                <div class="section-title">Data Personal & Jabatan</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" name="name" placeholder="Sesuai ID Card" required>
+                    </div>
+                    <div class="form-group">
+                        <label>NIK Karyawan</label>
+                        <input type="number" name="username" placeholder="Contoh: 12345" autocomplete="new-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Lahir</label>
+                        <input type="date" name="birth_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jabatan Saat Ini</label>
+                        <input type="text" name="position" placeholder="Contoh: Group Leader" required>
+                    </div>
+                </div>
+
+                <div class="section-title">Struktur Organisasi</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Area Kerja</label>
+                        <select name="plant" required>
+                            <option value="" disabled selected hidden>Pilih Area Kerja</option>
+                            <option value="Sunter 1">Sunter 1</option>
+                            <option value="Sunter 2">Sunter 2</option>
+                            <option value="Karawang 1">Karawang 1</option>
+                            <option value="Karawang 2">Karawang 2</option>
+                            <option value="Karawang 3">Karawang 3</option>
+                            <option value="HO">HO (Head Office)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Division</label>
+                        <input type="text" name="division" placeholder="Contoh: HO" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" name="department" placeholder="Contoh: TPS-G" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password Akun</label>
+                        <input type="password" name="password" placeholder="Minimal 6 karakter" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required>
+                    </div>
+                </div>
+
+                <div class="section-title">Kompetensi & Activity TPS</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Level TPS Sebelumnya</label>
+                        <select name="previous_tps_level" required>
+                            <option value="" disabled selected hidden>Pilih Level Sebelumnya</option>
+                            <option value="TPS BASIC">TPS BASIC</option>
+                            <option value="TPS SW">TPS SW</option>
+                            <option value="TPS STEP UP">TPS STEP UP</option>
+                            <option value="TPS ADVANCE">TPS ADVANCE</option>
+                            <option value="TPS KEY PERSON 3">TPS KEY PERSON 3</option>
+                            <option value="TPS KEY PERSON 4">TPS KEY PERSON 4</option>
+                            <option value="Belum Ada">Belum Ada</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tahun Lulus Level Sebelumnya</label>
+                        <input type="text" name="tahun_lulus_terakhir" placeholder="Contoh: 2022" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Level TPS Saat Ini</label>
+                        <select name="current_tps_level" required>
+                            <option value="" disabled selected hidden>Pilih Level Sekarang</option>
+                            <option value="TPS BASIC">TPS BASIC</option>
+                            <option value="TPS SW">TPS SW</option>
+                            <option value="TPS STEP UP">TPS STEP UP</option>
+                            <option value="TPS ADVANCE">TPS ADVANCE</option>
+                            <option value="TPS KEY PERSON 3">TPS KEY PERSON 3</option>
+                            <option value="TPS KEY PERSON 4">TPS KEY PERSON 4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tahun Lulus Level Saat Ini</label>
+                        <input type="text" name="tahun_lulus_saat_ini" placeholder="Contoh: 2024" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipe Aktivitas Terakhir</label>
+                        <select name="last_activity_type" required>
+                            <option value="" disabled selected hidden>Pilih Tipe</option>
+                            <option value="Kaizen">Kaizen</option>
+                            <option value="Jishuken">Jishuken</option>
+                            <option value="Problem Solving">Problem Solving</option>
+                            <option value="QCC">QCC</option>
+                            <option value="Belum Ada">Belum Ada</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+    <label>Tema Activity Terakhir</label>
+    <textarea name="last_activity_theme" rows="3" placeholder="Contoh: &#10;Theme 1 -> Judul Kaizen Pertama&#10;Theme 2 -> Judul Kaizen Kedua" required style="width: 100%; padding: 12px 14px; background: rgba(255, 255, 255, 0.7); border: 2px solid rgba(0, 0, 0, 0.15); border-radius: 8px; color: var(--text-dark); font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; outline: none; resize: vertical; transition: all 0.3s ease;"></textarea>
+</div>
+
+                    <div class="form-group">
+                        <label>Batch Workshop (Development TPS)</label>
+                        <input type="text" name="batch" placeholder="Contoh: #6 atau Batch 6" required>
+                    </div>
+                </div>
+
+                <div class="section-title">Upload Dokumen (Format JPG/PNG/PDF)</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Pas Foto</label>
+                        <input type="file" name="photo" accept="image/*" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sertifikat TPS Terakhir</label>
+                        <input type="file" name="certificate" accept=".pdf,image/*" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-reg">Kirim Data Pendaftaran</button>
+                
+                <div style="margin-top: 25px; text-align: center;">
+                    <a href="{{ url_for('auth.login') }}" class="link-login">Sudah punya akun? Login di sini</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            let inputs = document.querySelectorAll('input[autocomplete="new-password"]');
+            inputs.forEach(input => input.value = '');
+        }, 150); 
+    </script>
+
+</body>
+</html>

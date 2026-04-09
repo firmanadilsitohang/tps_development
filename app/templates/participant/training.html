@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Training Workshop | TPS-G{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header { margin-bottom: 30px; border-bottom: 1px solid rgba(55,138,221,0.2); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+    
+    .training-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .training-card {
+        background: var(--navy-mid);
+        border: 1px solid rgba(55,138,221,0.15);
+        border-radius: 12px;
+        display: flex;
+        overflow: hidden;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .training-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        border-color: rgba(55,138,221,0.4);
+    }
+
+    /* Bagian Kiri: Tanggal */
+    .training-date {
+        background: rgba(6, 19, 34, 0.6);
+        padding: 20px;
+        min-width: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px dashed rgba(55,138,221,0.2);
+    }
+
+    .date-day { font-family: 'Oswald', sans-serif; font-size: 32px; color: var(--toyota-red); line-height: 1; }
+    .date-month { font-size: 14px; color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+    .date-year { font-size: 11px; color: #8bb4d8; }
+
+    /* Bagian Tengah: Info Detail */
+    .training-info {
+        padding: 20px 25px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .training-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #fff; margin: 0 0 8px 0; letter-spacing: 0.5px; }
+    .training-desc { font-size: 13px; color: #8bb4d8; margin: 0 0 15px 0; line-height: 1.5; }
+    
+    .training-meta {
+        display: flex; gap: 20px; font-size: 12px; color: #4a7a9e; font-weight: 600;
+    }
+    .training-meta span { display: flex; align-items: center; gap: 6px; }
+
+    /* Bagian Kanan: Status & Tombol */
+    .training-action {
+        padding: 20px 25px;
+        background: rgba(55,138,221,0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 150px;
+        border-left: 1px solid rgba(55,138,221,0.1);
+    }
+
+    .quota-badge {
+        background: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .quota-full { background: rgba(235, 10, 30, 0.15); color: var(--toyota-red); border-color: rgba(235, 10, 30, 0.3); }
+
+    .btn-register {
+        background: var(--navy-light);
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        transition: 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        width: 100%;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-register:hover { background: #2c72b8; box-shadow: 0 4px 12px rgba(55,138,221,0.4); }
+    .btn-disabled { background: #4a7a9e; cursor: not-allowed; opacity: 0.5; }
+    .btn-disabled:hover { background: #4a7a9e; box-shadow: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 style="font-family: 'Oswald'; text-transform: uppercase; margin: 0; letter-spacing: 1px;">Training & Workshop</h2>
+        <p style="color: #8bb4d8; margin: 5px 0 0 0; font-size: 14px;">Jadwal pengembangan kompetensi dan pelatihan TPS TMMIN.</p>
+    </div>
+</div>
+
+<div class="training-list">
+    
+    <div class="training-card">
+        <div class="training-date">
+            <div class="date-day">12</div>
+            <div class="date-month">APR</div>
+            <div class="date-year">2026</div>
+        </div>
+        <div class="training-info">
+            <h3 class="training-title">Jishuken Leader Bootcamp (Batch 4)</h3>
+            <p class="training-desc">Pelatihan intensif selama 3 hari untuk membentuk Leader Jishuken yang mampu memimpin proyek Kaizen di area Genba dengan standar Toyota Way.</p>
+            <div class="training-meta">
+                <span><i class="fas fa-map-marker-alt" style="color: var(--toyota-red);"></i> Plant 1 Karawang - R. Training A</span>
+                <span><i class="far fa-clock"></i> 08:00 - 16:00 WIB</span>
+            </div>
+        </div>
+        <div class="training-action">
+            <span class="quota-badge">Sisa 5 Kuota</span>
+            <button class="btn-register">Daftar Kelas</button>
+        </div>
+    </div>
+
+    <div class="training-card">
+        <div class="training-date">
+            <div class="date-day">25</div>
+            <div class="date-month">APR</div>
+            <div class="date-year">2026</div>
+        </div>
+        <div class="training-info">
+            <h3 class="training-title">Yamazumi Chart & Line Balancing</h3>
+            <p class="training-desc">Workshop praktikal menganalisa beban kerja operator dan menyeimbangkan line produksi menggunakan Yamazumi Board.</p>
+            <div class="training-meta">
+                <span><i class="fas fa-video" style="color: #3498db;"></i> Online via Microsoft Teams</span>
+                <span><i class="far fa-clock"></i> 09:00 - 12:00 WIB</span>
+            </div>
+        </div>
+        <div class="training-action">
+            <span class="quota-badge quota-full">Kuota Penuh</span>
+            <button class="btn-register btn-disabled" disabled>Waiting List</button>
+        </div>
+    </div>
+
+    <div class="training-card">
+        <div class="training-date">
+            <div class="date-day">05</div>
+            <div class="date-month">MEI</div>
+            <div class="date-year">2026</div>
+        </div>
+        <div class="training-info">
+            <h3 class="training-title">Standardized Work for Supervisors</h3>
+            <p class="training-desc">Materi khusus untuk supervisor mengenai cara membuat, mengevaluasi, dan memastikan kepatuhan terhadap Standardized Work.</p>
+            <div class="training-meta">
+                <span><i class="fas fa-map-marker-alt" style="color: var(--toyota-red);"></i> Sunter Plant - Auditorium</span>
+                <span><i class="far fa-clock"></i> 13:00 - 16:30 WIB</span>
+            </div>
+        </div>
+        <div class="training-action">
+            <span class="quota-badge">Sisa 12 Kuota</span>
+            <button class="btn-register">Daftar Kelas</button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

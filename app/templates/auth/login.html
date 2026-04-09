@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TPS-G System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --toyota-red: #e3000f;
+            --navy-blue: #1A4B84; /* Navy Blue cerah */
+            --text-dark: #1f2937;
+            --text-muted: #4b5563;
+            --accent-cyan: #0A74FF;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Inter', sans-serif; /* Menggunakan font Inter yang bersih */
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            
+            /* =========================================================
+               FIX 1: SETTINGAN BACKGROUND AGAR TIDAK TERPOTONG
+            ========================================================= */
+            background-image: url("{{ url_for('static', filename='image/bg_login.png') }}");
+            background-size: 100% 100%; /* Memaksa gambar pas 1 banding 1 dengan layar */
+            background-position: top center; /* Menempel sempurna di sisi atas layar */
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        /* Overlay sangat tipis untuk menjaga kejernihan gambar asli */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.03); 
+            z-index: 0;
+        }
+
+        /* =========================================================
+           CARD LOGIN (FIX 2: GLASSMORPHISM SANGAT TRANSPARAN)
+        ========================================================= */
+        .login-card {
+            display: flex; width: 850px; height: 500px;
+            /* Latar belakang putih dibuat sangat transparan agar kaca terlihat tembus */
+            background: rgba(255, 255, 255, 0.35); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px; 
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative; 
+            z-index: 1;
+        }
+        
+        /* KIRI: Area Branding */
+        .login-left {
+            flex: 1; 
+            padding: 50px; 
+            display: flex; flex-direction: column; justify-content: center;
+            border-right: 1px solid rgba(0, 0, 0, 0.1); 
+        }
+        
+        .company-name { 
+            font-family: 'Oswald', sans-serif; color: var(--toyota-red); 
+            font-size: 16px; letter-spacing: 2px; margin-bottom: 10px; font-weight: bold;
+        }
+        
+        /* EFEK OUTLINE RAPI PADA TULISAN TPS-G (TEKNIK TEXT-SHADOW) */
+        .brand-logo { 
+            font-family: 'Oswald', sans-serif;
+            font-size: 60px; /* Proporsi disesuaikan agar pas di card transparan */
+            font-weight: 700; 
+            margin-bottom: 15px; letter-spacing: 2.5px;
+            color: var(--navy-blue);
+            line-height: 1.1;
+            /* Trik Multiple Text-Shadow untuk outline yang mulus dan solid */
+            text-shadow: 
+                -1.5px -1.5px 0 var(--toyota-red),  
+                 1.5px -1.5px 0 var(--toyota-red),
+                -1.5px  1.5px 0 var(--toyota-red),
+                 1.5px  1.5px 0 var(--toyota-red);
+        }
+        .brand-logo span { 
+            color: var(--toyota-red); 
+            /* Outline Navy untuk huruf G */
+            text-shadow: 
+                -1.5px -1.5px 0 var(--navy-blue),  
+                 1.5px -1.5px 0 var(--navy-blue),
+                -1.5px  1.5px 0 var(--navy-blue),
+                 1.5px  1.5px 0 var(--navy-blue);
+        }
+        
+        .brand-tagline { 
+            color: var(--text-dark); font-size: 16px; 
+            line-height: 1.6; font-weight: 700; 
+        }
+
+        /* KANAN: Area Form (FIX: Warna Latar Transparan) */
+        .login-right { 
+            flex: 1; padding: 50px; 
+            /* Latar belakang sisi kanan dibuat transparan agar tidak menumpuk warna putih tebal */
+            background: rgba(255, 255, 255, 0.1);
+            display: flex; flex-direction: column; justify-content: center; 
+        }
+        
+        h3 { font-size: 28px; margin: 0 0 10px 0; color: var(--text-dark); font-weight: 800; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 11px; color: var(--text-dark); margin-bottom: 8px; text-transform: uppercase; font-weight: 800; }
+        
+    /* =========================================================
+           INPUT FIELD (DIPERBAIKI AGAR BIRU TERANG SAAT DISOROT)
+        ========================================================= */
+        input {
+            width: 100%; padding: 12px 14px; 
+            background: rgba(255, 255, 255, 0.7); 
+            /* Ketebalan garis diubah jadi 2px agar warna birunya lebih jelas */
+            border: 2px solid rgba(0, 0, 0, 0.15); 
+            border-radius: 8px;
+            color: var(--text-dark); font-size: 14px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        input::placeholder { color: #888; }
+        
+        /* Efek menyala Biru Terang saat disorot mouse (Hover) */
+        input:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Efek menyala Biru Terang + Bayangan saat diklik (Focus) */
+        input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            /* Bayangan biru berpendar di luar kotak */
+            box-shadow: 0 0 0 4px rgba(10, 116, 255, 0.25);
+            background: #ffffff; /* Menjadi putih solid saat diketik */
+        }
+        .btn-login {
+            width: 100%; padding: 14px; background: var(--toyota-red);
+            color: #fff; border: none; border-radius: 8px; font-weight: 700; 
+            cursor: pointer; transition: 0.3s; margin-top: 10px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(227, 0, 15, 0.3);
+        }
+        .btn-login:hover { 
+            background: #c1081a; 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 18px rgba(227, 0, 15, 0.5);
+        }
+        
+        .flash-msg {
+            background: rgba(227, 0, 15, 0.1); border: 1px solid rgba(227, 0, 15, 0.3);
+            color: var(--toyota-red); padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13.5px; font-weight: 600;
+        }
+
+        .link-register {
+            color: var(--navy-blue); text-decoration: none;
+            font-weight: 700; transition: 0.3s;
+        }
+        .link-register:hover { color: var(--toyota-red); }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="login-left">
+        <div class="company-name">PT TOYOTA MOTOR MANUFACTURING INDONESIA</div>
+        <div class="brand-logo">TPS-<span>G</span></div>
+        <p class="brand-tagline">Digitalization Development Control<br>Key Person System</p>
+    </div>
+    <div class="login-right">
+        <h3>Selamat Datang</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px; font-weight: 600;">Silakan login dengan NIK Anda.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-msg">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.login') }}" method="POST" autocomplete="off">
+            <div class="form-group">
+                <label>NIK KARYAWAN</label>
+                <input type="text" name="username" placeholder="Masukkan NIK" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>PASSWORD</label>
+                <input type="password" name="password" placeholder="••••••••" required autocomplete="new-password">
+            </div>
+            <button type="submit" class="btn-login">MASUK KE SISTEM</button>
+        </form>
+        
+        <div style="margin-top: 25px; text-align: center;">
+            <p style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Belum punya akun? <a href="{{ url_for('auth.register') }}" class="link-register">Daftar di sini</a></p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
