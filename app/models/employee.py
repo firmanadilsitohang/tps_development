@@ -57,6 +57,7 @@ class Employee(db.Model):
     # === RELASI BARU: MENGHUBUNGKAN KARYAWAN KE TUGAS/WORKSHOP-NYA ===
     # Jika karyawan dihapus, semua tugas/nilainya ikut terhapus otomatis
     workshop_activities = db.relationship('WorkshopActivity', backref='employee_data', lazy=True, cascade="all, delete-orphan")
+    workshop_evaluations = db.relationship('WorkshopEvaluation', backref='employee', lazy=True, cascade="all, delete-orphan")
 
 # =========================================================
 # TABEL BARU: INTERAKSI PESERTA & OMDD (PORTAL WORKSHOP)
@@ -79,3 +80,33 @@ class WorkshopActivity(db.Model):
     feedback = db.Column(db.Text, nullable=True) # Catatan detail dari OMDD
     assessed_at = db.Column(db.DateTime, nullable=True) # Waktu OMDD menilai
     assessor_name = db.Column(db.String(100), nullable=True) # Nama OMDD yang menilai
+
+class BatchStat(db.Model):
+    __tablename__ = 'batch_stats'
+    id = db.Column(db.Integer, primary_key=True)
+    batch_name = db.Column(db.String(50), nullable=False)
+    participant_count = db.Column(db.Integer, default=0)
+    kp3_count = db.Column(db.Integer, default=0)
+    kp4_count = db.Column(db.Integer, default=0)
+    kp3_percent = db.Column(db.String(20))
+    kp4_percent = db.Column(db.String(20))
+
+# =========================================================
+# TABEL BARU: EVALUASI WORKSHOP PARTISIPAN (SPIDER CHART)
+# =========================================================
+class WorkshopEvaluation(db.Model):
+    __tablename__ = 'workshop_evaluations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
+
+    # 5 Aspek penilaian Spider Chart
+    genba = db.Column(db.Float, default=0)
+    analysis = db.Column(db.Float, default=0)
+    problem_solving = db.Column(db.Float, default=0)
+    kaizen = db.Column(db.Float, default=0)
+    observation = db.Column(db.Float, default=0)
+
+    notes = db.Column(db.Text, nullable=True)
+    evaluated_by = db.Column(db.String(100), nullable=True)
+    evaluated_at = db.Column(db.DateTime, default=datetime.utcnow)
