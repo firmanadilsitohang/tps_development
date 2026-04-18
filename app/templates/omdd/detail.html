@@ -1,154 +1,455 @@
-{% extends "base.html" %}
+{% extends "omdd/base.html" %}
 
-{% block title %}Detail Profil | TPS-G{% endblock %}
+{% block title %}Detail Profil Partisipan | OMDD{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --bg-cyber: #04070d;
+        --panel-bg: #0b1019;
+        --neon-blue: #00d2ff;
+        --neon-green: #39ff14;
+        --neon-pink: #ff00a0;
+        --neon-gold: #ffcc00;
+        --neon-red: #ff0055;
+        --border-glass: rgba(255, 255, 255, 0.07);
+    }
+
+    body { background-color: var(--bg-cyber); color: #e0e6ed; font-family: 'Inter', sans-serif; }
+
+    .detail-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* Page Header */
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-glass);
+    }
+
+    .detail-header h2 {
+        font-family: 'Oswald', sans-serif;
+        text-transform: uppercase;
+        margin: 0;
+        color: var(--neon-blue);
+        letter-spacing: 2px;
+        font-size: 20px;
+    }
+
+    .btn-back {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-back:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.3); }
+
+    .btn-eval-page {
+        color: #000;
+        text-decoration: none;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ff00a0, #cc0080);
+        border: none;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .btn-eval-page:hover { box-shadow: 0 0 20px rgba(255,0,160,0.5); transform: translateY(-2px); }
+
+    /* Profile Card */
+    .profile-card {
+        background: linear-gradient(145deg, #080d1a, #040710);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        margin-bottom: 24px;
+        display: flex;
+        gap: 36px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .profile-photo {
+        flex-shrink: 0;
+        width: 160px;
+        height: 160px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 3px solid rgba(0,210,255,0.3);
+        box-shadow: 0 0 25px rgba(0,210,255,0.15);
+        position: relative;
+    }
+
+    .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    .profile-photo-placeholder {
+        width: 160px;
+        height: 160px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.03);
+        border: 3px dashed rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        color: #30363d;
+        font-family: 'Oswald', sans-serif;
+        font-weight: 700;
+    }
+
+    .incomplete-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--neon-red);
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 800;
+        box-shadow: 0 0 12px rgba(255,0,85,0.5);
+    }
+
+    .profile-info { flex-grow: 1; min-width: 0; }
+
+    .profile-name {
+        font-family: 'Oswald', sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 0 4px;
+    }
+
+    .profile-nik {
+        font-family: monospace;
+        font-size: 15px;
+        color: var(--neon-green);
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+    }
+
+    .info-item {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border-glass);
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+
+    .info-label {
+        font-size: 10px;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* Level Panels */
+    .level-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .level-card {
+        background: #080d1a;
+        border: 1px solid var(--border-glass);
+        border-radius: 12px;
+        padding: 18px 20px;
+    }
+
+    /* Eval Section */
+    .eval-section {
+        background: linear-gradient(145deg, #0a0f1e, #050a14);
+        border: 1px solid rgba(255,0,160,0.2);
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 0 25px rgba(255,0,160,0.05);
+        margin-bottom: 24px;
+    }
+
+    .eval-section-title {
+        font-family: 'Oswald', sans-serif;
+        color: var(--neon-pink);
+        font-size: 15px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border-left: 4px solid var(--neon-pink);
+        padding-left: 14px;
+        margin-bottom: 20px;
+    }
+
+    .eval-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .eval-item {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border-glass);
+        border-radius: 10px;
+        padding: 14px 10px;
+        text-align: center;
+    }
+
+    .eval-lbl { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .eval-score { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; }
+    .score-high { color: var(--neon-green); }
+    .score-mid  { color: var(--neon-gold); }
+    .score-low  { color: var(--neon-red); }
+    .score-none { color: #30363d; }
+
+    /* Activity Timeline */
+    .activity-section {
+        background: rgba(16,185,129,0.03);
+        border: 1px solid rgba(16,185,129,0.15);
+        border-radius: 12px;
+        padding: 20px 24px;
+    }
+
+    .activity-title {
+        font-size: 11px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 1px;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #04070d; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div style="background: #050a14; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 30px; color: #fff; max-width: 1000px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 25px;">
-        <h2 style="font-family: 'Oswald'; text-transform: uppercase; margin: 0; color: #0A74FF; letter-spacing: 1px;">Profil Lengkap Peserta</h2>
-        <a href="{{ url_for('omdd.dashboard') }}" style="color: #fff; text-decoration: none; font-weight: bold; background: #f59e0b; padding: 8px 16px; border-radius: 6px; font-size: 12px; text-transform: uppercase; transition: 0.3s;" onmouseover="this.style.background='#d97706';" onmouseout="this.style.background='#f59e0b';"><i class="fas fa-arrow-left"></i> Kembali</a>
+<div class="container-fluid p-3 p-md-4">
+<div class="detail-wrapper">
+
+    <!-- Header -->
+    <div class="detail-header">
+        <div>
+            <h2><i class="fas fa-id-card me-2"></i>Profil Lengkap Partisipan</h2>
+            <p style="color: #8b949e; font-size: 12px; margin: 4px 0 0; letter-spacing: 1px;">OMDD — Read-Only View</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('omdd.participants') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+        </div>
     </div>
 
-    <div style="display: flex; gap: 40px; flex-wrap: wrap;">
-        
-        <div style="flex-shrink: 0; width: 300px; height: 300px; position: relative;">
+    <!-- Profile Card -->
+    <div class="profile-card">
+        <div style="position: relative;">
             {% if employee.photo %}
-                <img src="{{ employee.photo if employee.photo.startswith('http') else url_for('static', filename='uploads/photos/' + employee.photo) }}" alt="Foto" style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; border: 4px solid #0A74FF; box-shadow: 0 0 20px rgba(10, 116, 255, 0.4);">
-            {% else %}
-                <div style="width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%; border: 3px dashed #4b5563; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-weight: bold; font-size: 100px;">
-                    {{ employee.name[0] | upper }}
+                <div class="profile-photo">
+                    <img src="{{ employee.photo if employee.photo.startswith('http') else url_for('static', filename='uploads/photos/' + employee.photo) }}"
+                         alt="Foto"
+                         onerror="this.src='https://ui-avatars.com/api/?name={{ employee.name|urlencode }}&background=0b1019&color=00d2ff&size=200'">
                 </div>
+            {% else %}
+                <div class="profile-photo-placeholder">{{ employee.name[0] | upper }}</div>
             {% endif %}
-            
-            {% if not employee.birth_date or not employee.position or not employee.current_tps_level or not employee.photo %}
-                <div style="position: absolute; top: 15px; right: 5px; background: #ef4444; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); z-index: 10;"><i class="fas fa-exclamation-triangle"></i> Data Incomplete</div>
+            {% if not employee.birth_date or not employee.position or not employee.current_tps_level %}
+                <div class="incomplete-badge"><i class="fas fa-exclamation-triangle me-1"></i>Data Incomplete</div>
             {% endif %}
         </div>
 
-        <div style="flex-grow: 1;">
-            <h3 style="margin-top: 0; margin-bottom: 5px; font-size: 28px; text-transform: uppercase;">{{ employee.name }}</h3>
-            
-            <p style="color: #10b981; font-weight: bold; margin-top: 0; margin-bottom: 25px; font-family: monospace; font-size: 16px; letter-spacing: 1px;">
-                NPK: {{ "%08d" | format(employee.username|int) if employee.username.isdigit() else employee.username }}
-            </p>
+        <div class="profile-info">
+            <div class="profile-name">{{ employee.name }}</div>
+            <div class="profile-nik">NPK: {{ "%08d" | format(employee.username|int) if employee.username.isdigit() else employee.username }}</div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 14px;">
-                
-                <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px;">
-                    <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase;">Usia Saat Ini</span> <br>
-                    <b style="font-size: 18px; color: #fff;">{{ umur ~ ' Tahun' if umur else 'Belum Diatur' }}</b>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Usia</div>
+                    <div class="info-value">{{ umur ~ ' Tahun' if umur else '—' }}</div>
                 </div>
-                
-                <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px;">
-                    <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase;">Jabatan</span> <br>
-                    <b style="font-size: 14px; color: #fff;">{{ employee.position if employee.position else 'Belum Diatur' }}</b>
+                <div class="info-item">
+                    <div class="info-label">Jabatan</div>
+                    <div class="info-value">{{ employee.position if employee.position else '—' }}</div>
                 </div>
-                
-                <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px;">
-                    <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase;">Area Kerja (Plant)</span> <br>
-                    <b style="font-size: 14px; color: #10b981;">{{ employee.plant.name if employee.plant else 'Belum Diatur' }}</b>
+                <div class="info-item">
+                    <div class="info-label">Plant Area</div>
+                    <div class="info-value" style="color: var(--neon-green);">{{ employee.plant.name if employee.plant else '—' }}</div>
                 </div>
-                
-                <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; grid-column: 1 / -1;">
-                    <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase;">Division / Department</span> <br>
-                    <b style="font-size: 14px; color: #fff;">{{ employee.division.name if employee.division else '-' }} <span style="color: #64748b; margin: 0 5px;">/</span> {{ employee.department.name if employee.department else '-' }}</b>
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <div class="info-label">Division / Department</div>
+                    <div class="info-value">
+                        {{ employee.division.name if employee.division else '—' }}
+                        <span style="color: #64748b; margin: 0 6px;">/</span>
+                        {{ employee.department.name if employee.department else '—' }}
+                    </div>
                 </div>
-                
-                <div style="background: rgba(10, 116, 255, 0.1); padding: 12px; border-radius: 6px; border-left: 3px solid #0A74FF;">
-                    <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase;">Batch Workshop</span> <br>
-                    <b style="color: #0A74FF; font-size: 16px;">{{ employee.batch if employee.batch else '-' }}</b>
-                </div>
-                
-            </div>
-
-            <div style="margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; background: rgba(245, 158, 11, 0.05);">
-                    <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase;">Level Saat Ini</span><br>
-                    <b style="color: #f59e0b; font-size: 15px;">{{ employee.current_tps_level if employee.current_tps_level else 'Belum Diatur' }}</b><br>
-                    <span style="font-size: 12px; color: #64748b;"><i class="fas fa-calendar-alt" style="margin-right: 5px;"></i> Tahun Lulus: {{ employee.tahun_lulus_saat_ini | default('-') }}</span>
-                </div>
-                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
-                    <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase;">Level Sebelumnya</span><br>
-                    <b style="color: #cbd5e1; font-size: 15px;">{{ employee.previous_tps_level if employee.previous_tps_level else 'Tidak Ada' }}</b><br>
-                    <span style="font-size: 12px; color: #64748b;"><i class="fas fa-calendar-alt" style="margin-right: 5px;"></i> Tahun Lulus: {{ employee.tahun_lulus_terakhir | default('-') }}</span>
+                <div class="info-item" style="border-left: 3px solid var(--neon-blue);">
+                    <div class="info-label">Batch Workshop</div>
+                    <div class="info-value" style="color: var(--neon-blue); font-family: 'Oswald', sans-serif; font-size: 18px;">{{ employee.batch if employee.batch else '—' }}</div>
                 </div>
             </div>
-
-            <div style="margin-top: 25px; background: rgba(16, 185, 129, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
-                <span style="color: #94a3b8; font-size: 12px; text-transform: uppercase; font-weight: bold; margin-bottom: 15px; display: block;">
-                    <i class="fas fa-history" style="margin-right: 8px;"></i> Riwayat Aktivitas & Tema ({{ employee.last_activity_type if employee.last_activity_type else 'Tipe Belum Diatur' }})
-                </span>
-                
-                <div id="theme-timeline" style="display: flex; flex-direction: column; gap: 12px;">
-                    {% if employee.last_activity_theme %}
-                        <p id="raw-theme-text" style="display: none;">{{ employee.last_activity_theme }}</p>
-                    {% else %}
-                        <div style="color: #64748b; font-size: 13px; font-style: italic;">Peserta ini belum memiliki riwayat tugas atau tema Kaizen.</div>
-                    {% endif %}
-                </div>
-            </div>
-            
         </div>
     </div>
+
+    <!-- TPS Level -->
+    <div class="level-grid">
+        <div class="level-card" style="border-left: 4px solid #f59e0b;">
+            <div class="info-label">Level TPS Saat Ini</div>
+            <div style="color: #f59e0b; font-size: 17px; font-weight: 700; margin: 6px 0 4px;">
+                {{ employee.current_tps_level if employee.current_tps_level else '—' }}
+            </div>
+            <div style="font-size: 12px; color: #64748b;">
+                <i class="fas fa-calendar-alt me-1"></i>Tahun Lulus: {{ employee.tahun_lulus_saat_ini | default('—') }}
+            </div>
+        </div>
+        <div class="level-card">
+            <div class="info-label">Level TPS Sebelumnya</div>
+            <div style="color: #cbd5e1; font-size: 17px; font-weight: 700; margin: 6px 0 4px;">
+                {{ employee.previous_tps_level if employee.previous_tps_level else 'Tidak Ada' }}
+            </div>
+            <div style="font-size: 12px; color: #64748b;">
+                <i class="fas fa-calendar-alt me-1"></i>Tahun Lulus: {{ employee.tahun_lulus_terakhir | default('—') }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Workshop Evaluation Scores (Read-Only) -->
+    {% set ev = employee.workshop_evaluations[0] if employee.workshop_evaluations else none %}
+    <div class="eval-section">
+        <div class="eval-section-title"><i class="fas fa-spider me-2"></i>Skor Evaluasi Workshop</div>
+
+        {% macro score_cls(v) %}{% if v >= 75 %}score-high{% elif v >= 50 %}score-mid{% elif v > 0 %}score-low{% else %}score-none{% endif %}{% endmacro %}
+
+        <div class="eval-grid">
+            {% set fields = [('Genba', ev.genba if ev else 0), ('Analysis', ev.analysis if ev else 0), ('Problem Solving', ev.problem_solving if ev else 0), ('Kaizen', ev.kaizen if ev else 0), ('Observation', ev.observation if ev else 0)] %}
+            {% for lbl, val in fields %}
+            <div class="eval-item">
+                <div class="eval-lbl">{{ lbl }}</div>
+                <div class="eval-score {{ score_cls(val) }}">{{ val|int if val else '—' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if ev and ev.notes %}
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #94a3b8;">
+            <span style="color: var(--neon-pink); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px;"><i class="fas fa-sticky-note me-1"></i>Catatan Evaluator</span>
+            {{ ev.notes }}
+        </div>
+        {% endif %}
+
+        {% if ev %}
+        <div style="margin-top: 12px; font-size: 11px; color: #64748b;">
+            <i class="fas fa-user-check me-1"></i>Dievaluasi oleh: <strong style="color: #8b949e;">{{ ev.evaluated_by }}</strong>
+            {% if ev.evaluated_at %} &bull; {{ ev.evaluated_at.strftime('%d %b %Y, %H:%M') }}{% endif %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 10px; color: #64748b; font-size: 13px; font-style: italic;">
+            Belum ada evaluasi workshop untuk partisipan ini.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="activity-section">
+        <div class="activity-title">
+            <i class="fas fa-history" style="color: #10b981;"></i>
+            Riwayat Aktivitas — {{ employee.last_activity_type if employee.last_activity_type else 'Tidak Ada Tipe' }}
+        </div>
+        <div id="theme-timeline">
+            {% if employee.last_activity_theme %}
+                <p id="raw-theme-text" style="display:none;">{{ employee.last_activity_theme }}</p>
+            {% else %}
+                <div style="color: #64748b; font-size: 13px; font-style: italic; padding: 10px 0;">
+                    Partisipan ini belum memiliki riwayat aktivitas atau tema Kaizen.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const rawTextEl = document.getElementById('raw-theme-text');
         const timelineContainer = document.getElementById('theme-timeline');
-        
+
         if(rawTextEl && rawTextEl.innerText.trim() !== '') {
             let text = rawTextEl.innerText;
-            
-            // Regex mencari pola "Theme 1", "Theme 2", atau "Thema lv. 4" (Tidak Case Sensitive)
             let regex = /(Theme\s*\d+|Thema\s*lv\.?\s*\d+)/gi;
-            
+
             if(regex.test(text)) {
-                // Sisipkan tanda pemisah yang unik sebelum kata Theme
                 let formattedText = text.replace(regex, '|||$1');
-                
-                // Pecah teks berdasarkan tanda pemisah
                 let parts = formattedText.split('|||').filter(p => p.trim() !== '');
-                
+
                 parts.forEach((part, index) => {
                     let content = part.trim();
-                    
-                    // Ekstrak Label Theme dan Isi Teksnya
-                    let match = content.match(/^(Theme\s*\d+|Thema\s*lv\.?\s*\d+)\s*(?:->|:|-)?\s*(.*)/i);
+                    let match = content.match(/^(Theme\s*\d+|Thema\s*lv\.?\s*\d+)\s*(?:->|:|-)?\\s*(.*)/i);
                     let label = match ? match[1] : `Activity ${index + 1}`;
                     let desc = match ? match[2] : content;
-                    
-                    // Buat Kotak Desain untuk Tiap Theme
+
                     let card = document.createElement('div');
-                    card.style.cssText = "background: rgba(0,0,0,0.25); border: 1px solid rgba(16,185,129,0.2); padding: 15px; border-radius: 8px; display: flex; gap: 15px; align-items: flex-start; transition: 0.3s;";
-                    
+                    card.style.cssText = 'background:rgba(0,0,0,0.25);border:1px solid rgba(16,185,129,0.2);padding:15px;border-radius:8px;display:flex;gap:15px;align-items:flex-start;transition:0.3s;margin-bottom:10px;';
                     card.innerHTML = `
-                        <div style="background: rgba(16,185,129,0.15); color: #10b981; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 2px;">
+                        <div style="background:rgba(16,185,129,0.15);color:#10b981;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px;">
                             <i class="fas fa-check"></i>
                         </div>
                         <div>
-                            <div style="color: #10b981; font-weight: bold; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;">${label.toUpperCase()}</div>
-                            <div style="color: #e2e8f0; font-size: 14px; line-height: 1.5;">${desc}</div>
+                            <div style="color:#10b981;font-weight:bold;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">${label.toUpperCase()}</div>
+                            <div style="color:#e2e8f0;font-size:14px;line-height:1.5;">${desc}</div>
                         </div>
                     `;
-                    
-                    // Efek Hover
-                    card.onmouseover = () => card.style.borderColor = "rgba(16,185,129,0.6)";
-                    card.onmouseout = () => card.style.borderColor = "rgba(16,185,129,0.2)";
-                    
+                    card.onmouseover = () => card.style.borderColor = 'rgba(16,185,129,0.5)';
+                    card.onmouseout  = () => card.style.borderColor = 'rgba(16,185,129,0.2)';
                     timelineContainer.appendChild(card);
                 });
             } else {
-                // Jika formatnya tidak mengandung kata "Theme", cetak normal dalam 1 card
                 timelineContainer.innerHTML = `
-                    <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(16,185,129,0.2); padding: 15px; border-radius: 8px; display: flex; gap: 15px; align-items: flex-start;">
-                        <div style="background: rgba(16,185,129,0.15); color: #10b981; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 2px;">
+                    <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(16,185,129,0.2);padding:15px;border-radius:8px;display:flex;gap:15px;align-items:flex-start;">
+                        <div style="background:rgba(16,185,129,0.15);color:#10b981;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px;">
                             <i class="fas fa-check"></i>
                         </div>
                         <div>
-                            <div style="color: #10b981; font-weight: bold; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;">ACTIVITY LOG</div>
-                            <div style="color: #e2e8f0; font-size: 14px; line-height: 1.5;">${text}</div>
+                            <div style="color:#10b981;font-weight:bold;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">ACTIVITY LOG</div>
+                            <div style="color:#e2e8f0;font-size:14px;line-height:1.5;">${text}</div>
                         </div>
                     </div>
                 `;

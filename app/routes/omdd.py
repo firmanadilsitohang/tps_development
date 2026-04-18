@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
-from app.models.employee import Employee, Plant, Division, Department
+from app.models.employee import Employee, Plant, Division, Department, BatchStat, WorkshopEvaluation
 from app.models.development import Activity
 from app.models.module import LearningModule 
 from werkzeug.utils import secure_filename
 from app import db
 from sqlalchemy import func
-from datetime import date
+from datetime import date, datetime
 import os
 
 omdd = Blueprint('omdd', __name__, url_prefix='/omdd')
@@ -43,8 +43,8 @@ def dashboard():
     div_labels = [str(item[0]) if item[0] else 'Tanpa Divisi' for item in div_counts]
     div_data = [int(item[1]) for item in div_counts]
 
-    # 5. DATA UNTUK GRAFIK PER DEPARTEMEN (Bar Chart)
-    dept_counts = db.session.query(Department.name, func.count(Employee.id)).select_from(Employee).outerjoin(Department).group_by(Department.name).all()
+    # 5. DATA UNTUK GRAFIK PER DEPARTEMEN (Bar Chart) — Top 10
+    dept_counts = db.session.query(Department.name, func.count(Employee.id)).select_from(Employee).outerjoin(Department).group_by(Department.name).order_by(func.count(Employee.id).desc()).limit(10).all()
     dept_labels = [str(item[0]) if item[0] else 'Tanpa Departemen' for item in dept_counts]
     dept_data = [int(item[1]) for item in dept_counts]
 
@@ -53,26 +53,61 @@ def dashboard():
     status_labels = [str(item[0]).upper() for item in status_counts]
     status_data = [int(item[1]) for item in status_counts]
 
-    # 7. DATA UNTUK GRAFIK TREN KELULUSAN (Line Chart - Diperbaiki)
-    # Mengambil semua data Completed
+    # 7. DATA UNTUK GRAFIK TREN KELULUSAN (Line Chart)
     completed_activities = Activity.query.filter_by(status='Completed').all()
-    
-    # Memproses pengelompokan berdasarkan bulan menggunakan Python (Dictionary)
     trend_dict = {}
     for act in completed_activities:
         if act.updated_at:
-            # Format menjadi 'YYYY-MM'
             month_key = act.updated_at.strftime('%Y-%m')
             trend_dict[month_key] = trend_dict.get(month_key, 0) + 1
-
-    # Mengurutkan berdasarkan bulan
     sorted_trend = sorted(trend_dict.items())
-    
     trend_labels = [item[0] for item in sorted_trend] if sorted_trend else ["No Data"]
     trend_values = [item[1] for item in sorted_trend] if sorted_trend else [0]
 
-    # 8. DATA TABEL MONITORING (KARYAWAN)
-    all_employees = Employee.query.all()
+    # ============================================================
+    # TPSG-STYLE CHART DATA (BARU: Pension, Age, KP Level, Batch)
+    # ============================================================
+    this_year = date.today().year
+    kp4 = Employee.query.filter(Employee.current_tps_level.ilike('%4%')).count()
+    kp3 = Employee.query.filter(Employee.current_tps_level.ilike('%3%')).count()
+    adv = Employee.query.filter(Employee.current_tps_level.ilike('%ADVANCE%')).count()
+
+    emps = Employee.query.all()
+    prod, risk = 0, 0
+    pension_forecast = {str(y): 0 for y in range(this_year, this_year + 5)}
+    for e in emps:
+        if e.birth_date:
+            age = this_year - e.birth_date.year
+            if age >= 50: risk += 1
+            else: prod += 1
+            p_year = e.birth_date.year + 55
+            if str(p_year) in pension_forecast:
+                pension_forecast[str(p_year)] += 1
+        else:
+            prod += 1
+
+    # Data Batch Success Rate
+    batch_stats = BatchStat.query.all()
+    if batch_stats:
+        b_labels, b_kp3, b_kp4 = [], [], []
+        for bs in batch_stats:
+            b_labels.append(bs.batch_name)
+            def parse_pct(val):
+                v_str = str(val).replace('%', '').strip()
+                if not v_str or v_str.lower() == 'nan': return 0
+                try:
+                    vf = float(v_str)
+                    return int(vf * 100) if vf <= 1.0 and '%' not in str(val) else int(vf)
+                except: return 0
+            b_kp3.append(parse_pct(bs.kp3_percent))
+            b_kp4.append(parse_pct(bs.kp4_percent))
+    else:
+        b_labels = ['B-01', 'B-11']
+        b_kp3 = [5, 95]
+        b_kp4 = [15, 0]
+
+    # 8. DATA TABEL MONITORING DAN SIDE PANEL KARYAWAN
+    all_employees = Employee.query.order_by(Employee.name.asc()).all()
 
     def get_join_year(emp):
         nik_str = str(emp.username).strip()
@@ -95,6 +130,11 @@ def dashboard():
     # 9. DATA TUGAS YANG MENUNGGU DINILAI (PENDING ACTIVITIES)
     pending_activities = Activity.query.filter_by(status='pending').order_by(Activity.submitted_at.asc()).all()
 
+    # 10. DATA EVALUASI WORKSHOP (untuk panel spider chart)
+    # Buat dict: employee_id -> evaluasi terakhir
+    all_evals = WorkshopEvaluation.query.all()
+    eval_map = {ev.employee_id: ev for ev in all_evals}
+
     return render_template('omdd/dashboard.html', 
                            stats=stats, 
                            level_labels=level_labels, level_data=level_data,
@@ -104,7 +144,17 @@ def dashboard():
                            status_labels=status_labels, status_data=status_data,
                            trend_labels=trend_labels, trend_values=trend_values,
                            employees=all_employees_sorted,
-                           pending_activities=pending_activities)
+                           pending_activities=pending_activities,
+                           # Data TPSG-style charts
+                           kp_labels=['TPS KP 4', 'TPS KP 3', 'TPS ADVANCE'],
+                           kp_values=[kp4, kp3, adv],
+                           forecast_labels=list(pension_forecast.keys()),
+                           forecast_values=list(pension_forecast.values()),
+                           age_labels=['Produktif (<50)', 'Risk Area (>=50)'],
+                           age_values=[prod, risk],
+                           batch_labels=b_labels, batch_kp3=b_kp3, batch_kp4=b_kp4,
+                           # Data evaluasi workshop
+                           eval_map=eval_map)
 
 # ==========================================
 # FITUR EVALUASI TUGAS / ACTIVITY
@@ -203,6 +253,43 @@ def detail_employee(id):
     return render_template('omdd/detail.html', employee=employee, umur=umur)
 
 # ==========================================
+# HALAMAN PARTISIPAN (TABEL LENGKAP)
+# ==========================================
+@omdd.route('/participants')
+@login_required
+def participants():
+    if current_user.role != 'omdd':
+        flash('Akses ditolak. Halaman khusus OMDD.', 'danger')
+        return redirect(url_for('auth.login'))
+
+    all_employees = Employee.query.order_by(Employee.name.asc()).all()
+
+    def get_join_year(emp):
+        nik_str = str(emp.username).strip()
+        if nik_str.isdigit():
+            nik_str = nik_str.zfill(8)
+        if len(nik_str) >= 3:
+            prefix = nik_str[:3]
+            if prefix[0] == '0' and prefix[1:].isdigit():
+                yy = int(prefix[1:])
+                year = 1900 + yy if yy > 50 else 2000 + yy
+                return (year, nik_str)
+            elif prefix[:2].isdigit():
+                yy = int(prefix[:2])
+                year = 1900 + yy if yy > 50 else 2000 + yy
+                return (year, nik_str)
+        return (9999, nik_str)
+
+    all_employees_sorted = sorted(all_employees, key=get_join_year)
+
+    all_evals = WorkshopEvaluation.query.all()
+    eval_map = {ev.employee_id: ev for ev in all_evals}
+
+    return render_template('omdd/participants.html',
+                           employees=all_employees_sorted,
+                           eval_map=eval_map)
+
+# ==========================================
 # MASTER DIRECTORY (DAFTAR SEMUA KARYAWAN)
 # ==========================================
 @omdd.route('/directory')
@@ -280,3 +367,39 @@ def manage_modules():
 
     modules = LearningModule.query.order_by(LearningModule.created_at.desc()).all()
     return render_template('omdd/manage_modules.html', modules=modules)
+
+# ==========================================
+# EVALUASI WORKSHOP (SPIDER CHART OMDD)
+# ==========================================
+@omdd.route('/evaluate-workshop/<int:emp_id>', methods=['POST'])
+@login_required
+def submit_workshop_evaluation(emp_id):
+    if current_user.role != 'omdd':
+        flash('Akses ditolak. Halaman khusus OMDD.', 'danger')
+        return redirect(url_for('auth.login'))
+
+    employee = Employee.query.get_or_404(emp_id)
+
+    # Ambil atau buat evaluasi baru
+    evaluation = WorkshopEvaluation.query.filter_by(employee_id=emp_id).first()
+    if not evaluation:
+        evaluation = WorkshopEvaluation(employee_id=emp_id)
+        db.session.add(evaluation)
+
+    try:
+        evaluation.genba = float(request.form.get('genba', 0))
+        evaluation.analysis = float(request.form.get('analysis', 0))
+        evaluation.problem_solving = float(request.form.get('problem_solving', 0))
+        evaluation.kaizen = float(request.form.get('kaizen', 0))
+        evaluation.observation = float(request.form.get('observation', 0))
+        evaluation.notes = request.form.get('notes', '')
+        evaluation.evaluated_by = current_user.username
+        evaluation.evaluated_at = datetime.utcnow()
+
+        db.session.commit()
+        flash(f'Evaluasi Workshop untuk {employee.name} berhasil disimpan!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Terjadi kesalahan: {str(e)}', 'danger')
+
+    return redirect(url_for('omdd.dashboard') + '#workshop-panel')

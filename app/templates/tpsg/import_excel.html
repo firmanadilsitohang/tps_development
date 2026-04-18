@@ -1,26 +1,404 @@
 {% extends "base.html" %}
 {% block title %}Import Excel | TPS-G{% endblock %}
+
+{% block extra_css %}
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;700&display=swap"
+    rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --bg-cyber: #04070d;
+        --panel-bg: #0d1117;
+        --neon-green: #10b981;
+        --neon-green-glow: rgba(16, 185, 129, 0.4);
+        --neon-gold: #f59e0b;
+        --border-dark: #30363d;
+    }
+
+    body {
+        background-color: var(--bg-cyber);
+        color: #c9d1d9;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* --- LOADING OVERLAY ANIMATION --- */
+    #loadingOverlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(4, 7, 13, 0.9);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    /* Dual Ring Glowing Spinner */
+    .loader-rings {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin-bottom: 25px;
+    }
+
+    .loader-rings:before,
+    .loader-rings:after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        border: 4px solid transparent;
+    }
+
+    .loader-rings:before {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-top-color: var(--neon-green);
+        border-bottom-color: var(--neon-green);
+        animation: spin 1.5s linear infinite;
+        box-shadow: 0 0 20px var(--neon-green-glow);
+    }
+
+    .loader-rings:after {
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+        border-left-color: #58a6ff;
+        border-right-color: #58a6ff;
+        animation: spin-reverse 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin-reverse {
+        0% {
+            transform: rotate(360deg);
+        }
+
+        100% {
+            transform: rotate(0deg);
+        }
+    }
+
+    .loading-text {
+        color: #ffffff;
+        font-family: 'Oswald', sans-serif;
+        font-size: 22px;
+        letter-spacing: 2px;
+        animation: pulse-text 1.5s ease-in-out infinite;
+        text-shadow: 0 0 10px var(--neon-green-glow);
+    }
+
+    @keyframes pulse-text {
+
+        0%,
+        100% {
+            opacity: 0.7;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+    }
+
+    .loading-subtext {
+        color: #8b949e;
+        font-size: 13px;
+        margin-top: 10px;
+        font-family: monospace;
+        letter-spacing: 1px;
+    }
+
+    /* --- UPLOAD CARD STYLING --- */
+    .upload-card {
+        max-width: 550px;
+        margin: 60px auto;
+        background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+        border: 1px solid var(--border-dark);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Decorative Top Line */
+    .upload-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+    }
+
+    .icon-container i {
+        font-size: 55px;
+        color: var(--neon-green);
+        margin-bottom: 20px;
+        filter: drop-shadow(0 0 15px var(--neon-green-glow));
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .card-title {
+        font-family: 'Oswald', sans-serif;
+        color: #fff;
+        margin: 0;
+        font-size: 26px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    /* File Input Zone */
+    .file-drop-area {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        border: 2px dashed #484f58;
+        border-radius: 12px;
+        padding: 40px 20px;
+        margin-bottom: 25px;
+        background: rgba(1, 4, 9, 0.5);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .file-drop-area:hover,
+    .file-drop-area.active {
+        border-color: var(--neon-green);
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .fake-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 8px 16px;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        transition: 0.3s;
+    }
+
+    .file-drop-area:hover .fake-btn {
+        background: var(--neon-green);
+        color: #04070d;
+        border-color: var(--neon-green);
+    }
+
+    .file-msg {
+        color: #8b949e;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .file-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        cursor: pointer;
+        opacity: 0;
+    }
+
+    /* Info Alert */
+    .alert-automation {
+        background: rgba(245, 158, 11, 0.08);
+        border-left: 3px solid var(--neon-gold);
+        padding: 16px;
+        border-radius: 0 8px 8px 0;
+        font-size: 13px;
+        color: #d1d5db;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    .alert-automation code {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--neon-gold);
+        font-weight: bold;
+        margin-left: 5px;
+    }
+
+    /* Buttons */
+    .btn-action-group {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 14px;
+        text-align: center;
+        background: #21262d;
+        color: #c9d1d9;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        border: 1px solid var(--border-dark);
+        transition: 0.3s;
+    }
+
+    .btn-cancel:hover {
+        background: #30363d;
+        color: #fff;
+    }
+
+    .btn-submit {
+        flex: 2;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--neon-green) 0%, #059669 100%);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-submit i {
+        margin-right: 8px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width: 600px; margin: 50px auto; background: #080f1e; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
-    <div style="text-align: center; margin-bottom: 30px;">
-        <i class="fas fa-file-excel" style="font-size: 50px; color: #10b981; margin-bottom: 15px;"></i>
-        <h2 style="font-family: 'Oswald', sans-serif; color: #fff; margin: 0; letter-spacing: 1px;">IMPORT DATA MASSAL</h2>
-        <p style="color: #64748b; font-size: 13px; margin-top: 5px;">Upload file mentahan (.xlsx / .csv) untuk mendaftarkan ratusan partisipan sekaligus.</p>
+<div id="loadingOverlay">
+    <div class="loader-rings"></div>
+    <div class="loading-text">MEMPROSES DATA EXCEL</div>
+    <div class="loading-subtext">Menyinkronkan Database Sistem... Mohon Tunggu.</div>
+</div>
+
+<div class="upload-card">
+    <div style="text-align: center; margin-bottom: 35px;">
+        <div class="icon-container">
+            <i class="fas fa-file-excel"></i>
+        </div>
+        <h2 class="card-title">IMPORT DATA MASSAL</h2>
+        <p style="color: #8b949e; font-size: 14px; margin-top: 8px;">Upload file mentahan (.xlsx / .csv) untuk
+            mendaftarkan partisipan ke dalam sistem.</p>
     </div>
 
-    <form action="{{ url_for('tpsg.import_excel') }}" method="POST" enctype="multipart/form-data">
-        <div style="border: 2px dashed #334155; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 25px; background: rgba(255,255,255,0.02);">
-            <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required style="width: 100%; color: #94a3b8;">
+    <form id="importForm" action="{{ url_for('tpsg.import_excel') }}" method="POST" enctype="multipart/form-data">
+
+        <div class="file-drop-area" id="dropArea">
+            <span class="fake-btn"><i class="fas fa-search me-2"></i> Pilih File Excel</span>
+            <span class="file-msg" id="fileMessage">atau drag & drop file ke area ini</span>
+            <input type="file" name="file" id="fileInput" class="file-input"
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                required>
         </div>
 
-        <div style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; padding: 15px; border-radius: 0 8px 8px 0; font-size: 13px; color: #fbbf24; margin-bottom: 30px;">
-            <i class="fas fa-bolt" style="margin-right: 5px;"></i> <strong>Otomasi:</strong> Akun login akan dibuatkan otomatis dengan password <code>tmmin123</code>.
+        <div class="alert-automation">
+            <i class="fas fa-robot text-warning"
+                style="font-size: 18px; margin-right: 12px; color: var(--neon-gold);"></i>
+            <span><strong>Otomasi Sistem:</strong> Akun login akan dibuatkan otomatis dengan password standard:
+                <code>tmmin123</code></span>
         </div>
 
-        <div style="display: flex; gap: 15px;">
-            <a href="{{ url_for('tpsg.employees') }}" style="flex: 1; padding: 12px; text-align: center; background: #1e293b; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold;">Batal</a>
-            <button type="submit" style="flex: 2; padding: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px;"><i class="fas fa-cloud-upload-alt"></i> Eksekusi Import</button>
+        <div class="btn-action-group">
+            <a href="{{ url_for('tpsg.employees') }}" class="btn-cancel">BATAL</a>
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-cloud-upload-alt"></i> EKSEKUSI IMPORT
+            </button>
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const importForm = document.getElementById('importForm');
+        const fileInput = document.getElementById('fileInput');
+        const fileMessage = document.getElementById('fileMessage');
+        const dropArea = document.getElementById('dropArea');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // File Selection Event - Update Text
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                fileMessage.innerHTML = `<span style="color: #10b981; font-weight: 700;"><i class="fas fa-file-check me-1"></i> File terpilih: ${fileName}</span>`;
+                dropArea.classList.add('active');
+            } else {
+                fileMessage.innerHTML = "atau drag & drop file ke area ini";
+                dropArea.classList.remove('active');
+            }
+        });
+
+        // Form Submit Event - Trigger Loading Animation
+        importForm.addEventListener('submit', function (e) {
+            // Pastikan file sudah dipilih
+            if (fileInput.files.length > 0) {
+                // Tampilkan overlay
+                document.getElementById('loadingOverlay').style.display = 'flex';
+
+                // Ubah state tombol
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> MENGUNGGAH...';
+                submitBtn.style.opacity = '0.8';
+                submitBtn.style.pointerEvents = 'none';
+
+                // Sedikit delay visual agar animasi terasa smooth sebelum form benar-benar di-submit
+                // Hapus e.preventDefault() jika ini mengganggu flow backend Flask kamu
+                /* e.preventDefault();
+                setTimeout(() => {
+                    this.submit();
+                }, 500); 
+                */
+            }
+        });
+    });
+</script>
 {% endblock %}

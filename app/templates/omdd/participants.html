@@ -1,0 +1,521 @@
+{% extends "omdd/base.html" %}
+
+{% block title %}Partisipan | OMDD System{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --bg-cyber: #04070d;
+        --panel-bg: #0b1019;
+        --neon-blue: #00d2ff;
+        --neon-green: #39ff14;
+        --neon-pink: #ff00a0;
+        --neon-gold: #ffcc00;
+        --neon-red: #ff0055;
+        --border-glass: rgba(255, 255, 255, 0.07);
+    }
+
+    body {
+        background-color: var(--bg-cyber);
+        color: #e0e6ed;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(90deg, #0a0f1e 0%, rgba(10, 15, 30, 0.4) 100%);
+        padding: 20px 25px;
+        border-radius: 14px;
+        border-left: 5px solid var(--neon-blue);
+        margin-bottom: 24px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .page-title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 22px;
+        letter-spacing: 3px;
+        color: #fff;
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    .header-icon {
+        background: rgba(0, 210, 255, 0.1);
+        padding: 12px 15px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+    }
+
+    /* Stats bar */
+    .stats-bar {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .stat-chip {
+        background: #0b1019;
+        border: 1px solid var(--border-glass);
+        border-radius: 10px;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+    }
+
+    .stat-chip i {
+        font-size: 16px;
+    }
+
+    .stat-chip .val {
+        font-family: 'Oswald', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .stat-chip .lbl {
+        font-size: 10px;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Table Panel */
+    .tbl-panel {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-glass);
+        border-radius: 14px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+    }
+
+    .tbl-panel-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border-glass);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .tbl-panel-title {
+        font-family: 'Oswald', sans-serif;
+        color: var(--neon-blue);
+        font-size: 16px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .search-wrapper {
+        position: relative;
+        width: 280px;
+    }
+
+    .search-wrapper .fa-search {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #8b949e;
+        font-size: 12px;
+    }
+
+    .search-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 10px 16px 10px 38px;
+        color: #e0e6ed;
+        font-size: 13px;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+    .search-input:focus {
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.1);
+    }
+
+    /* Table */
+    .participants-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+    .tbl-wrap {
+        overflow-x: auto;
+    }
+
+    .participants-table thead tr {
+        background: rgba(0, 210, 255, 0.04);
+    }
+
+    .participants-table th {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--neon-blue);
+        padding: 14px 16px;
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 210, 255, 0.15);
+        white-space: nowrap;
+    }
+
+    .participants-table td {
+        padding: 13px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        vertical-align: middle;
+        font-size: 13px;
+    }
+
+    .participants-table tbody tr:hover td {
+        background: rgba(0, 210, 255, 0.03);
+    }
+
+    .participants-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Avatar */
+    .emp-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 210, 255, 0.25);
+        flex-shrink: 0;
+    }
+
+    .emp-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .emp-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .emp-name {
+        font-weight: 700;
+        color: #fff;
+        font-size: 13px;
+    }
+
+    .emp-nik {
+        font-size: 10px;
+        color: #8b949e;
+        font-family: monospace;
+    }
+
+    /* Badges */
+    .badge-mini {
+        padding: 3px 9px;
+        border-radius: 5px;
+        font-size: 10px;
+        font-weight: 800;
+        display: inline-block;
+        white-space: nowrap;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-kp4 {
+        background: rgba(255, 204, 0, 0.12);
+        color: var(--neon-gold);
+        border: 1px solid rgba(255, 204, 0, 0.3);
+    }
+
+    .badge-kp3 {
+        background: rgba(57, 255, 20, 0.1);
+        color: var(--neon-green);
+        border: 1px solid rgba(57, 255, 20, 0.3);
+    }
+
+    .badge-adv {
+        background: rgba(0, 210, 255, 0.1);
+        color: var(--neon-blue);
+        border: 1px solid rgba(0, 210, 255, 0.3);
+    }
+
+    .badge-jis {
+        background: rgba(188, 19, 254, 0.1);
+        color: #bc13fe;
+        border: 1px solid rgba(188, 19, 254, 0.3);
+    }
+
+    .badge-none {
+        border-color: #30363d;
+        color: #8b949e;
+        border: 1px solid #30363d;
+    }
+
+    /* Score ring */
+    .score-ring {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        font-weight: 800;
+        font-size: 12px;
+        border: 2px solid;
+    }
+
+    .score-high {
+        border-color: var(--neon-green);
+        color: var(--neon-green);
+        background: rgba(57, 255, 20, 0.08);
+    }
+
+    .score-mid {
+        border-color: var(--neon-gold);
+        color: var(--neon-gold);
+        background: rgba(255, 204, 0, 0.08);
+    }
+
+    .score-low {
+        border-color: var(--neon-red);
+        color: var(--neon-red);
+        background: rgba(255, 0, 85, 0.08);
+    }
+
+    .score-none {
+        border-color: #30363d;
+        color: #8b949e;
+        background: transparent;
+    }
+
+    /* Action button */
+    .btn-action {
+        background: rgba(0, 210, 255, 0.08);
+        color: var(--neon-blue);
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        padding: 7px 14px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 11px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.25s;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .btn-action:hover {
+        background: var(--neon-blue);
+        color: #000;
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #04070d;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-3 p-md-4">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon">
+                <i class="fas fa-users" style="font-size: 24px; color: var(--neon-blue);"></i>
+            </div>
+            <div>
+                <h1 class="page-title">Daftar Partisipan</h1>
+                <p class="m-0" style="font-size: 11px; color: #8b949e; letter-spacing: 2px;">OMDD — OPERATIONAL
+                    MANAGEMENT & DEVELOPMENT DIVISION</p>
+            </div>
+        </div>
+        <div style="font-family: 'Oswald'; font-size: 14px; color: #8b949e;">
+            Total: <span style="color: var(--neon-blue); font-size: 22px;">{{ employees|length }}</span> Partisipan
+        </div>
+    </div>
+
+
+
+
+    <div class="stats-bar">
+        {% set ns = namespace(kp4=0, kp3=0) %}
+        {% for emp in employees %}
+        {% if emp.current_tps_level %}
+        {% set lvl = emp.current_tps_level | string | upper %}
+        {% if '4' in lvl %}{% set ns.kp4 = ns.kp4 + 1 %}{% endif %}
+        {% if '3' in lvl and '4' not in lvl %}{% set ns.kp3 = ns.kp3 + 1 %}{% endif %}
+        {% endif %}
+        {% endfor %}
+
+        <div class="stat-chip" style="border-color: rgba(255,204,0,0.3);">
+            <i class="fas fa-certificate" style="color: var(--neon-gold);"></i>
+            <div>
+                <div class="val" style="color: var(--neon-gold);">{{ ns.kp4 }}</div>
+                <div class="lbl">TPS KP4</div>
+            </div>
+        </div>
+        <div class="stat-chip" style="border-color: rgba(57,255,20,0.3);">
+            <i class="fas fa-award" style="color: var(--neon-green);"></i>
+            <div>
+                <div class="val" style="color: var(--neon-green);">{{ ns.kp3 }}</div>
+                <div class="lbl">TPS KP3</div>
+            </div>
+        </div>
+        <div class="stat-chip" style="border-color: rgba(0,210,255,0.3);">
+            <i class="fas fa-users" style="color: var(--neon-blue);"></i>
+            <div>
+                <div class="val" style="color: var(--neon-blue);">{{ employees | length }}</div>
+                <div class="lbl">Total Partisipan</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PARTICIPANTS TABLE ===== -->
+    <div class="tbl-panel">
+        <div class="tbl-panel-header">
+            <span class="tbl-panel-title"><i class="fas fa-table me-2"></i>Master Partisipan OMDD</span>
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="participantSearch" class="search-input" placeholder="Cari nama, NIK, plant...">
+            </div>
+        </div>
+        <div class="tbl-wrap">
+            <table class="participants-table" id="participantsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Profil Partisipan</th>
+                        <th>NIK</th>
+                        <th>Plant / Division</th>
+                        <th>Departemen</th>
+                        <th>Jabatan</th>
+                        <th style="text-align:center;">Level TPS</th>
+                        <th style="text-align:center;">Genba</th>
+                        <th style="text-align:center;">Analysis</th>
+                        <th style="text-align:center;">P.Solving</th>
+                        <th style="text-align:center;">Kaizen</th>
+                        <th style="text-align:center;">Obs.</th>
+                        <th style="text-align:center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="participantsBody">
+
+                    {# Score ring macro — defined ONCE outside the for loop #}
+                    {% macro score_box(val) %}
+                    {% if val and val > 0 %}
+                    {% if val >= 75 %}<span class="score-ring score-high">{{ val|int }}</span>
+                    {% elif val >= 50 %}<span class="score-ring score-mid">{{ val|int }}</span>
+                    {% else %}<span class="score-ring score-low">{{ val|int }}</span>
+                    {% endif %}
+                    {% else %}<span class="score-ring score-none">—</span>
+                    {% endif %}
+                    {% endmacro %}
+
+                    {% for emp in employees %}
+                    {% set ev = eval_map.get(emp.id) %}
+                    {% set level_str = emp.current_tps_level | default('', true) | upper %}
+                    <tr class="participant-row">
+                        <td style="color: #8b949e; font-size: 11px; font-family: monospace;">{{ loop.index }}</td>
+                        <td>
+                            <div class="emp-info">
+                                <div class="emp-avatar">
+                                    {% if emp.photo %}
+                                    <img src="{{ emp.photo }}"
+                                        onerror="this.src='https://ui-avatars.com/api/?name={{ emp.name|urlencode }}&background=0b1019&color=00d2ff&size=80'">
+                                    {% else %}
+                                    <img
+                                        src="https://ui-avatars.com/api/?name={{ emp.name|urlencode }}&background=0b1019&color=00d2ff&size=80">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="emp-name">{{ emp.name }}</div>
+                                    <div class="emp-nik">{{ emp.batch if emp.batch else '—' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-family: monospace; font-size: 12px; color: #38bdf8;">{{ emp.username }}</td>
+                        <td>
+                            <div style="font-size: 12px; color: #fff; font-weight: 600;">{{ emp.plant.name if emp.plant
+                                else '—' }}</div>
+                            <div style="font-size: 11px; color: #8b949e;">{{ emp.division.name if emp.division else '—'
+                                }}</div>
+                        </td>
+                        <td style="font-size: 12px; color: #8b949e;">{{ emp.department.name if emp.department else '—'
+                            }}</td>
+                        <td
+                            style="font-size: 12px; color: #cbd5e1; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ emp.position if emp.position else '—' }}</td>
+                        <td style="text-align:center;">
+                            {% if '4' in level_str %}<span class="badge-mini badge-kp4">KP4</span>
+                            {% elif '3' in level_str %}<span class="badge-mini badge-kp3">KP3</span>
+                            {% elif 'ADV' in level_str %}<span class="badge-mini badge-adv">ADV</span>
+                            {% elif 'JIS' in level_str %}<span class="badge-mini badge-jis">JIS</span>
+                            {% else %}<span class="badge-mini badge-none">—</span>{% endif %}
+                        </td>
+                        <td style="text-align:center;">{{ score_box(ev.genba if ev else 0) }}</td>
+                        <td style="text-align:center;">{{ score_box(ev.analysis if ev else 0) }}</td>
+                        <td style="text-align:center;">{{ score_box(ev.problem_solving if ev else 0) }}</td>
+                        <td style="text-align:center;">{{ score_box(ev.kaizen if ev else 0) }}</td>
+                        <td style="text-align:center;">{{ score_box(ev.observation if ev else 0) }}</td>
+                        <td style="text-align:center;">
+                            <a href="{{ url_for('omdd.detail_employee', id=emp.id) }}" class="btn-action">
+                                <i class="fas fa-eye me-1"></i> Detail
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="13" style="text-align:center; padding: 50px; color: #64748b;">
+                            <i class="fas fa-users-slash"
+                                style="font-size: 32px; display: block; margin-bottom: 14px;"></i>
+                            Belum ada data partisipan.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById('participantSearch').addEventListener('input', function () {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('.participant-row').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}
