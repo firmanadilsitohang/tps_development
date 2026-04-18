@@ -58,6 +58,10 @@
     .search-wrapper {
         position: relative;
         flex: 1 1 300px;
+<<<<<<< HEAD
+=======
+        /* Tumbuh proporsional */
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
     }
 
     .search-icon {
@@ -78,6 +82,10 @@
         font-size: 14px;
         transition: all 0.3s ease;
         flex: 1 1 180px;
+<<<<<<< HEAD
+=======
+        /* Tumbuh otomatis di layar kecil */
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
     }
 
     .search-wrapper .filter-box {
@@ -119,6 +127,10 @@
         -webkit-overflow-scrolling: touch;
     }
 
+<<<<<<< HEAD
+=======
+    /* Custom Scrollbar untuk Tabel */
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
     .table-responsive::-webkit-scrollbar {
         height: 10px;
     }
@@ -140,6 +152,10 @@
         margin-bottom: 0;
         width: 100%;
         min-width: 1000px;
+<<<<<<< HEAD
+=======
+        /* Mencegah kolom hancur */
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
     }
 
     .table thead {
@@ -252,6 +268,10 @@
         line-height: 1.5;
     }
 
+<<<<<<< HEAD
+=======
+    /* Classes Warna Teks Murni */
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
     .text-neon-red {
         color: var(--neon-red) !important;
     }
@@ -345,6 +365,24 @@
         transform: translateY(-2px);
     }
 
+<<<<<<< HEAD
+=======
+    .btn-import {
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 10px 20px;
+        box-shadow: 0 4px 15px rgba(63, 185, 80, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-import:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(63, 185, 80, 0.4);
+    }
+
+    /* Helper Info Box */
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
     .info-box {
         background: rgba(13, 17, 23, 0.8);
         border: 1px solid var(--border-dark);
@@ -366,6 +404,7 @@
                 <p class="text-secondary m-0 mt-2 small" style="font-size: 13px;">
                     Manajemen Profil, Level, dan Monitoring Risiko Pensiun Manpower
                 </p>
+<<<<<<< HEAD
             </div>
         </div>
 
@@ -406,6 +445,51 @@
             </div>
         </div>
 
+=======
+            </div>
+
+        </div>
+
+        <div class="filter-section">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="filter-box" placeholder="Cari Nama, NIK, atau Jabatan...">
+            </div>
+
+            <select id="filterArea" class="filter-box">
+                <option value="">-- Semua Area --</option>
+            </select>
+
+            <select id="filterDivisi" class="filter-box" disabled>
+                <option value="">-- Semua Divisi --</option>
+            </select>
+
+            <select id="filterDept" class="filter-box" disabled>
+                <option value="">-- Semua Departemen --</option>
+            </select>
+        </div>
+    </div>
+
+    <form action="{{ url_for('tpsg.bulk_delete_employees') }}" method="POST" id="bulkDeleteForm">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-3 gap-3">
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                <button type="submit" class="btn btn-delete-mass"
+                    onclick="return confirm('PERINGATAN: Yakin ingin menghapus data partisipan yang dipilih secara permanen?')">
+                    <i class="fas fa-trash-alt me-2"></i> HAPUS TERPILIH
+                </button>
+                <span class="text-secondary small d-none d-sm-inline">
+                    <i class="fas fa-info-circle me-1"></i> Centang kotak di tabel untuk menyeleksi data.
+                </span>
+            </div>
+
+            <div class="info-box text-secondary small fw-bold">
+                Total Menampilkan: <span id="rowCountDisplay" class="text-white mx-2 fs-6">{{ employees|length }}</span>
+                Partisipan
+            </div>
+        </div>
+
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
         <div class="table-container">
             <div class="table-responsive">
                 <table class="table" id="employeeTable">
@@ -432,7 +516,11 @@
                         {% set dept_name = emp.department.name if emp.department else 'N/A' %}
 
                         <tr class="employee-row" data-area="{{ area_name }}" data-divisi="{{ div_name }}"
+<<<<<<< HEAD
                             data-dept="{{ dept_name }}" data-level="{{ emp.current_tps_level | default('', true) }}">
+=======
+                            data-dept="{{ dept_name }}">
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
 
                             <td class="text-center">
                                 <input class="form-check-input emp-checkbox" type="checkbox" name="employee_ids"
@@ -555,6 +643,10 @@
                 <h4 class="text-white mt-2">Tidak Ada Data Ditemukan</h4>
                 <p class="text-secondary">Cobalah mengubah filter pencarian atau kata kunci.</p>
             </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
         </div>
     </form>
 </div>
@@ -566,7 +658,10 @@
         const filterArea = document.getElementById('filterArea');
         const filterDivisi = document.getElementById('filterDivisi');
         const filterDept = document.getElementById('filterDept');
+<<<<<<< HEAD
         const filterLevel = document.getElementById('filterLevel');
+=======
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
         const rows = Array.from(document.querySelectorAll('.employee-row'));
         const rowCountDisplay = document.getElementById('rowCountDisplay');
         const noResultsMsg = document.getElementById('noResultsMsg');
@@ -581,6 +676,10 @@
             if (area && area !== "N/A") uniqueAreas.add(area);
         });
 
+<<<<<<< HEAD
+=======
+        // Convert to array and sort
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
         Array.from(uniqueAreas).sort().forEach(area => {
             const option = document.createElement('option');
             option.value = area;
@@ -588,6 +687,7 @@
             filterArea.appendChild(option);
         });
 
+<<<<<<< HEAD
         // PERBAIKAN JS: Mengambil data level dan memecahnya ke dropdown
         const uniqueLevels = new Set();
         rows.forEach(row => {
@@ -609,6 +709,9 @@
             filterLevel.appendChild(option);
         });
 
+=======
+        // Function: Update Divisi Dropdown Based on Area
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
         function populateDivisi(selectedArea) {
             filterDivisi.innerHTML = '<option value="">-- Semua Divisi --</option>';
             filterDept.innerHTML = '<option value="">-- Semua Departemen --</option>';
@@ -636,6 +739,10 @@
             });
         }
 
+<<<<<<< HEAD
+=======
+        // Function: Update Departemen Dropdown Based on Divisi
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
         function populateDept(selectedDivisi) {
             filterDept.innerHTML = '<option value="">-- Semua Departemen --</option>';
 
@@ -647,6 +754,10 @@
             filterDept.disabled = false;
             const uniqueDepts = new Set();
             rows.forEach(row => {
+<<<<<<< HEAD
+=======
+                // Must match both selected Area and Divisi to be entirely safe
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
                 if (row.dataset.area === filterArea.value && row.dataset.divisi === selectedDivisi) {
                     const dept = row.dataset.dept;
                     if (dept && dept !== "N/A") uniqueDepts.add(dept);
@@ -661,13 +772,20 @@
             });
         }
 
+<<<<<<< HEAD
         // PERBAIKAN JS: Logika Filter
+=======
+        // Function: Apply All Active Filters & Search
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
         function applyFilters() {
             const searchText = searchInput.value.toLowerCase();
             const areaVal = filterArea.value;
             const divVal = filterDivisi.value;
             const deptVal = filterDept.value;
+<<<<<<< HEAD
             const levelVal = filterLevel.value.toLowerCase();
+=======
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
 
             let visibleCount = 0;
 
@@ -676,17 +794,27 @@
                 const rowArea = row.dataset.area;
                 const rowDiv = row.dataset.divisi;
                 const rowDept = row.dataset.dept;
+<<<<<<< HEAD
                 // Ambil string dari dataset.level, lalu jadikan huruf kecil
                 const rowLevel = (row.dataset.level || "").toLowerCase();
 
+=======
+
+                // Match tests
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
                 const mSearch = textContent.includes(searchText);
                 const mArea = !areaVal || rowArea === areaVal;
                 const mDiv = !divVal || rowDiv === divVal;
                 const mDept = !deptVal || rowDept === deptVal;
+<<<<<<< HEAD
                 // Cek apakah string rowLevel mengandung string levelVal
                 const mLevel = !levelVal || rowLevel.includes(levelVal);
 
                 if (mSearch && mArea && mDiv && mDept && mLevel) {
+=======
+
+                if (mSearch && mArea && mDiv && mDept) {
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
                     row.style.display = '';
                     visibleCount++;
                 } else {
@@ -694,14 +822,25 @@
                 }
             });
 
+<<<<<<< HEAD
             rowCountDisplay.textContent = visibleCount;
 
+=======
+            // Update row count text
+            rowCountDisplay.textContent = visibleCount;
+
+            // Show/hide empty state
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
             if (visibleCount === 0) {
                 noResultsMsg.style.display = 'block';
             } else {
                 noResultsMsg.style.display = 'none';
             }
 
+<<<<<<< HEAD
+=======
+            // Sync Checkbox Select All display logic after filtering
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
             updateSelectAllState();
         }
 
@@ -718,7 +857,10 @@
 
         filterDept.addEventListener('change', applyFilters);
         searchInput.addEventListener('keyup', applyFilters);
+<<<<<<< HEAD
         filterLevel.addEventListener('change', applyFilters); // Trigger filter level
+=======
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
 
         // Checkbox Control Logic
         function updateSelectAllState() {
@@ -730,6 +872,10 @@
         selectAllCheckbox.addEventListener('change', function () {
             const isChecked = this.checked;
             employeeCheckboxes.forEach(checkbox => {
+<<<<<<< HEAD
+=======
+                // only check if row is visible
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
                 if (checkbox.closest('tr').style.display !== 'none') {
                     checkbox.checked = isChecked;
                 }

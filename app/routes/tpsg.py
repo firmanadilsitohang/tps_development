@@ -93,6 +93,7 @@ def dashboard():
         age_labels=['Produktif (<50)', 'Risk Area (>=50)'], age_values=[prod, risk],
         batch_labels=r_batch_labels, batch_kp3=r_batch_kp3, batch_kp4=r_batch_kp4
     )
+<<<<<<< HEAD
 
 # =======================================================
 # 2. DIRECTORY PARTISIPAN
@@ -302,6 +303,175 @@ def import_excel():
 # =======================================================
 # 4. HAPUS & RESET DATA 
 # =======================================================
+=======
+
+# =======================================================
+# 2. DIRECTORY PARTISIPAN
+# =======================================================
+@tpsg.route('/employees')
+@login_required
+@tpsg_required
+def employees():
+    all_participants = Employee.query.order_by(Employee.name.asc()).all()
+    return render_template('tpsg/employees.html', employees=all_participants)
+
+# =======================================================
+# 3. IMPORT EXCEL (SMART COLUMN MAPPING)
+# =======================================================
+@tpsg.route('/import-excel', methods=['GET', 'POST'])
+@login_required
+@tpsg_required
+def import_excel():
+    if request.method == 'POST':
+        file = request.files.get('file')
+        if not file:
+            flash('Pilih file dulu!', 'warning')
+            return redirect(request.url)
+        try:
+            excel_file = pd.ExcelFile(file)
+            
+            # Cek format file khusus Batch Success Rate
+            is_batch_stats = False
+            for sheet_name in excel_file.sheet_names:
+                df = excel_file.parse(sheet_name)
+                cols_check = [str(c).strip().upper() for c in df.columns]
+                
+                if "BATCH" in cols_check and "PARTICIPAN" in cols_check and "KP 3" in cols_check:
+                    is_batch_stats = True
+                    df.columns = cols_check
+                    
+                    BatchStat.query.delete()
+                    
+                    def safe_int(val):
+                        try:
+                            if pd.notnull(val): return int(float(val))
+                        except: pass
+                        return 0
+
+                    for _, row in df.iterrows():
+                        b_val = str(row['BATCH']).strip()
+                        if b_val.upper() in ['TOTAL', 'NAN', 'N/A', '']:
+                            continue
+                            
+                        stat = BatchStat(
+                            batch_name=b_val,
+                            participant_count=safe_int(row.get('PARTICIPAN')),
+                            kp3_count=safe_int(row.get('KP 3')),
+                            kp4_count=safe_int(row.get('KP 4')),
+                            kp3_percent=str(row.get('%KP3', '')),
+                            kp4_percent=str(row.get('%KP4', ''))
+                        )
+                        db.session.add(stat)
+                        
+                    db.session.commit()
+                    break
+
+            if is_batch_stats:
+                flash('Import Sukses! Grafik Batch Success Rate telah diperbarui.', 'success')
+                return redirect(url_for('tpsg.dashboard'))
+
+            def process_sheet(sheet_name, default_level_func):
+                if sheet_name in excel_file.sheet_names:
+                    df = excel_file.parse(sheet_name)
+                    df.columns = [str(c).strip().upper() for c in df.columns]
+                    
+                    for _, row in df.iterrows():
+                        # Pencarian Kolom NIK/NOREG
+                        noreg = None
+                        for col in ['NOREG', 'NIK', 'NO REG']:
+                            if col in row:
+                                noreg = str(row[col]).replace('.0', '').strip()
+                                break
+                        
+                        if not noreg or noreg.lower() == 'nan': continue
+                        if len(noreg) == 7: noreg = "0" + noreg
+                        
+                        # Pencarian Nama
+                        nama = "Tanpa Nama"
+                        for col in ['NAMA', 'NAME', 'NAMA LENGKAP']:
+                            if col in row and pd.notnull(row[col]):
+                                nama = str(row[col]).strip()
+                                break
+
+                        emp = Employee.query.filter_by(username=noreg).first()
+                        if not emp:
+                            emp = Employee(username=noreg, name=nama)
+                            db.session.add(emp)
+                            db.session.flush() 
+                        else:
+                            emp.name = nama
+
+                        # Pencarian Tahun Lahir
+                        birth_year = None
+                        for col in ['TAHUN LAHIR', 'THN LAHIR', 'BIRTH YEAR', 'YEAR']:
+                            if col in row and pd.notnull(row[col]):
+                                try:
+                                    birth_year = int(float(row[col]))
+                                    break
+                                except: pass
+                        
+                        if birth_year:
+                            emp.birth_date = date(birth_year, 1, 1)
+
+                        emp.position = str(row.get('JABATAN', emp.position))
+                        emp.photo = str(row.get('FOTO', emp.photo))
+                        
+                        # --- Area / Plant ---
+                        plant_name = None
+                        if 'PLANT_ID' in row and pd.notnull(row['PLANT_ID']):
+                            plant_name = str(row['PLANT_ID']).strip()
+                        if plant_name:
+                            p = Plant.query.filter_by(name=plant_name).first()
+                            if not p:
+                                p = Plant(name=plant_name); db.session.add(p); db.session.flush()
+                            emp.plant_id = p.id
+                            
+                        # --- Division ---
+                        div_name = None
+                        if 'DIVISI' in row and pd.notnull(row['DIVISI']):
+                            div_name = str(row['DIVISI']).strip()
+                        if div_name:
+                            div = Division.query.filter_by(name=div_name).first()
+                            if not div:
+                                div = Division(name=div_name); db.session.add(div); db.session.flush()
+                            emp.division_id = div.id
+                            
+                        # --- Department ---
+                        dept_name = None
+                        if 'DEPARTEMEN' in row and pd.notnull(row['DEPARTEMEN']):
+                            dept_name = str(row['DEPARTEMEN']).strip()
+                        if dept_name:
+                            dept = Department.query.filter_by(name=dept_name).first()
+                            if not dept:
+                                dept = Department(name=dept_name); db.session.add(dept); db.session.flush()
+                            emp.department_id = dept.id
+                        
+                        new_level = default_level_func(row)
+                        if emp.current_tps_level:
+                            if new_level not in emp.current_tps_level:
+                                emp.current_tps_level += f", {new_level}"
+                        else:
+                            emp.current_tps_level = new_level
+
+                        if not User.query.filter_by(employee_id=emp.id).first():
+                            db.session.add(User(username=noreg, password=generate_password_hash('tmmin123'), role='participant', employee_id=emp.id))
+
+            process_sheet('TPS KP', lambda r: "KEY PERSON 4" if "4" in str(r.get('KP_ID', '')) else "KEY PERSON 3")
+            process_sheet('TPS ADVANCE', lambda r: "ADVANCE")
+            process_sheet('MEMBER OFFICE JISHUKEN', lambda r: "JISHUKEN MEMBER")
+
+            db.session.commit()
+            flash('Import Sukses! Data & Grafik telah diperbarui.', 'success')
+            return redirect(url_for('tpsg.employees'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error: {str(e)}', 'danger')
+    return render_template('tpsg/import_excel.html')
+
+# =======================================================
+# 4. HAPUS & RESET DATA 
+# =======================================================
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
 @tpsg.route('/bulk-delete-employees', methods=['POST'])
 @login_required
 @tpsg_required

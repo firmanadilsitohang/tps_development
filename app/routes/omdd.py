@@ -253,6 +253,7 @@ def detail_employee(id):
     return render_template('omdd/detail.html', employee=employee, umur=umur)
 
 # ==========================================
+<<<<<<< HEAD
 # HALAMAN PARTISIPAN (TABEL LENGKAP)
 # ==========================================
 @omdd.route('/participants')
@@ -290,6 +291,8 @@ def participants():
                            eval_map=eval_map)
 
 # ==========================================
+=======
+>>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
 # MASTER DIRECTORY (DAFTAR SEMUA KARYAWAN)
 # ==========================================
 @omdd.route('/directory')
