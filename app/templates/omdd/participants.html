@@ -3,344 +3,363 @@
 {% block title %}Partisipan | OMDD System{% endblock %}
 
 {% block extra_css %}
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;700&display=swap"
+    rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     :root {
         --bg-cyber: #04070d;
-        --panel-bg: #0b1019;
-        --neon-blue: #00d2ff;
-        --neon-green: #39ff14;
-        --neon-pink: #ff00a0;
-        --neon-gold: #ffcc00;
-        --neon-red: #ff0055;
-        --border-glass: rgba(255, 255, 255, 0.07);
+        --panel-bg: #0d1117;
+        --neon-blue: #58a6ff;
+        --neon-gold: #e3b341;
+        --neon-green: #3fb950;
+        --neon-red: #f85149;
+        --border-dark: #30363d;
+        --hover-bg: rgba(88, 166, 255, 0.08);
     }
 
     body {
         background-color: var(--bg-cyber);
-        color: #e0e6ed;
+        color: #c9d1d9;
         font-family: 'Inter', sans-serif;
     }
 
-    /* Page Header */
-    .page-header {
-        background: linear-gradient(90deg, #0a0f1e 0%, rgba(10, 15, 30, 0.4) 100%);
-        padding: 20px 25px;
-        border-radius: 14px;
-        border-left: 5px solid var(--neon-blue);
-        margin-bottom: 24px;
-        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
+    /* Header & Panel Styles */
+    .premium-header {
+        background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+        border: 1px solid var(--border-dark);
+        border-radius: 16px;
+        padding: 24px 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
     }
 
     .page-title {
         font-family: 'Oswald', sans-serif;
-        font-size: 22px;
-        letter-spacing: 3px;
-        color: #fff;
+        letter-spacing: 1.5px;
+        color: #ffffff;
         margin: 0;
+        font-size: 26px;
         text-transform: uppercase;
+        text-shadow: 0 2px 10px rgba(88, 166, 255, 0.2);
     }
 
-    .header-icon {
-        background: rgba(0, 210, 255, 0.1);
-        padding: 12px 15px;
-        border-radius: 12px;
-        border: 1px solid rgba(0, 210, 255, 0.3);
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
-    }
-
-    /* Stats bar */
-    .stats-bar {
+    /* Fitur Pencarian & Filter (Lebih Responsif) */
+    .filter-section {
+        border-top: 1px solid var(--border-dark);
+        padding-top: 20px;
+        margin-top: 20px;
         display: flex;
-        gap: 16px;
-        margin-bottom: 24px;
         flex-wrap: wrap;
-    }
-
-    .stat-chip {
-        background: #0b1019;
-        border: 1px solid var(--border-glass);
-        border-radius: 10px;
-        padding: 12px 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 13px;
-    }
-
-    .stat-chip i {
-        font-size: 16px;
-    }
-
-    .stat-chip .val {
-        font-family: 'Oswald', sans-serif;
-        font-size: 22px;
-        font-weight: 700;
-        line-height: 1;
-    }
-
-    .stat-chip .lbl {
-        font-size: 10px;
-        color: #8b949e;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    /* Table Panel */
-    .tbl-panel {
-        background: var(--panel-bg);
-        border: 1px solid var(--border-glass);
-        border-radius: 14px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-        overflow: hidden;
-    }
-
-    .tbl-panel-header {
-        padding: 18px 24px;
-        border-bottom: 1px solid var(--border-glass);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .tbl-panel-title {
-        font-family: 'Oswald', sans-serif;
-        color: var(--neon-blue);
-        font-size: 16px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
+        gap: 15px;
     }
 
     .search-wrapper {
         position: relative;
-        width: 280px;
+        flex: 1 1 300px;
     }
 
-    .search-wrapper .fa-search {
+    .search-icon {
         position: absolute;
-        left: 14px;
+        left: 16px;
         top: 50%;
         transform: translateY(-50%);
         color: #8b949e;
-        font-size: 12px;
+        font-size: 14px;
     }
 
-    .search-input {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    .filter-box {
+        background-color: #010409;
+        border: 1px solid var(--border-dark);
         border-radius: 10px;
-        padding: 10px 16px 10px 38px;
-        color: #e0e6ed;
-        font-size: 13px;
-        outline: none;
-        transition: all 0.3s;
+        color: #c9d1d9;
+        padding: 12px 16px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        flex: 1 1 180px;
     }
 
-    .search-input:focus {
-        border-color: var(--neon-blue);
-        box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.1);
-    }
-
-    /* Table */
-    .participants-table {
+    .search-wrapper .filter-box {
+        padding-left: 45px;
         width: 100%;
-        border-collapse: collapse;
-        min-width: 900px;
     }
 
-    .tbl-wrap {
+    .filter-box:focus,
+    .filter-box:not(:disabled):hover {
+        outline: none;
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.15);
+        background-color: #0d1117;
+    }
+
+    .filter-box:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .filter-box option {
+        background-color: #0d1117;
+        color: #c9d1d9;
+        padding: 10px;
+    }
+
+    /* Table Styling dengan Scroll Custom */
+    .table-container {
+        background: #161b22;
+        border: 1px solid var(--border-dark);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        margin-bottom: 30px;
+    }
+
+    .table-responsive {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .participants-table thead tr {
-        background: rgba(0, 210, 255, 0.04);
+    .table-responsive::-webkit-scrollbar {
+        height: 10px;
     }
 
-    .participants-table th {
-        font-size: 10px;
+    .table-responsive::-webkit-scrollbar-track {
+        background: #0d1117;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--border-dark);
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #484f58;
+    }
+
+    /* PERBAIKAN: MEMAKSA TABEL MENJADI GELAP (!important) */
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        min-width: 1000px;
+        background-color: #161b22 !important;
+        color: #c9d1d9 !important;
+    }
+
+    .table thead,
+    .table thead tr,
+    .table thead th {
+        background: #1f242c !important;
+    }
+
+    .table th {
+        color: #8b949e !important;
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1.2px;
-        color: var(--neon-blue);
-        padding: 14px 16px;
-        text-align: left;
-        border-bottom: 1px solid rgba(0, 210, 255, 0.15);
+        border-bottom: 2px solid var(--border-dark) !important;
+        padding: 18px 15px;
         white-space: nowrap;
+        letter-spacing: 0.5px;
     }
 
-    .participants-table td {
-        padding: 13px 16px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    .table td {
         vertical-align: middle;
-        font-size: 13px;
+        padding: 16px 15px;
+        border-bottom: 1px solid #21262d !important;
+        color: #c9d1d9 !important;
+        background-color: #161b22 !important;
+        transition: background-color 0.2s;
     }
 
-    .participants-table tbody tr:hover td {
-        background: rgba(0, 210, 255, 0.03);
+    .table tbody tr {
+        background-color: #161b22 !important;
+        transition: transform 0.2s, background-color 0.2s;
     }
 
-    .participants-table tbody tr:last-child td {
-        border-bottom: none;
+    .table tbody tr:hover,
+    .table tbody tr:hover td {
+        background-color: var(--hover-bg) !important;
     }
 
-    /* Avatar */
-    .emp-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+    /* Checkbox Custom */
+    .form-check-input {
+        background-color: #010409;
+        border: 2px solid var(--border-dark);
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--neon-blue);
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 10px rgba(88, 166, 255, 0.4);
+    }
+
+    /* Foto & Frame */
+    .photo-wrapper {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
         overflow: hidden;
-        border: 1px solid rgba(0, 210, 255, 0.25);
-        flex-shrink: 0;
+        background: #010409;
+        border: 2px solid var(--border-dark);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        transition: transform 0.3s ease;
     }
 
-    .emp-avatar img {
+    .table tbody tr:hover .photo-wrapper {
+        border-color: rgba(88, 166, 255, 0.5);
+        transform: scale(1.05);
+    }
+
+    .photo-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
 
-    .emp-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
+    /* Typography Data */
     .emp-name {
-        font-weight: 700;
-        color: #fff;
-        font-size: 13px;
-    }
-
-    .emp-nik {
-        font-size: 10px;
-        color: #8b949e;
-        font-family: monospace;
-    }
-
-    /* Badges */
-    .badge-mini {
-        padding: 3px 9px;
-        border-radius: 5px;
-        font-size: 10px;
+        font-size: 15px;
         font-weight: 800;
-        display: inline-block;
-        white-space: nowrap;
+        color: #ffffff;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .emp-job {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--neon-gold);
+        text-transform: uppercase;
+        margin-bottom: 6px;
         letter-spacing: 0.5px;
     }
 
+    .emp-nik {
+        font-size: 12px;
+        color: #8b949e;
+        font-family: 'JetBrains Mono', monospace, sans-serif;
+        letter-spacing: 0.5px;
+    }
+
+    .org-area {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .org-div-dept {
+        color: #8b949e;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .text-neon-red {
+        color: var(--neon-red) !important;
+    }
+
+    .text-neon-green {
+        color: var(--neon-green) !important;
+    }
+
+    /* Badges Level TPS */
+    .badges-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .badge-level {
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        display: inline-block;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
     .badge-kp4 {
-        background: rgba(255, 204, 0, 0.12);
+        background: rgba(227, 179, 65, 0.1);
         color: var(--neon-gold);
-        border: 1px solid rgba(255, 204, 0, 0.3);
+        border: 1px solid rgba(227, 179, 65, 0.4);
     }
 
     .badge-kp3 {
-        background: rgba(57, 255, 20, 0.1);
+        background: rgba(63, 185, 80, 0.1);
         color: var(--neon-green);
-        border: 1px solid rgba(57, 255, 20, 0.3);
+        border: 1px solid rgba(63, 185, 80, 0.4);
     }
 
     .badge-adv {
-        background: rgba(0, 210, 255, 0.1);
+        background: rgba(88, 166, 255, 0.1);
         color: var(--neon-blue);
-        border: 1px solid rgba(0, 210, 255, 0.3);
+        border: 1px solid rgba(88, 166, 255, 0.4);
     }
 
     .badge-jis {
         background: rgba(188, 19, 254, 0.1);
         color: #bc13fe;
-        border: 1px solid rgba(188, 19, 254, 0.3);
+        border: 1px solid rgba(188, 19, 254, 0.4);
     }
 
-    .badge-none {
-        border-color: #30363d;
-        color: #8b949e;
-        border: 1px solid #30363d;
-    }
-
-    /* Score ring */
-    .score-ring {
+    /* Button Actions */
+    .btn-detail {
+        background: rgba(88, 166, 255, 0.1);
+        color: var(--neon-blue);
+        border: 1px solid rgba(88, 166, 255, 0.3);
+        font-weight: 700;
+        font-size: 12px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        font-weight: 800;
-        font-size: 12px;
-        border: 2px solid;
     }
 
-    .score-high {
-        border-color: var(--neon-green);
-        color: var(--neon-green);
-        background: rgba(57, 255, 20, 0.08);
-    }
-
-    .score-mid {
-        border-color: var(--neon-gold);
-        color: var(--neon-gold);
-        background: rgba(255, 204, 0, 0.08);
-    }
-
-    .score-low {
-        border-color: var(--neon-red);
-        color: var(--neon-red);
-        background: rgba(255, 0, 85, 0.08);
-    }
-
-    .score-none {
-        border-color: #30363d;
-        color: #8b949e;
-        background: transparent;
-    }
-
-    /* Action button */
-    .btn-action {
-        background: rgba(0, 210, 255, 0.08);
-        color: var(--neon-blue);
-        border: 1px solid rgba(0, 210, 255, 0.3);
-        padding: 7px 14px;
-        border-radius: 7px;
-        font-weight: 700;
-        font-size: 11px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.25s;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-
-    .btn-action:hover {
+    .btn-detail:hover {
         background: var(--neon-blue);
-        color: #000;
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+        color: #04070d;
+        border-color: var(--neon-blue);
+        box-shadow: 0 4px 15px rgba(88, 166, 255, 0.4);
+        transform: translateY(-2px);
     }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+    .btn-delete-mass {
+        background: rgba(248, 81, 73, 0.1);
+        color: var(--neon-red);
+        border: 1px solid rgba(248, 81, 73, 0.4);
+        font-weight: 700;
+        padding: 10px 20px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-size: 13px;
+        letter-spacing: 0.5px;
     }
 
-    ::-webkit-scrollbar-track {
-        background: #04070d;
+    .btn-delete-mass:hover {
+        background: var(--neon-red);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(248, 81, 73, 0.4);
+        transform: translateY(-2px);
     }
 
-    ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.2);
+    .info-box {
+        background: rgba(13, 17, 23, 0.8);
+        border: 1px solid var(--border-dark);
+        border-radius: 10px;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
     }
 </style>
 {% endblock %}
@@ -348,174 +367,354 @@
 {% block content %}
 <div class="container-fluid p-3 p-md-4">
 
-    <!-- ===== PAGE HEADER ===== -->
-    <div class="page-header">
-        <div class="d-flex align-items-center gap-3">
-            <div class="header-icon">
-                <i class="fas fa-users" style="font-size: 24px; color: var(--neon-blue);"></i>
-            </div>
+    <div class="premium-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
             <div>
-                <h1 class="page-title">Daftar Partisipan</h1>
-                <p class="m-0" style="font-size: 11px; color: #8b949e; letter-spacing: 2px;">OMDD — OPERATIONAL
-                    MANAGEMENT & DEVELOPMENT DIVISION</p>
+                <h1 class="page-title"><i class="fas fa-users-cog me-3 text-info"></i> DAFTAR PARTISIPAN</h1>
+                <p class="text-secondary m-0 mt-2 small" style="font-size: 13px;">
+                    OMDD — OPERATIONAL MANAGEMENT & DEVELOPMENT DIVISION
+                </p>
             </div>
         </div>
-        <div style="font-family: 'Oswald'; font-size: 14px; color: #8b949e;">
-            Total: <span style="color: var(--neon-blue); font-size: 22px;">{{ employees|length }}</span> Partisipan
-        </div>
-    </div>
 
-
-
-
-    <div class="stats-bar">
-        {% set ns = namespace(kp4=0, kp3=0) %}
-        {% for emp in employees %}
-        {% if emp.current_tps_level %}
-        {% set lvl = emp.current_tps_level | string | upper %}
-        {% if '4' in lvl %}{% set ns.kp4 = ns.kp4 + 1 %}{% endif %}
-        {% if '3' in lvl and '4' not in lvl %}{% set ns.kp3 = ns.kp3 + 1 %}{% endif %}
-        {% endif %}
-        {% endfor %}
-
-        <div class="stat-chip" style="border-color: rgba(255,204,0,0.3);">
-            <i class="fas fa-certificate" style="color: var(--neon-gold);"></i>
-            <div>
-                <div class="val" style="color: var(--neon-gold);">{{ ns.kp4 }}</div>
-                <div class="lbl">TPS KP4</div>
-            </div>
-        </div>
-        <div class="stat-chip" style="border-color: rgba(57,255,20,0.3);">
-            <i class="fas fa-award" style="color: var(--neon-green);"></i>
-            <div>
-                <div class="val" style="color: var(--neon-green);">{{ ns.kp3 }}</div>
-                <div class="lbl">TPS KP3</div>
-            </div>
-        </div>
-        <div class="stat-chip" style="border-color: rgba(0,210,255,0.3);">
-            <i class="fas fa-users" style="color: var(--neon-blue);"></i>
-            <div>
-                <div class="val" style="color: var(--neon-blue);">{{ employees | length }}</div>
-                <div class="lbl">Total Partisipan</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== PARTICIPANTS TABLE ===== -->
-    <div class="tbl-panel">
-        <div class="tbl-panel-header">
-            <span class="tbl-panel-title"><i class="fas fa-table me-2"></i>Master Partisipan OMDD</span>
+        <div class="filter-section">
             <div class="search-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" id="participantSearch" class="search-input" placeholder="Cari nama, NIK, plant...">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="filter-box" placeholder="Cari Nama, NIK, atau Jabatan...">
             </div>
+            <select id="filterArea" class="filter-box">
+                <option value="">-- Semua Area --</option>
+            </select>
+            <select id="filterDivisi" class="filter-box" disabled>
+                <option value="">-- Semua Divisi --</option>
+            </select>
+            <select id="filterDept" class="filter-box" disabled>
+                <option value="">-- Semua Departemen --</option>
+            </select>
+            <select id="filterLevel" class="filter-box">
+                <option value="">-- Semua Level --</option>
+            </select>
         </div>
-        <div class="tbl-wrap">
-            <table class="participants-table" id="participantsTable">
+    </div>
+
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-3 gap-3">
+        <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+
+
+        </div>
+        <div class="info-box text-secondary small fw-bold">
+            Total Menampilkan: <span id="rowCountDisplay" class="text-white mx-2 fs-6">{{ employees|length }}</span>
+            Partisipan
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table" id="employeeTable">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Profil Partisipan</th>
-                        <th>NIK</th>
-                        <th>Plant / Division</th>
-                        <th>Departemen</th>
-                        <th>Jabatan</th>
-                        <th style="text-align:center;">Level TPS</th>
-                        <th style="text-align:center;">Genba</th>
-                        <th style="text-align:center;">Analysis</th>
-                        <th style="text-align:center;">P.Solving</th>
-                        <th style="text-align:center;">Kaizen</th>
-                        <th style="text-align:center;">Obs.</th>
-                        <th style="text-align:center;">Aksi</th>
+                        <th style="width: 100px; text-align: center;">FOTO</th>
+                        <th>PROFIL PARTISIPAN</th>
+                        <th>ORGANISASI</th>
+                        <th>KUALIFIKASI / LEVEL TPS</th>
+                        <th class="text-center">USIA & PENSIUN</th>
+                        <th class="text-center" style="width: 120px;">AKSI</th>
                     </tr>
                 </thead>
-                <tbody id="participantsBody">
-
-                    {# Score ring macro — defined ONCE outside the for loop #}
-                    {% macro score_box(val) %}
-                    {% if val and val > 0 %}
-                    {% if val >= 75 %}<span class="score-ring score-high">{{ val|int }}</span>
-                    {% elif val >= 50 %}<span class="score-ring score-mid">{{ val|int }}</span>
-                    {% else %}<span class="score-ring score-low">{{ val|int }}</span>
-                    {% endif %}
-                    {% else %}<span class="score-ring score-none">—</span>
-                    {% endif %}
-                    {% endmacro %}
-
+                <tbody id="employeeTableBody">
                     {% for emp in employees %}
-                    {% set ev = eval_map.get(emp.id) %}
-                    {% set level_str = emp.current_tps_level | default('', true) | upper %}
-                    <tr class="participant-row">
-                        <td style="color: #8b949e; font-size: 11px; font-family: monospace;">{{ loop.index }}</td>
-                        <td>
-                            <div class="emp-info">
-                                <div class="emp-avatar">
-                                    {% if emp.photo %}
-                                    <img src="{{ emp.photo }}"
-                                        onerror="this.src='https://ui-avatars.com/api/?name={{ emp.name|urlencode }}&background=0b1019&color=00d2ff&size=80'">
-                                    {% else %}
-                                    <img
-                                        src="https://ui-avatars.com/api/?name={{ emp.name|urlencode }}&background=0b1019&color=00d2ff&size=80">
-                                    {% endif %}
-                                </div>
-                                <div>
-                                    <div class="emp-name">{{ emp.name }}</div>
-                                    <div class="emp-nik">{{ emp.batch if emp.batch else '—' }}</div>
-                                </div>
+                    {% set age = 2026 - emp.birth_date.year if emp.birth_date else 0 %}
+                    {% set pension = emp.birth_date.year + 55 if emp.birth_date else 0 %}
+
+                    {% set area_name = emp.plant.name if emp.plant else 'N/A' %}
+                    {% set div_name = emp.division.name if emp.division else 'N/A' %}
+                    {% set dept_name = emp.department.name if emp.department else 'N/A' %}
+
+                    <tr class="employee-row" data-area="{{ area_name }}" data-divisi="{{ div_name }}"
+                        data-dept="{{ dept_name }}" data-level="{{ emp.current_tps_level | default('', true) }}">
+
+
+
+                        <td class="text-center">
+                            <div class="photo-wrapper mx-auto">
+                                {% if emp.photo %}
+                                <img src="{{ emp.photo }}" class="photo-img"
+                                    onerror="this.src='https://ui-avatars.com/api/?name={{ emp.name | urlencode }}&background=0d1117&color=c9d1d9&size=150'">
+                                {% else %}
+                                <img src="https://ui-avatars.com/api/?name={{ emp.name | urlencode }}&background=0d1117&color=c9d1d9&size=150"
+                                    class="photo-img">
+                                {% endif %}
                             </div>
                         </td>
-                        <td style="font-family: monospace; font-size: 12px; color: #38bdf8;">{{ emp.username }}</td>
+
                         <td>
-                            <div style="font-size: 12px; color: #fff; font-weight: 600;">{{ emp.plant.name if emp.plant
-                                else '—' }}</div>
-                            <div style="font-size: 11px; color: #8b949e;">{{ emp.division.name if emp.division else '—'
+                            <div class="emp-name">{{ emp.name }}</div>
+                            <div class="emp-job">{{ emp.position if emp.position else 'NO POSITION' }}</div>
+                            <div class="emp-nik"><i class="fas fa-id-badge me-2 text-secondary"></i>{{ emp.username
                                 }}</div>
+                            {% if emp.batch and emp.batch != 'nan' %}
+                            <div class="mt-2">
+                                <span class="badge bg-dark border border-secondary text-light px-2 py-1"
+                                    style="font-size: 10px; letter-spacing: 0.5px; border-radius: 6px;">
+                                    <i class="fas fa-layer-group me-1 text-secondary"></i> BATCH: {{ emp.batch }}
+                                </span>
+                            </div>
+                            {% endif %}
                         </td>
-                        <td style="font-size: 12px; color: #8b949e;">{{ emp.department.name if emp.department else '—'
-                            }}</td>
-                        <td
-                            style="font-size: 12px; color: #cbd5e1; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            {{ emp.position if emp.position else '—' }}</td>
-                        <td style="text-align:center;">
-                            {% if '4' in level_str %}<span class="badge-mini badge-kp4">KP4</span>
-                            {% elif '3' in level_str %}<span class="badge-mini badge-kp3">KP3</span>
-                            {% elif 'ADV' in level_str %}<span class="badge-mini badge-adv">ADV</span>
-                            {% elif 'JIS' in level_str %}<span class="badge-mini badge-jis">JIS</span>
-                            {% else %}<span class="badge-mini badge-none">—</span>{% endif %}
+
+                        <td>
+                            <div class="org-area"><i class="fas fa-industry me-2 text-secondary"></i>{{ area_name }}
+                            </div>
+                            <div class="org-div-dept">
+                                <span class="fw-bold text-light">Div:</span> {{ div_name }}<br>
+                                <span class="fw-bold text-light">Dept:</span> {{ dept_name }}
+                            </div>
                         </td>
-                        <td style="text-align:center;">{{ score_box(ev.genba if ev else 0) }}</td>
-                        <td style="text-align:center;">{{ score_box(ev.analysis if ev else 0) }}</td>
-                        <td style="text-align:center;">{{ score_box(ev.problem_solving if ev else 0) }}</td>
-                        <td style="text-align:center;">{{ score_box(ev.kaizen if ev else 0) }}</td>
-                        <td style="text-align:center;">{{ score_box(ev.observation if ev else 0) }}</td>
-                        <td style="text-align:center;">
-                            <a href="{{ url_for('omdd.detail_employee', id=emp.id) }}" class="btn-action">
-                                <i class="fas fa-eye me-1"></i> Detail
+
+                        <td>
+                            <div class="badges-container">
+                                {% set level_str = emp.current_tps_level | default('', true) | upper %}
+                                {% if level_str %}
+                                {% set levels = level_str.split(',') %}
+                                {% set unique_levels = [] %}
+                                {% for lvl in levels %}
+                                {% set clean_lvl = lvl | trim %}
+                                {% if clean_lvl and clean_lvl not in unique_levels %}
+                                {% set _ = unique_levels.append(clean_lvl) %}
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for clean_lvl in unique_levels %}
+                                {% if 'JIS' in clean_lvl %}
+                                <span class="badge-level badge-jis">{{ clean_lvl }}</span>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for clean_lvl in unique_levels %}
+                                {% if '3' in clean_lvl %}
+                                <span class="badge-level badge-kp3">{{ clean_lvl }}</span>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for clean_lvl in unique_levels %}
+                                {% if '4' in clean_lvl %}
+                                <span class="badge-level badge-kp4">{{ clean_lvl }}</span>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for clean_lvl in unique_levels %}
+                                {% if 'ADV' in clean_lvl %}
+                                <span class="badge-level badge-adv">{{ clean_lvl }}</span>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for clean_lvl in unique_levels %}
+                                {% if 'JIS' not in clean_lvl and '3' not in clean_lvl and '4' not in clean_lvl and
+                                'ADV' not in clean_lvl %}
+                                <span class="badge-level bg-secondary text-white">{{ clean_lvl }}</span>
+                                {% endif %}
+                                {% endfor %}
+                                {% else %}
+                                <span class="badge-level bg-dark text-secondary border border-secondary">BELUM ADA
+                                    LEVEL</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            {% if age > 0 %}
+                            <div class="fw-bold mb-1 {% if age >= 50 %}text-neon-red{% else %}text-neon-green{% endif %}"
+                                style="font-size: 17px;">
+                                {% if age >= 50 %}<i class="fas fa-exclamation-triangle me-1"></i>{% endif %}{{ age
+                                }} Thn
+                            </div>
+                            <div class="text-secondary" style="font-size: 12px;">
+                                Pensiun: <span class="fw-bold" style="color: #c9d1d9;">{{ pension }}</span>
+                            </div>
+                            {% else %}
+                            <div class="text-secondary">-</div>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center">
+                            <a href="{{ url_for('omdd.detail_employee', id=emp.id) }}" class="btn btn-detail w-100">
+                                <i class="fas fa-external-link-alt me-2"></i> DETAIL
                             </a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="13" style="text-align:center; padding: 50px; color: #64748b;">
-                            <i class="fas fa-users-slash"
-                                style="font-size: 32px; display: block; margin-bottom: 14px;"></i>
-                            Belum ada data partisipan.
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        <div id="noResultsMsg" class="text-center py-5" style="display: none; background: #0d1117;">
+            <i class="fas fa-search fa-3x text-secondary mb-3 opacity-50"></i>
+            <h4 class="text-white mt-2">Tidak Ada Data Ditemukan</h4>
+            <p class="text-secondary">Cobalah mengubah filter pencarian atau kata kunci.</p>
+        </div>
     </div>
 
 </div>
 
 <script>
-    document.getElementById('participantSearch').addEventListener('input', function () {
-        const q = this.value.toLowerCase();
-        document.querySelectorAll('.participant-row').forEach(row => {
-            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    document.addEventListener("DOMContentLoaded", function () {
+        // Elements
+        const searchInput = document.getElementById('searchInput');
+        const filterArea = document.getElementById('filterArea');
+        const filterDivisi = document.getElementById('filterDivisi');
+        const filterDept = document.getElementById('filterDept');
+        const filterLevel = document.getElementById('filterLevel');
+        const rows = Array.from(document.querySelectorAll('.employee-row'));
+        const rowCountDisplay = document.getElementById('rowCountDisplay');
+        const noResultsMsg = document.getElementById('noResultsMsg');
+
+        // Extract and populate initial Area Dropdown
+        const uniqueAreas = new Set();
+        rows.forEach(row => {
+            const area = row.dataset.area;
+            if (area && area !== "N/A") uniqueAreas.add(area);
         });
+
+        Array.from(uniqueAreas).sort().forEach(area => {
+            const option = document.createElement('option');
+            option.value = area;
+            option.textContent = area;
+            filterArea.appendChild(option);
+        });
+
+        // PERBAIKAN JS: Mengambil data level dan memecahnya ke dropdown
+        const uniqueLevels = new Set();
+        rows.forEach(row => {
+            // Ambil data-level (mengambil string seperti "KEY PERSON 3, ADVANCE")
+            const levelStr = row.dataset.level;
+            if (levelStr && levelStr !== "N/A" && levelStr.trim() !== "") {
+                // Pecah berdasarkan koma, bersihkan spasi, dan masukkan ke Set
+                levelStr.split(',').forEach(lvl => {
+                    const cleanLvl = lvl.trim();
+                    if (cleanLvl) uniqueLevels.add(cleanLvl);
+                });
+            }
+        });
+
+        Array.from(uniqueLevels).sort().forEach(level => {
+            const option = document.createElement('option');
+            option.value = level;
+            option.textContent = level;
+            filterLevel.appendChild(option);
+        });
+
+        function populateDivisi(selectedArea) {
+            filterDivisi.innerHTML = '<option value="">-- Semua Divisi --</option>';
+            filterDept.innerHTML = '<option value="">-- Semua Departemen --</option>';
+            filterDept.disabled = true;
+
+            if (!selectedArea) {
+                filterDivisi.disabled = true;
+                return;
+            }
+
+            filterDivisi.disabled = false;
+            const uniqueDivs = new Set();
+            rows.forEach(row => {
+                if (row.dataset.area === selectedArea) {
+                    const div = row.dataset.divisi;
+                    if (div && div !== "N/A") uniqueDivs.add(div);
+                }
+            });
+
+            Array.from(uniqueDivs).sort().forEach(div => {
+                const option = document.createElement('option');
+                option.value = div;
+                option.textContent = div;
+                filterDivisi.appendChild(option);
+            });
+        }
+
+        function populateDept(selectedDivisi) {
+            filterDept.innerHTML = '<option value="">-- Semua Departemen --</option>';
+
+            if (!selectedDivisi) {
+                filterDept.disabled = true;
+                return;
+            }
+
+            filterDept.disabled = false;
+            const uniqueDepts = new Set();
+            rows.forEach(row => {
+                if (row.dataset.area === filterArea.value && row.dataset.divisi === selectedDivisi) {
+                    const dept = row.dataset.dept;
+                    if (dept && dept !== "N/A") uniqueDepts.add(dept);
+                }
+            });
+
+            Array.from(uniqueDepts).sort().forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                filterDept.appendChild(option);
+            });
+        }
+
+        // PERBAIKAN JS: Logika Filter
+        function applyFilters() {
+            const searchText = searchInput.value.toLowerCase();
+            const areaVal = filterArea.value;
+            const divVal = filterDivisi.value;
+            const deptVal = filterDept.value;
+            const levelVal = filterLevel.value.toLowerCase();
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const textContent = row.textContent.toLowerCase();
+                const rowArea = row.dataset.area;
+                const rowDiv = row.dataset.divisi;
+                const rowDept = row.dataset.dept;
+                // Ambil string dari dataset.level, lalu jadikan huruf kecil
+                const rowLevel = (row.dataset.level || "").toLowerCase();
+
+                const mSearch = textContent.includes(searchText);
+                const mArea = !areaVal || rowArea === areaVal;
+                const mDiv = !divVal || rowDiv === divVal;
+                const mDept = !deptVal || rowDept === deptVal;
+                // Cek apakah string rowLevel mengandung string levelVal
+                const mLevel = !levelVal || rowLevel.includes(levelVal);
+
+                if (mSearch && mArea && mDiv && mDept && mLevel) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            rowCountDisplay.textContent = visibleCount;
+
+            if (visibleCount === 0) {
+                noResultsMsg.style.display = 'block';
+            } else {
+                noResultsMsg.style.display = 'none';
+            }
+
+            updateSelectAllState();
+        }
+
+        // Event Listeners
+        filterArea.addEventListener('change', function () {
+            populateDivisi(this.value);
+            applyFilters();
+        });
+
+        filterDivisi.addEventListener('change', function () {
+            populateDept(this.value);
+            applyFilters();
+        });
+
+        filterDept.addEventListener('change', applyFilters);
+        // Search input keyup
+        searchInput.addEventListener('keyup', applyFilters);
+        filterLevel.addEventListener('change', applyFilters); // Trigger filter level
+
     });
 </script>
 {% endblock %}

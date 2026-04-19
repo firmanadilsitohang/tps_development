@@ -132,6 +132,20 @@
 
     .profile-glow-blue { border-color: var(--accent-cyan) !important; animation: breath-blue 3s infinite alternate !important; }
     .profile-glow-gold { border-color: var(--accent-gold) !important; animation: breath-gold 3s infinite alternate !important; }
+
+    /* =========================================================
+       7. SPIDER CHART PANEL
+    ========================================================= */
+    .spider-panel { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; border: 1px solid var(--border-glass); margin-top: 15px; }
+    .spider-container { height: 250px; position: relative; }
+    
+    .schedule-date { background: rgba(10, 116, 255, 0.1); border-radius: 8px; padding: 10px; text-align: center; min-width: 60px; border: 1px solid var(--border-glass); }
+    .schedule-day { font-size: 18px; font-weight: 800; color: var(--accent-cyan); display: block; line-height: 1; }
+    .schedule-month { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+
+    .module-card { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 15px; border: 1px solid var(--border-glass); transition: 0.3s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; text-decoration: none; color: inherit; }
+    .module-card:hover { background: rgba(10, 116, 255, 0.08); border-color: var(--accent-cyan); transform: translateX(5px); }
+    .module-icon { font-size: 24px; color: var(--accent-cyan); }
 </style>
 {% endblock %}
 
@@ -227,7 +241,30 @@
         <span class="status-badge" style="margin-bottom: 15px;">STATUS: {{ employee.status | upper if employee else 'UNKNOWN' }}</span>
         
         <br>
-        <button onclick="openEditModal()" class="btn-sm"><i class="fas fa-user-edit"></i> Edit Data Profil</button>
+        {% if show_evaluation %}
+        <div class="spider-panel" style="margin-top: 25px; background: rgba(0,0,0,0.4); border-color: rgba(10, 116, 255, 0.2);">
+            <h4 style="font-family:'Oswald'; font-size:12px; color:#fff; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                <span><i class="fas fa-chart-radar me-2 text-info"></i> EVALUASI KOMPETENSI</span>
+                <span style="font-size:9px; color:var(--text-muted);">OMDD ASSESS</span>
+            </h4>
+            <div class="spider-container" style="height: 200px;">
+                <canvas id="participantSpiderChart"></canvas>
+            </div>
+            {% if latest_eval %}
+                <div style="margin-top: 12px; font-size: 10px; color: var(--text-muted); background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px; border-left: 2px solid var(--accent-cyan); text-align: left;">
+                    <i class="fas fa-info-circle me-1"></i> {{ latest_eval.notes | truncate(60) if latest_eval.notes else 'No assessment notes.' }}
+                </div>
+            {% else %}
+                <div style="margin-top: 12px; font-size: 10px; color: #475569; font-style: italic; text-align: center;">
+                    <i class="fas fa-hourglass-half me-1"></i> Menunggu penilaian OMDD
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <div style="margin-top: 20px;">
+            <button onclick="openEditModal()" class="btn-sm" style="width: 100%;"><i class="fas fa-user-edit"></i> Edit Data Profil</button>
+        </div>
     </div>
 
     <div class="panel-card">
@@ -276,6 +313,68 @@
                     {% endif %}
                 </div>
             </div>
+        </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="panel-card">
+        <h3 class="panel-header"><i class="fas fa-calendar-alt me-2"></i> Jadwal Training & Workshop</h3>
+        <div class="widget-list">
+            {% for t in trainings %}
+            <div class="widget-item">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="schedule-date">
+                        <span class="schedule-day">{{ t.training_date.strftime('%d') }}</span>
+                        <span class="schedule-month">{{ t.training_date.strftime('%b') }}</span>
+                    </div>
+                    <div>
+                        <h4 class="widget-item-title">{{ t.title }}</h4>
+                        <p style="font-size: 11px; color: var(--text-muted); margin: 0;">
+                            <i class="fas fa-map-marker-alt me-1"></i> {{ t.location }}
+                        </p>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-dark border border-secondary text-info">{{ t.training_date.strftime('%H:%M') }}</span>
+                </div>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                <i class="fas fa-calendar-times mb-2 d-block" style="font-size: 24px;"></i>
+                <p style="font-size: 12px;">Belum ada jadwal pelatihan terdekat.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <h3 class="panel-header"><i class="fas fa-book-open me-2"></i> Modul Pembelajaran Terbaru</h3>
+        <div>
+            {% for mod in recent_modules %}
+            <a href="{{ url_for('participant.modules') }}" class="module-card">
+                <div class="module-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div style="flex-grow: 1;">
+                    <div style="color: #fff; font-size: 13px; font-weight: 600; margin-bottom: 2px;">{{ mod.title }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Diterbitkan: {{ mod.created_at.strftime('%d %b %Y') }}</div>
+                </div>
+                <div style="color: var(--accent-cyan); font-size: 16px;">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+            {% else %}
+            <p style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">Belum ada modul yang diunggah.</p>
+            {% endfor %}
+            {% if recent_modules %}
+            <div class="text-center mt-3">
+                <a href="{{ url_for('participant.modules') }}" class="btn-sm" style="width: 100%; text-align: center;">Lihat Semua Modul</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -331,5 +430,66 @@
     function closeEditModal() {
         document.getElementById('editProfileModal').classList.remove('active');
     }
+
+    {% if show_evaluation %}
+    // --- INITIALIZE SPIDER CHART ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('participantSpiderChart').getContext('2d');
+        
+        // Default ke 0 jika data evaluasi belum ada
+        const dataValues = [
+            {{ latest_eval.score_genba if latest_eval else 0 }},
+            {{ latest_eval.score_problem_solving if latest_eval else 0 }},
+            {{ latest_eval.score_observasi if latest_eval else 0 }},
+            {{ latest_eval.score_kaizen if latest_eval else 0 }},
+            {{ latest_eval.score_implementation if latest_eval else 0 }},
+            {{ latest_eval.score_presentation if latest_eval else 0 }}
+        ];
+
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Genba', 'Prob. Solving', 'Observation', 'Kaizen', 'Implementation', 'Presentation'],
+                datasets: [{
+                    label: 'Skor Saya',
+                    data: dataValues,
+                    backgroundColor: 'rgba(0, 210, 255, 0.2)',
+                    borderColor: '#00d2ff',
+                    pointBackgroundColor: '#39ff14',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#ff00a0',
+                    borderWidth: 2,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255,255,255,0.1)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        pointLabels: { 
+                            color: '#8b949e', 
+                            font: { size: 9, family: 'Inter', weight: 'bold' } 
+                        },
+                        ticks: { display: false, min: 0, max: 100, stepSize: 20 }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+    {% endif %}
 </script>
 {% endblock %}

@@ -253,7 +253,7 @@ def detail_employee(id):
     return render_template('omdd/detail.html', employee=employee, umur=umur)
 
 # ==========================================
-<<<<<<< HEAD
+# ==========================================
 # HALAMAN PARTISIPAN (TABEL LENGKAP)
 # ==========================================
 @omdd.route('/participants')
@@ -290,9 +290,6 @@ def participants():
                            employees=all_employees_sorted,
                            eval_map=eval_map)
 
-# ==========================================
-=======
->>>>>>> 8b283ee1cc13a71cccdbff1e03f107db8f6c3eae
 # MASTER DIRECTORY (DAFTAR SEMUA KARYAWAN)
 # ==========================================
 @omdd.route('/directory')
@@ -390,11 +387,13 @@ def submit_workshop_evaluation(emp_id):
         db.session.add(evaluation)
 
     try:
-        evaluation.genba = float(request.form.get('genba', 0))
-        evaluation.analysis = float(request.form.get('analysis', 0))
-        evaluation.problem_solving = float(request.form.get('problem_solving', 0))
-        evaluation.kaizen = float(request.form.get('kaizen', 0))
-        evaluation.observation = float(request.form.get('observation', 0))
+        evaluation.score_genba = int(request.form.get('score_genba', 0))
+        evaluation.score_problem_solving = int(request.form.get('score_problem_solving', 0))
+        evaluation.score_observasi = int(request.form.get('score_observasi', 0))
+        evaluation.score_kaizen = int(request.form.get('score_kaizen', 0))
+        evaluation.score_implementation = int(request.form.get('score_implementation', 0))
+        evaluation.score_presentation = int(request.form.get('score_presentation', 0))
+        evaluation.final_decision = request.form.get('final_decision', 'PASS')
         evaluation.notes = request.form.get('notes', '')
         evaluation.evaluated_by = current_user.username
         evaluation.evaluated_at = datetime.utcnow()
@@ -405,4 +404,5 @@ def submit_workshop_evaluation(emp_id):
         db.session.rollback()
         flash(f'Terjadi kesalahan: {str(e)}', 'danger')
 
-    return redirect(url_for('omdd.dashboard') + '#workshop-panel')
+    return redirect(url_for('omdd.detail_employee', id=emp_id))
+

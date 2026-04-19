@@ -6,10 +6,10 @@ from werkzeug.utils import secure_filename
 from sqlalchemy.orm import joinedload
 from app import db
 # Pastikan Division, Department, dan Plant di-import di sini
-from app.models.employee import Employee, WorkshopActivity, Division, Department, Plant
+from app.models.employee import Employee, WorkshopActivity, Division, Department, Plant, WorkshopEvaluation
 from app.models.module import LearningModule
-from app.models.development import News 
-from sqlalchemy import or_
+from app.models.development import News, Training
+from sqlalchemy import or_, desc
 
 participant = Blueprint('participant', __name__, url_prefix='/participant')
 
@@ -58,13 +58,35 @@ def dashboard():
             )
         ).order_by(News.created_at.desc()).limit(5).all()
 
+    # 5. AMBIL JADWAL PELATIHAN (UPCOMING TRAININGS)
+    upcoming_trainings = Training.query.order_by(Training.training_date.asc()).filter(Training.training_date >= datetime.now()).limit(5).all()
+
+    # 6. AMBIL HASIL EVALUASI SPIDER CHART (OMDD)
+    latest_eval = None
+    show_evaluation = False
+    if employee:
+        latest_eval = WorkshopEvaluation.query.filter_by(employee_id=employee.id).order_by(WorkshopEvaluation.evaluated_at.desc()).first()
+        
+        # LOGIKA VISIBILITAS: Hanya muncul untuk ADVANCE, KP3, dan JISHUKEN
+        lvl = str(employee.current_tps_level or '').upper()
+        if 'ADVANCE' in lvl or 'KP 3' in lvl or 'KP3' in lvl or 'KEY PERSON 3' in lvl or 'JISHUKEN' in lvl:
+            # Kecuali jika dia KP 4 (Kadang ada label ganda, kita prioritaskan sembunyikan jika sudah KP 4)
+            if 'KP 4' not in lvl and 'KP4' not in lvl and 'KEY PERSON 4' not in lvl:
+                show_evaluation = True
+    
+    # 7. AMBIL MODUL PEMBELAJARAN TERBARU
+    recent_modules = LearningModule.query.order_by(LearningModule.created_at.desc()).limit(3).all()
+
     return render_template('participant/dashboard.html', 
                            employee=employee, 
                            trainings=upcoming_trainings, 
                            activities=my_activities,
                            news_events=news_events,
                            umur=umur,
-                           tahun_pensiun=tahun_pensiun)
+                           tahun_pensiun=tahun_pensiun,
+                           latest_eval=latest_eval,
+                           show_evaluation=show_evaluation,
+                           recent_modules=recent_modules)
 
 @participant.route('/modules')
 @login_required
