@@ -37,11 +37,13 @@ def create_app():
     from app.routes.participant import participant
     from app.routes.omdd import omdd
     from app.routes.tpsg import tpsg
+    from app.routes.management import management
     
     # Daftarkan semua ke aplikasi
     app.register_blueprint(auth)
     app.register_blueprint(participant)
     app.register_blueprint(omdd)
     app.register_blueprint(tpsg)
+    app.register_blueprint(management)
 
     return app

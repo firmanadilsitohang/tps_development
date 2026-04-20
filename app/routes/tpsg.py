@@ -431,3 +431,31 @@ def manage_news():
 @tpsg_required
 def generate_dummy(): 
     return redirect(url_for('tpsg.dashboard'))
+
+# =======================================================
+# 7. MANAGE MANUAL CHART DATA
+# =======================================================
+@tpsg.route('/manage-charts', methods=['GET', 'POST'])
+@login_required
+@tpsg_required
+def manage_charts():
+    if request.method == 'POST':
+        # Update Batch Stats
+        batch_ids = request.form.getlist('batch_id')
+        for bid in batch_ids:
+            stat = BatchStat.query.get(bid)
+            if stat:
+                stat.kp3_percent = request.form.get(f'kp3_pct_{bid}')
+                stat.kp4_percent = request.form.get(f'kp4_pct_{bid}')
+        
+        try:
+            db.session.commit()
+            flash('Data grafik berhasil diperbarui!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Gagal memperbarui data: {str(e)}', 'danger')
+        
+        return redirect(url_for('tpsg.manage_charts'))
+
+    batch_stats = BatchStat.query.all()
+    return render_template('tpsg/manage_charts.html', batch_stats=batch_stats)

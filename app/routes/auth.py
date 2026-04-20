@@ -19,6 +19,8 @@ def login():
         # Redirect cerdas berdasarkan ROLE
         if current_user.role == 'tpsg':
             return redirect(url_for('tpsg.dashboard'))
+        elif current_user.role == 'management':
+            return redirect(url_for('management.dashboard'))
         elif current_user.role == 'omdd':
             return redirect(url_for('omdd.dashboard'))
         else:
@@ -34,6 +36,8 @@ def login():
             # Redirect setelah berhasil login
             if user.role == 'tpsg':
                 return redirect(url_for('tpsg.dashboard'))
+            elif user.role == 'management':
+                return redirect(url_for('management.dashboard'))
             elif user.role == 'omdd':
                 return redirect(url_for('omdd.dashboard'))
             else:
@@ -178,3 +182,15 @@ def setup_omdd():
         db.session.commit()
         return "<h3>✅ Akun OMDD Berhasil Dibuat!<br>User: OMDD001<br>Pass: tmmin123</h3>"
     return "<h3>Akun OMDD sudah ada.</h3>"
+
+# PEMBUAT AKUN MANAGEMENT (Jalur Cepat untuk Tes)
+@auth.route('/setup-management')
+def setup_management():
+    user = User.query.filter_by(username='MANAGEMENT001').first()
+    if not user:
+        new_man = User(username='MANAGEMENT001', role='management')
+        new_man.set_password('tmmin123')
+        db.session.add(new_man)
+        db.session.commit()
+        return "<h3>✅ Akun Management Berhasil Dibuat!<br>User: MANAGEMENT001<br>Pass: tmmin123</h3>"
+    return "<h3>Akun Management sudah ada.</h3>"

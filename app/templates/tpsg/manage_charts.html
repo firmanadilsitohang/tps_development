@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Chart Data - TPS-G Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-edit me-2"></i> Manage Global Chart Data</h2>
+        <a href="{{ url_for('tpsg.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card bg-dark text-white border-secondary mb-4">
+                <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Batch Success Rate Data</h5>
+                    <span class="badge bg-primary">Manual Overide</span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-4">
+                        Edit persentase kelulusan untuk setiap batch. Data ini akan langsung tercermin pada grafik "Management Dashboard".
+                    </p>
+                    
+                    <form action="{{ url_for('tpsg.manage_charts') }}" method="POST">
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover align-middle">
+                                <thead class="table-secondary text-dark">
+                                    <tr>
+                                        <th>Batch Name</th>
+                                        <th>KP 4 (%)</th>
+                                        <th>KP 3 (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for bs in batch_stats %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ bs.batch_name }}</strong>
+                                            <input type="hidden" name="batch_id" value="{{ bs.id }}">
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="kp4_pct_{{ bs.id }}" value="{{ bs.kp4_percent }}" class="form-control bg-dark text-white border-secondary">
+                                                <span class="input-group-text bg-dark border-secondary text-muted">%</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="kp3_pct_{{ bs.id }}" value="{{ bs.kp3_percent }}" class="form-control bg-dark text-white border-secondary">
+                                                <span class="input-group-text bg-dark border-secondary text-muted">%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-1"></i> Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-dark text-white border-secondary">
+                <div class="card-header border-secondary">
+                    <h5 class="mb-0">Petunjuk Penggunaan</h5>
+                </div>
+                <div class="card-body small">
+                    <ul class="ps-3 mb-0">
+                        <li class="mb-2">Masukkan angka saja (misal: 85) atau sertakan simbol % jika perlu.</li>
+                        <li class="mb-2">Perubahan di sini bersifat global dan akan mempengaruhi semua dashboard yang menampilkan grafik batch.</li>
+                        <li>Pastikan total persentase logis (biasanya 0-100%).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

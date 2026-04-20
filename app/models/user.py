@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     # 3. 'participant' (Peserta Workshop)
     # 4. 'bod' (Direktur - Bisa lihat semua Divisi)
     # 5. 'division_head' (Kadiv - Hanya lihat Divisi miliknya)
+    # 6. 'management' (Management Account - Comprehensive Dashboard)
     role = db.Column(db.String(20), default='participant') 
     
     is_first_login = db.Column(db.Boolean, default=True)

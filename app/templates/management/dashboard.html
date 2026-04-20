@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+
+{% block title %}Management Dashboard - TPS-G System{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --orange-vibrant: #FF8A00;
+        --green-vibrant: #00D16B;
+        --blue-vibrant: #0A74FF;
+        --purple-vibrant: #A855F7;
+    }
+
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 25px;
+    }
+
+    .stat-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent-cyan);
+    }
+
+    .card-title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-title i {
+        color: var(--accent-cyan);
+    }
+
+    /* GRID LAYOUTS */
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+
+    /* MENU TABS */
+    .menu-tabs {
+        grid-column: span 12;
+        display: flex;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .menu-tab {
+        padding: 12px 25px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .menu-tab.active {
+        background: var(--accent-cyan);
+        color: white;
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 15px rgba(10, 116, 255, 0.4);
+    }
+
+    /* CENTER TEXT IN PIE */
+    .pie-center-text {
+        position: absolute;
+        top: 55%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .pie-center-text .total {
+        display: block;
+        font-size: 36px;
+        font-weight: 800;
+        font-family: 'Oswald', sans-serif;
+    }
+
+    .pie-center-text .label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+
+    /* TOOLTIP FOR TPS ADVANCE */
+    #custom-tooltip {
+        position: absolute;
+        display: none;
+        background: rgba(5, 10, 20, 0.95);
+        border: 1px solid var(--accent-cyan);
+        border-radius: 12px;
+        padding: 15px;
+        z-index: 1000;
+        width: 250px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        pointer-events: none;
+    }
+
+    .emp-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .emp-item:last-child { border: none; margin: 0; padding: 0; }
+
+    .emp-img {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        border: 2px solid var(--accent-cyan);
+        object-fit: cover;
+    }
+
+    .emp-info .name { font-size: 13px; font-weight: 600; }
+    .emp-info .theme { font-size: 11px; color: var(--accent-gold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 160px; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h2 class="mb-1">Management Command Center</h2>
+    <p class="text-muted">Toyota Production System - Executive Monitoring Plateform</p>
+</div>
+
+<div class="dashboard-container">
+    
+    <!-- MENU TABS -->
+    <div class="menu-tabs">
+        <div class="menu-tab active" onclick="showMenu('all')">All Overview</div>
+        <div class="menu-tab" onclick="showMenu('kp')">Progress TPS KP 4 & 3</div>
+        <div class="menu-tab" onclick="showMenu('advance')">TPS Advance</div>
+        <div class="menu-tab" onclick="showMenu('jishuken')">Jishuken Office</div>
+    </div>
+
+    <!-- 1. Progress TPS KP 4 & 3 -->
+    <div class="stat-card col-4 menu-content all-content kp-content">
+        <div class="card-title"><i class="fas fa-chart-pie"></i> TPS KP 4 & 3 Status</div>
+        <div style="position: relative; height: 300px;">
+            <canvas id="kpPieChart"></canvas>
+            <div class="pie-center-text">
+                <span class="total">{{ kp_total }}</span>
+                <span class="label">Total KP</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. TPS Advance Mapping -->
+    <div class="stat-card col-8 menu-content all-content advance-content">
+        <div class="card-title"><i class="fas fa-layer-group"></i> TPS Advance per Division</div>
+        <div style="height: 300px;">
+            <canvas id="advBarChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 3. Jishuken Office Mapping -->
+    <div class="stat-card col-6 menu-content all-content jishuken-content">
+        <div class="card-title"><i class="fas fa-building"></i> Jishuken Office per Department</div>
+        <div style="height: 300px;">
+            <canvas id="jishukenBarChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 4. Pension Projection -->
+    <div class="stat-card col-6 menu-content all-content">
+        <div class="card-title"><i class="fas fa-hourglass-half"></i> Retirement Forecast (until 2047)</div>
+        <div style="height: 300px;">
+            <canvas id="pensionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 5. Passing Rate -->
+    <div class="stat-card col-4 menu-content all-content">
+        <div class="card-title"><i class="fas fa-graduation-cap"></i> Passing Rate per Batch</div>
+        <div style="height: 250px;">
+            <canvas id="batchChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 6. Utilization -->
+    <div class="stat-card col-4 menu-content all-content">
+        <div class="card-title"><i class="fas fa-tasks"></i> Theme Utilization</div>
+        <div style="height: 250px;">
+            <canvas id="utilChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 7. Demographics -->
+    <div class="stat-card col-4 menu-content all-content">
+        <div class="card-title"><i class="fas fa-users-cog"></i> Age Demographics per Level</div>
+        <div id="demoContainer" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 250px; padding-right: 10px;">
+            {% for level, data in demo_data.items() %}
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
+                <span style="font-weight: 700; font-size: 12px; width: 80px;">{{ level }}</span>
+                <div style="flex-grow: 1; height: 60px; position: relative;">
+                    <canvas id="demoChart-{{ loop.index }}" width="60" height="60"></canvas>
+                </div>
+                <div style="text-align: right; font-size: 11px;">
+                    <div style="color: var(--accent-cyan);">Prod: {{ data.prod }}</div>
+                    <div style="color: var(--accent-red);">Risk: {{ data.non }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<!-- CUSTOM TOOLTIP DIV -->
+<div id="custom-tooltip"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showMenu(menu) {
+        document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        document.querySelectorAll('.menu-content').forEach(c => c.style.display = 'none');
+        if(menu === 'all') {
+            document.querySelectorAll('.all-content').forEach(c => c.style.display = 'block');
+        } else {
+            document.querySelectorAll('.' + menu + '-content').forEach(c => c.style.display = 'block');
+        }
+    }
+
+    // --- DATA DARI BACKEND ---
+    const advDetails = {{ adv_details | tojson }};
+
+    // 1. KP PIE CHART
+    new Chart(document.getElementById('kpPieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['KP 4', 'KP 3'],
+            datasets: [{
+                data: [{{ kp4_count }}, {{ kp3_count }}],
+                backgroundColor: ['#FF8A00', '#00D16B'],
+                borderWidth: 0,
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            cutout: '75%',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#8bb4d8', font: { size: 10 } } },
+                datalabels: { color: '#fff', font: { weight: 'bold' } }
+            }
+        }
+    });
+
+    // 2. TPS ADVANCE HORIZONTAL BAR
+    const advChart = new Chart(document.getElementById('advBarChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ adv_div_labels | tojson }},
+            datasets: [{
+                label: 'Employees',
+                data: {{ adv_div_values | tojson }},
+                backgroundColor: 'rgba(10, 116, 255, 0.6)',
+                borderColor: '#0A74FF',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } },
+                y: { grid: { display: false }, ticks: { color: '#fff' } }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: false,
+                    external: function(context) {
+                        const tooltipEl = document.getElementById('custom-tooltip');
+                        if (context.tooltip.opacity === 0) {
+                            tooltipEl.style.display = 'none';
+                            return;
+                        }
+
+                        const label = context.tooltip.dataPoints[0].label;
+                        const data = advDetails[label] || [];
+                        
+                        let html = `<div style="font-weight: 700; margin-bottom: 10px; color: #0A74FF;">${label} Details</div>`;
+                        data.forEach(item => {
+                            html += `
+                                <div class="emp-item">
+                                    <img src="/static/uploads/photos/${item.photo}" class="emp-img" onerror="this.src='/static/uploads/photos/default.png'">
+                                    <div class="emp-info">
+                                        <div class="name">${item.name}</div>
+                                        <div class="theme">${item.theme}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        tooltipEl.innerHTML = html;
+                        tooltipEl.style.display = 'block';
+                        tooltipEl.style.left = context.chart.canvas.offsetLeft + context.tooltip.caretX + 20 + 'px';
+                        tooltipEl.style.top = context.chart.canvas.offsetTop + context.tooltip.caretY + 'px';
+                    }
+                }
+            }
+        }
+    });
+
+    // 3. JISHUKEN BAR CHART
+    new Chart(document.getElementById('jishukenBarChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ dept_labels | tojson }},
+            datasets: [{
+                data: {{ dept_values | tojson }},
+                backgroundColor: 'rgba(168, 85, 247, 0.5)',
+                borderColor: '#A855F7',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } },
+                x: { grid: { display: false }, ticks: { color: '#fff', font: { size: 9 } } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // 4. PENSION FORECAST
+    new Chart(document.getElementById('pensionChart'), {
+        type: 'line',
+        data: {
+            labels: {{ forecast_labels | tojson }},
+            datasets: [{
+                label: 'Retirement Count',
+                data: {{ forecast_values | tojson }},
+                borderColor: '#FF8A00',
+                backgroundColor: 'rgba(255, 138, 0, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#FF8A00'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } },
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8', autoSkip: true, maxTicksLimit: 10 } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // 5. BATCH STATS
+    new Chart(document.getElementById('batchChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ batch_labels | tojson }},
+            datasets: [
+                { label: 'KP 4 %', data: {{ batch_kp4 | tojson }}, backgroundColor: '#FF8A00' },
+                { label: 'KP 3 %', data: {{ batch_kp3 | tojson }}, backgroundColor: '#00D16B' }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { max: 100, ticks: { color: '#8bb4d8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                x: { ticks: { color: '#fff' }, grid: { display: false } }
+            }
+        }
+    });
+
+    // 6. UTILIZATION
+    new Chart(document.getElementById('utilChart'), {
+        type: 'pie',
+        data: {
+            labels: {{ util_labels | tojson }},
+            datasets: [{
+                data: {{ util_values | tojson }},
+                backgroundColor: ['#0A74FF', 'rgba(255,255,255,0.1)'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { color: '#8bb4d8' } } }
+        }
+    });
+
+    // 7. DEMOGRAPHICS PIE CHARTS
+    {% for level, data in demo_data.items() %}
+    new Chart(document.getElementById('demoChart-{{ loop.index }}'), {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [{{ data.prod }}, {{ data.non }}],
+                backgroundColor: ['#00D16B', '#E3000F'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: '70%',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: { enabled: false },
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        let percentage = (value * 100 / sum).toFixed(0) + "%";
+                        return percentage;
+                    },
+                    color: '#fff',
+                    font: { size: 9, weight: 'bold' }
+                }
+            }
+        }
+    });
+    {% endfor %}
+
+</script>
+{% endblock %}
