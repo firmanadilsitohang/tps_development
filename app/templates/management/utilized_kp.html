@@ -1,0 +1,615 @@
+{% extends "base.html" %}
+
+{% block title %}TPS Key Person 3 & 4 - Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .module-container {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 25px;
+    }
+    .stat-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .card-title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--accent-cyan);
+    }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 20px;
+        transition: 0.3s;
+    }
+    .btn-back:hover { color: var(--accent-cyan); transform: translateX(-5px); }
+
+    .pie-center-text {
+        position: absolute;
+        top: 55%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    .pie-center-text .total {
+        display: block;
+        font-size: 36px;
+        font-weight: 800;
+        font-family: 'Oswald', sans-serif;
+    }
+    .pie-center-text .label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+
+    /* TOOLTIP FOR MAPPING */
+    #custom-tooltip {
+        position: absolute;
+        display: none;
+        background: rgba(5, 10, 20, 0.95);
+        border: 1px solid var(--accent-cyan);
+        border-radius: 12px;
+        padding: 15px;
+        z-index: 1000;
+        width: 280px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        pointer-events: none;
+    }
+
+    .tooltip-header {
+        font-weight: 700;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: var(--accent-cyan);
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .emp-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .emp-img {
+        width: 35px; height: 35px;
+        border-radius: 50%;
+        border: 2px solid;
+        object-fit: cover;
+    }
+
+    .lvl-4 { border-color: #FF8A00; }
+    .lvl-3 { border-color: #00D16B; }
+
+    .emp-info .name { font-size: 12px; font-weight: 600; }
+    .emp-info .theme { font-size: 10px; color: var(--accent-gold); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* BOTTOM SHEET PANEL */
+    #bottom-sheet {
+        position: fixed;
+        bottom: -100%;
+        left: 0;
+        width: 100%;
+        height: 80vh;
+        background: #0B0F1A;
+        border-top: 1px solid var(--accent-cyan);
+        border-top-left-radius: 30px;
+        border-top-right-radius: 30px;
+        z-index: 2000;
+        transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 40px;
+        box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
+        overflow-y: auto;
+    }
+
+    #bottom-sheet.active { bottom: 0; }
+
+    #sheet-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(5px);
+        display: none;
+        z-index: 1999;
+    }
+
+    .sheet-close {
+        position: absolute;
+        top: 20px; right: 30px;
+        font-size: 24px;
+        color: var(--text-muted);
+        cursor: pointer;
+    }
+
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 40px;
+    }
+
+    .profile-left { text-align: center; }
+    .profile-photo {
+        width: 200px; height: 200px;
+        border-radius: 20px;
+        border: 4px solid var(--accent-cyan);
+        object-fit: cover;
+        margin-bottom: 20px;
+    }
+
+    .detail-section {
+        background: rgba(255,255,255,0.03);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .section-title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 16px;
+        color: var(--accent-cyan);
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 5px;
+    }
+
+    .theme-list { list-style: none; padding: 0; }
+    .theme-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .theme-item:last-child { border: none; }
+
+    .score-badge {
+        background: var(--accent-cyan);
+        color: #000;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .status-badge {
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+    .status-completed { background: #00D16B; color: #000; }
+    .status-ongoing { background: #FF8A00; color: #000; }
+
+    /* Assessment Grid */
+    .assessment-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+    .assessment-card {
+        background: rgba(255,255,255,0.05);
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+    }
+    .assessment-val { font-size: 24px; font-weight: 800; color: var(--accent-cyan); }
+    .assessment-lbl { font-size: 10px; text-transform: uppercase; color: var(--text-muted); }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('management.dashboard') }}" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+
+<div class="dashboard-header mb-4">
+    <h2 class="mb-1" style="color: #FF8A00;">UTILIZED TPS KEY PERSON 3 & 4</h2>
+    <p class="text-muted">Analytical Mapping & Performance Tracking</p>
+</div>
+
+<div class="module-container">
+    <!-- 1. Progress TPS KP 4 & 3 -->
+    <div class="stat-card col-4">
+        <div class="card-title"><i class="fas fa-chart-pie"></i> Status KP 4 & 3</div>
+        <div style="position: relative; height: 300px;">
+            <canvas id="kpPieChart"></canvas>
+            <div class="pie-center-text">
+                <span class="total">{{ kp_total }}</span>
+                <span class="label">Total KP</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Division Mapping -->
+    <div class="stat-card col-8">
+        <div class="card-title"><i class="fas fa-sitemap"></i> Division Tracking (KP 4 & 3)</div>
+        <div style="height: 300px;">
+            <canvas id="divMappingChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 3. Department Mapping -->
+    <div class="stat-card col-12">
+        <div class="card-title"><i class="fas fa-building"></i> Department Tracking (KP 4 & 3)</div>
+        <div style="height: 350px;">
+            <canvas id="deptMappingChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 4. Passing Rate -->
+    <div class="stat-card col-4">
+        <div class="card-title"><i class="fas fa-graduation-cap"></i> Passing Rate per Batch</div>
+        <div style="height: 250px;">
+            <canvas id="batchChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 5. Pension Projection -->
+    <div class="stat-card col-4">
+        <div class="card-title"><i class="fas fa-hourglass-half"></i> Retirement Forecast</div>
+        <div style="height: 250px;">
+            <canvas id="pensionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 6. Demographics -->
+    <div class="stat-card col-4">
+        <div class="card-title"><i class="fas fa-users-cog"></i> KP Demographics (Risk @ 50+)</div>
+        <div id="demoContainer" style="display: flex; flex-direction: column; gap: 12px;">
+            {% for level, data in demo_data.items() %}
+            <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 700;">
+                    <span>{{ level }}</span>
+                    <span style="color: var(--text-muted);">Total: {{ data.prod + data.non }}</span>
+                </div>
+                <!-- Progress Bar Style Demographics -->
+                <div class="demo-bar-container" style="height: 25px; display: flex; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,0.1); cursor: help;">
+                    {% if data.prod + data.non > 0 %}
+                    <div class="demo-bar-segment" 
+                         data-label="{{ level }} - Productive" 
+                         data-participants='{{ data.prod_list | tojson }}'
+                         style="width:{{ (data.prod / (data.prod + data.non) * 100)|round }}%; background: #00D16B; display: flex; align-items: center; padding-left: 10px; font-size: 10px; font-weight: 800;">
+                        PROD {{ (data.prod / (data.prod + data.non) * 100)|round }}%
+                    </div>
+                    <div class="demo-bar-segment" 
+                         data-label="{{ level }} - Retirement Risk" 
+                         data-participants='{{ data.non_list | tojson }}'
+                         style="width:{{ (data.non / (data.prod + data.non) * 100)|round }}%; background: #E3000F; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-size: 10px; font-weight: 800;">
+                        RISK {{ (data.non / (data.prod + data.non) * 100)|round }}%
+                    </div>
+                    {% else %}
+                    <div style="width: 100%; text-align: center; line-height: 25px; font-size: 10px; color: var(--text-muted);">NO DATA</div>
+                    {% endif %}
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px; color: var(--text-muted);">
+                    <span>Productive (< 50): {{ data.prod }}</span>
+                    <span>Retirement Risk (≥ 50): {{ data.non }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div id="custom-tooltip"></div>
+
+<!-- Bottom Sheet -->
+<div id="sheet-overlay" onclick="closeBottomSheet()"></div>
+<div id="bottom-sheet">
+    <div class="sheet-close" onclick="closeBottomSheet()"><i class="fas fa-times"></i></div>
+    <div id="sheet-content">
+        <!-- Content will be loaded via AJAX -->
+        <div style="text-align: center; padding-top: 100px;">
+            <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--accent-cyan);"></i>
+            <p class="mt-3">Loading details...</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const divDetails = {{ kp_div_details | tojson }};
+    const deptDetails = {{ kp_dept_details | tojson }};
+
+    function showCustomTooltip(label, data, event) {
+        const tooltipEl = document.getElementById('custom-tooltip');
+        if (!data || data.length === 0) {
+            tooltipEl.style.display = 'none';
+            return;
+        }
+
+        let html = `<div class="tooltip-header"><span>${label}</span> <span>${data.length} Total</span></div>`;
+        html += `<div style="font-size:9px; color:#888; margin-bottom:10px; text-align:center;">Click to view full detail</div>`;
+        data.sort((a, b) => (a.level || "").localeCompare(b.level || ""));
+
+        data.forEach(item => {
+            html += `
+                <div class="emp-item" style="cursor: pointer; pointer-events: auto;" onclick="openParticipantDetail(${item.id})">
+                    <div class="emp-info">
+                        <div class="name">${item.name} <span style="color:${(item.level || "").includes('4') ? '#FF8A00' : '#00D16B'}">(${(item.level || "")})</span></div>
+                        <div class="theme">${item.theme}</div>
+                    </div>
+                </div>`;
+        });
+
+        tooltipEl.innerHTML = html;
+        tooltipEl.style.display = 'block';
+        tooltipEl.style.pointerEvents = 'auto'; // Allow clicking items inside
+        
+        let x = event.pageX + 20;
+        let y = event.pageY;
+        
+        if (x + 300 > window.innerWidth) x = event.pageX - 300;
+        
+        tooltipEl.style.left = x + 'px';
+        tooltipEl.style.top = y + 'px';
+    }
+
+    async function openParticipantDetail(id) {
+        const overlay = document.getElementById('sheet-overlay');
+        const sheet = document.getElementById('bottom-sheet');
+        const content = document.getElementById('sheet-content');
+        
+        overlay.style.display = 'block';
+        sheet.classList.add('active');
+        
+        try {
+            const response = await fetch(`/management/participant_detail/${id}`);
+            const data = await response.json();
+            
+            let themesHtml = '';
+            if (data.themes.length > 0) {
+                data.themes.forEach(t => {
+                    themesHtml += `
+                        <div class="theme-item">
+                            <div>
+                                <div style="font-weight:600;">${t.title}</div>
+                                <div style="font-size:10px; color:#888;">Submitted: ${t.date}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <span class="status-badge ${t.status === 'completed' ? 'status-completed' : 'status-ongoing'}">${t.status}</span>
+                                <div class="score-badge mt-1">${t.score} pts</div>
+                            </div>
+                        </div>`;
+                });
+            } else {
+                themesHtml = '<p class="text-muted">No theme history found.</p>';
+            }
+
+            let assessmentHtml = '';
+            if (data.assessment) {
+                assessmentHtml = `
+                    <div class="detail-section">
+                        <div class="section-title"><i class="fas fa-chart-bar"></i> OMDD Assessment (KP 3)</div>
+                        <div class="assessment-grid">
+                            <div class="assessment-card"><div class="assessment-val">${data.assessment.genba}</div><div class="assessment-lbl">Genba</div></div>
+                            <div class="assessment-card"><div class="assessment-val">${data.assessment.ps}</div><div class="assessment-lbl">Analysis</div></div>
+                            <div class="assessment-card"><div class="assessment-val">${data.assessment.obs}</div><div class="assessment-lbl">Obs</div></div>
+                            <div class="assessment-card"><div class="assessment-val">${data.assessment.kaizen}</div><div class="assessment-lbl">Kaizen</div></div>
+                            <div class="assessment-card"><div class="assessment-val">${data.assessment.impl}</div><div class="assessment-lbl">Impl</div></div>
+                            <div class="assessment-card"><div class="assessment-val">${data.assessment.pres}</div><div class="assessment-lbl">Pres</div></div>
+                        </div>
+                        <div class="mt-3 p-3" style="background:rgba(255,255,255,0.05); border-radius:10px;">
+                            <div style="font-weight:700; color:var(--accent-cyan);">Decision: ${data.assessment.decision}</div>
+                            <p class="mb-0 small text-muted mt-1">"${data.assessment.notes || 'No notes available'}"</p>
+                        </div>
+                    </div>`;
+            }
+
+            content.innerHTML = `
+                <div class="profile-grid">
+                    <div class="profile-left">
+                        <img src="/static/uploads/photos/${data.photo}" class="profile-photo" onerror="this.src='/static/uploads/photos/default.png'">
+                        <h3 class="mb-1">${data.name}</h3>
+                        <div class="text-muted small mb-3">${data.username}</div>
+                        <div class="badge" style="background:var(--accent-cyan); color:#000; font-weight:800; padding:5px 15px;">${data.level}</div>
+                    </div>
+                    <div class="profile-right">
+                        <div class="detail-section">
+                            <div class="section-title"><i class="fas fa-info-circle"></i> Employee Information</div>
+                            <div class="row">
+                                <div class="col-6 mb-3"><div class="text-muted small uppercase">Position</div><div style="font-weight:600;">${data.position}</div></div>
+                                <div class="col-6 mb-3"><div class="text-muted small uppercase">Plant</div><div style="font-weight:600;">${data.plant}</div></div>
+                                <div class="col-6"><div class="text-muted small uppercase">Division</div><div style="font-weight:600;">${data.division}</div></div>
+                                <div class="col-6"><div class="text-muted small uppercase">Department</div><div style="font-weight:600;">${data.department}</div></div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <div class="section-title"><i class="fas fa-history"></i> Theme Activity History</div>
+                            <div class="theme-list">
+                                ${themesHtml}
+                            </div>
+                        </div>
+                        
+                        ${assessmentHtml}
+                    </div>
+                </div>
+            `;
+        } catch (err) {
+            content.innerHTML = `<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3">Error loading details. Please try again.</p></div>`;
+        }
+    }
+
+    function closeBottomSheet() {
+        document.getElementById('sheet-overlay').style.display = 'none';
+        document.getElementById('bottom-sheet').classList.remove('active');
+    }
+
+    // Event Delegation for Demographics
+    document.addEventListener('mouseover', function(e) {
+        if (e.target.classList.contains('demo-bar-segment')) {
+            const label = e.target.getAttribute('data-label');
+            const participants = JSON.parse(e.target.getAttribute('data-participants'));
+            showCustomTooltip(label, participants, e);
+        }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (e.target.classList.contains('demo-bar-segment')) {
+            const tooltipEl = document.getElementById('custom-tooltip');
+            let x = e.pageX + 20;
+            if (x + 300 > window.innerWidth) x = e.pageX - 300;
+            tooltipEl.style.left = x + 'px';
+            tooltipEl.style.top = e.pageY + 'px';
+        }
+    });
+
+    document.addEventListener('mouseout', function(e) {
+        if (e.target.classList.contains('demo-bar-segment')) {
+            document.getElementById('custom-tooltip').style.display = 'none';
+        }
+    });
+
+    function createMappingChart(ctx, labels, data4, data3, details) {
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'KP 4', data: data4, backgroundColor: '#FF8A00', borderRadius: 5 },
+                    { label: 'KP 3', data: data3, backgroundColor: '#00D16B', borderRadius: 5 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true, grid: { display: false }, ticks: { color: '#fff' } },
+                    y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } }
+                },
+                plugins: {
+                    legend: { position: 'top', labels: { color: '#8bb4d8' } },
+                    tooltip: {
+                        enabled: false,
+                        external: function(context) {
+                            const tooltipEl = document.getElementById('custom-tooltip');
+                            if (context.tooltip.opacity === 0) {
+                                tooltipEl.style.display = 'none';
+                                return;
+                            }
+                            const label = context.tooltip.dataPoints[0].label;
+                            const data = details[label] || [];
+                            showCustomTooltip(label, data, {
+                                pageX: context.chart.canvas.getBoundingClientRect().left + window.pageXOffset + context.tooltip.caretX,
+                                pageY: context.chart.canvas.getBoundingClientRect().top + window.pageYOffset + context.tooltip.caretY
+                            });
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // PIE CHART
+    new Chart(document.getElementById('kpPieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['KP 4', 'KP 3'],
+            datasets: [{
+                data: [{{ kp4_count }}, {{ kp3_count }}],
+                backgroundColor: ['#FF8A00', '#00D16B'],
+                borderWidth: 0,
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            cutout: '75%',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: '#8bb4d8' } } }
+        }
+    });
+
+    // Division Mapping
+    createMappingChart(
+        document.getElementById('divMappingChart'),
+        {{ kp_div_labels | tojson }},
+        {{ kp_div_4 | tojson }},
+        {{ kp_div_3 | tojson }},
+        divDetails
+    );
+
+    // Department Mapping
+    createMappingChart(
+        document.getElementById('deptMappingChart'),
+        {{ kp_dept_labels | tojson }},
+        {{ kp_dept_4 | tojson }},
+        {{ kp_dept_3 | tojson }},
+        deptDetails
+    );
+
+    // BATCH STATS
+    new Chart(document.getElementById('batchChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ batch_labels | tojson }},
+            datasets: [
+                { label: 'KP 4 %', data: {{ batch_kp4 | tojson }}, backgroundColor: '#FF8A00' },
+                { label: 'KP 3 %', data: {{ batch_kp3 | tojson }}, backgroundColor: '#00D16B' }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { max: 100, ticks: { color: '#8bb4d8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                x: { ticks: { color: '#fff' }, grid: { display: false } }
+            }
+        }
+    });
+
+    // PENSION FORECAST
+    new Chart(document.getElementById('pensionChart'), {
+        type: 'line',
+        data: {
+            labels: {{ forecast_labels | tojson }},
+            datasets: [{
+                label: 'Retirement Count',
+                data: {{ forecast_values | tojson }},
+                borderColor: '#FF8A00',
+                backgroundColor: 'rgba(255, 138, 0, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#FF8A00'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } },
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8', autoSkip: true, maxTicksLimit: 10 } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+{% endblock %}

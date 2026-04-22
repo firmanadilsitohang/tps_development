@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Database Partisipan | Management{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --panel-bg: #0d1117;
+        --accent-blue: #0A74FF;
+        --accent-gold: #f59e0b;
+        --accent-green: #00D16B;
+        --accent-red: #E3000F;
+        --border-dark: #30363d;
+    }
+
+    .premium-header {
+        background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+        border: 1px solid var(--border-dark);
+        border-radius: 16px;
+        padding: 25px 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .page-title {
+        font-family: 'Oswald', sans-serif;
+        letter-spacing: 1.5px;
+        color: #ffffff;
+        margin: 0;
+        font-size: 24px;
+        text-transform: uppercase;
+    }
+
+    .filter-section {
+        border-top: 1px solid var(--border-dark);
+        padding-top: 20px;
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .filter-box {
+        background-color: #010409;
+        border: 1px solid var(--border-dark);
+        border-radius: 10px;
+        color: #c9d1d9;
+        padding: 10px 15px;
+        font-size: 13px;
+        transition: 0.3s;
+        flex: 1 1 200px;
+    }
+
+    .filter-box:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 4px rgba(10, 116, 255, 0.1);
+    }
+
+    /* Table Styles */
+    .table-container {
+        background: #161b22;
+        border: 1px solid var(--border-dark);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        color: #c9d1d9 !important;
+    }
+
+    .table th {
+        background: #1f242c !important;
+        color: var(--text-muted) !important;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 15px;
+        border-bottom: 2px solid var(--border-dark) !important;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 15px;
+        border-bottom: 1px solid #21262d !important;
+        background: #161b22 !important;
+    }
+
+    .photo-circle {
+        width: 45px; height: 45px;
+        border-radius: 50%;
+        border: 2px solid var(--border-dark);
+        object-fit: cover;
+    }
+
+    .emp-name { font-weight: 700; color: #fff; font-size: 14px; text-transform: uppercase; }
+    .emp-nik { font-family: monospace; font-size: 11px; color: var(--text-muted); }
+    .emp-job { font-size: 11px; color: var(--accent-gold); font-weight: 600; text-transform: uppercase; }
+
+    .org-info { font-size: 12px; line-height: 1.4; }
+    .org-label { font-weight: 700; color: var(--text-muted); margin-right: 5px; }
+
+    .badge-level {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        margin: 2px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .badge-kp4 { color: #FF8A00; background: rgba(255,138,0,0.1); border-color: rgba(255,138,0,0.3); }
+    .badge-kp3 { color: #00D16B; background: rgba(0,209,107,0.1); border-color: rgba(0,209,107,0.3); }
+    .badge-adv { color: #0A74FF; background: rgba(10,116,255,0.1); border-color: rgba(10,116,255,0.3); }
+    .badge-jis { color: #9333ea; background: rgba(147,51,234,0.1); border-color: rgba(147,51,234,0.3); }
+
+    .age-pill {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 800;
+        display: inline-block;
+    }
+    .age-prod { color: var(--accent-green); background: rgba(0,209,107,0.1); }
+    .age-risk { color: var(--accent-red); background: rgba(227,0,15,0.1); }
+
+    .ret-year { font-weight: 700; font-size: 12px; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="premium-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title"><i class="fas fa-users-cog me-2 text-info"></i> DATABASE PARTISIPAN (MONITORING)</h1>
+                <p class="text-muted small mt-2">Executive Overview: Organisasi, Kualifikasi, dan Risiko Pensiun</p>
+            </div>
+            <div class="text-end">
+                <div class="text-muted small">Total Partisipan</div>
+                <div class="fs-4 fw-bold text-white" id="totalCount">{{ employees|length }}</div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <input type="text" id="nameSearch" class="filter-box" placeholder="Cari Nama atau NIK...">
+            <select id="filterArea" class="filter-box">
+                <option value="">-- Semua Area --</option>
+            </select>
+            <select id="filterDivisi" class="filter-box">
+                <option value="">-- Semua Divisi --</option>
+            </select>
+            <select id="filterDept" class="filter-box">
+                <option value="">-- Semua Departemen --</option>
+            </select>
+            <select id="filterLevel" class="filter-box">
+                <option value="">-- Semua Level --</option>
+                <option value="4">TPS KP 4</option>
+                <option value="3">TPS KP 3</option>
+                <option value="ADVANCE">TPS ADVANCE</option>
+                <option value="JISHUKEN">JISHUKEN</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table" id="empTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">FOTO</th>
+                        <th>PROFILE PARTISIPAN</th>
+                        <th>ORGANISASI</th>
+                        <th>TPS LEVEL</th>
+                        <th class="text-center">UMUR</th>
+                        <th class="text-center">TAHUN PENSIUN</th>
+                    </tr>
+                </thead>
+                <tbody id="empTableBody">
+                    {% for emp in employees %}
+                    {% set age = 2026 - emp.birth_date.year if emp.birth_date else 0 %}
+                    {% set ret_year = emp.birth_date.year + 55 if emp.birth_date else 'N/A' %}
+                    {% set a_name = emp.plant.name if emp.plant else 'N/A' %}
+                    {% set d_name = emp.division.name if emp.division else 'N/A' %}
+                    {% set dp_name = emp.department.name if emp.department else 'N/A' %}
+                    <tr class="emp-row" 
+                        data-area="{{ a_name }}" 
+                        data-div="{{ d_name }}" 
+                        data-dept="{{ dp_name }}"
+                        data-level="{{ emp.current_tps_level | upper }}">
+                        <td class="text-center">
+                            <img src="/static/uploads/photos/{{ emp.photo or 'default.png' }}" class="photo-circle" onerror="this.src='/static/uploads/photos/default.png'">
+                        </td>
+                        <td>
+                            <div class="emp-name">{{ emp.name }}</div>
+                            <div class="emp-nik">{{ emp.username }}</div>
+                            <div class="emp-job">{{ emp.position or '-' }}</div>
+                        </td>
+                        <td>
+                            <div class="org-info">
+                                <div><span class="org-label">Area:</span> {{ a_name }}</div>
+                                <div><span class="org-label">Div:</span> {{ d_name }}</div>
+                                <div><span class="org-label">Dept:</span> {{ dp_name }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if emp.current_tps_level %}
+                                {% if '4' in emp.current_tps_level.upper() %}<span class="badge-level badge-kp4">TPS KP 4</span>{% endif %}
+                                {% if '3' in emp.current_tps_level.upper() %}<span class="badge-level badge-kp3">TPS KP 3</span>{% endif %}
+                                {% if 'ADV' in emp.current_tps_level.upper() %}<span class="badge-level badge-adv">TPS ADVANCE</span>{% endif %}
+                                {% if 'JIS' in emp.current_tps_level.upper() %}<span class="badge-level badge-jis">JISHUKEN</span>{% endif %}
+                            {% else %}
+                                <span class="text-muted small">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if age > 0 %}
+                            <div class="age-pill {% if age >= 50 %}age-risk{% else %}age-pill age-prod{% endif %}">
+                                {{ age }}
+                            </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center ret-year">
+                            {{ ret_year }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const rows = Array.from(document.querySelectorAll('.emp-row'));
+    const totalDisplay = document.getElementById('totalCount');
+    
+    // Dynamic Filter Populate
+    const areas = new Set();
+    const divs = new Set();
+    const depts = new Set();
+    
+    rows.forEach(r => {
+        if(r.dataset.area !== 'N/A') areas.add(r.dataset.area);
+        if(r.dataset.div !== 'N/A') divs.add(r.dataset.div);
+        if(r.dataset.dept !== 'N/A') depts.add(r.dataset.dept);
+    });
+    
+    const populate = (id, set) => {
+        const el = document.getElementById(id);
+        Array.from(set).sort().forEach(val => {
+            const opt = document.createElement('option');
+            opt.value = val; opt.textContent = val;
+            el.appendChild(opt);
+        });
+    };
+    
+    populate('filterArea', areas);
+    populate('filterDivisi', divs);
+    populate('filterDept', depts);
+    
+    const filters = {
+        name: document.getElementById('nameSearch'),
+        area: document.getElementById('filterArea'),
+        div: document.getElementById('filterDivisi'),
+        dept: document.getElementById('filterDept'),
+        level: document.getElementById('filterLevel')
+    };
+    
+    function applyFilters() {
+        let count = 0;
+        rows.forEach(r => {
+            const mName = r.innerText.toLowerCase().includes(filters.name.value.toLowerCase());
+            const mArea = !filters.area.value || r.dataset.area === filters.area.value;
+            const mDiv = !filters.div.value || r.dataset.div === filters.div.value;
+            const mDept = !filters.dept.value || r.dataset.dept === filters.dept.value;
+            const mLevel = !filters.level.value || r.dataset.level.includes(filters.level.value);
+            
+            if(mName && mArea && mDiv && mDept && mLevel) {
+                r.style.display = '';
+                count++;
+            } else {
+                r.style.display = 'none';
+            }
+        });
+        totalDisplay.textContent = count;
+    }
+    
+    Object.values(filters).forEach(f => f.addEventListener('input', applyFilters));
+});
+</script>
+{% endblock %}

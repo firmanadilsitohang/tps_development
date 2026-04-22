@@ -110,6 +110,9 @@
                     <a href="{{ url_for('management.dashboard') }}" class="nav-link {% if request.endpoint == 'management.dashboard' %}active{% endif %}">
                         <i class="fas fa-chart-pie"></i> Dashboard Utama
                     </a>
+                    <a href="{{ url_for('management.participants') }}" class="nav-link {% if request.endpoint == 'management.participants' %}active{% endif %}">
+                        <i class="fas fa-users"></i> Database Partisipan
+                    </a>
                 {% endif %}
             {% endif %}
         </nav>
