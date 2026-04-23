@@ -847,40 +847,42 @@
         </div>
         <div class="stat-card" style="border-top: 2px solid rgba(255,0,85,0.4);">
             <i class="fas fa-hourglass-half"></i>
-            <p class="stat-label">Tugas Menunggu Dinilai</p>
-            <p class="stat-value" style="color: var(--neon-red);">{{ stats.pending_review }}</p>
+            <div class="stat-label">Total Participants</div>
+            <h2 class="stat-value">{{ stats.total_karyawan }}</h2>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #FF9F43;">
+            <i class="fas fa-file-signature"></i>
+            <div class="stat-label">Pending Review</div>
+            <h2 class="stat-value" style="color: #FF9F43;">{{ stats.pending_review }}</h2>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #28C76F;">
+            <i class="fas fa-chart-line"></i>
+            <div class="stat-label">Total Kaizen Themes</div>
+            <h2 class="stat-value" style="color: #28C76F;">{{ stats.total_kaizen }}</h2>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid var(--neon-gold);">
+            <i class="fas fa-crown"></i>
+            <div class="stat-label">Key Person 4</div>
+            <h2 class="stat-value" style="color: var(--neon-gold);">{{ stats.total_kp4 }}</h2>
         </div>
     </div>
 
-    <!-- ========== GRAFIK ROW 1 ========== -->
-    <div class="dashboard-grid mb-4">
-        <div class="glass-panel col-4">
-            <h6 class="chart-title-premium"><i class="fas fa-trophy me-2"></i>01. ACHIEVEMENT LEVEL PROFILE</h6>
-            <div class="chart-wrapper"><canvas id="chartKP"></canvas></div>
+    <div class="dashboard-grid">
+        <!-- SKILL GAP ANALYSIS (SPIDER CHART) -->
+        <div class="glass-panel col-6">
+            <h6 class="chart-title-premium" style="color: #28C76F; border-color: #28C76F;">01. OVERALL SKILL GAP ANALYSIS (AVG)</h6>
+            <div class="chart-wrapper-tall"><canvas id="spiderAvgChart"></canvas></div>
         </div>
-        <div class="glass-panel col-8">
-            <h6 class="chart-title-premium"><i class="fas fa-industry me-2"></i>02. MAPPING PARTICIPANTS BY PLANT AREA
-            </h6>
-            <div class="chart-wrapper"><canvas id="chartPlant"></canvas></div>
-        </div>
-    </div>
 
-    <!-- GRAFIK ROW 2 -->
-    <div class="dashboard-grid mb-4">
+        <div class="glass-panel col-6">
+            <h6 class="chart-title-premium">02. ACHIEVEMENT LEVEL PROFILE</h6>
+            <div class="chart-wrapper-tall"><canvas id="chartLevel"></canvas></div>
+        </div>
+
         <div class="glass-panel col-4">
-            <h6 class="chart-title-premium"><i class="fas fa-sitemap me-2"></i>03. POPULATION BY DIVISION</h6>
+            <h6 class="chart-title-premium">03. POPULATION BY DIVISION</h6>
             <div class="chart-wrapper"><canvas id="chartDiv"></canvas></div>
         </div>
-        <div class="glass-panel col-7">
-            <h6 class="chart-title-premium"><i class="fas fa-building me-2"></i>04. TOP 10 DEPARTMENTS DISTRIBUTION</h6>
-            <div class="chart-wrapper"><canvas id="chartDept"></canvas></div>
-        </div>
-    </div>
-
-    <!-- GRAFIK ROW 3 -->
-    <div class="dashboard-grid mb-4">
-        <div class="glass-panel col-6">
-            <h6 class="chart-title-premium"><i class="fas fa-chart-pie me-2"></i>05. TPS LEVEL COMPOSITION</h6>
             <div class="chart-wrapper"><canvas id="levelChart"></canvas></div>
         </div>
         <div class="glass-panel col-6">
@@ -942,9 +944,7 @@
     Chart.register(ChartDataLabels);
     Chart.defaults.color = '#ffffff';
     Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.plugins.datalabels.display = false;
-
-    // -------- DATA FROM FLASK --------
+    Chart.defaults.plugins.datalabels.display     // -------- DATA FROM FLASK --------
     const kpLabels = {{ kp_labels | tojson }};
     const kpValues = {{ kp_values | tojson }};
     const plantLabels = {{ plant_labels | tojson }};
@@ -964,72 +964,186 @@
     const batchLabels = {{ batch_labels | tojson }};
     const batchKP3 = {{ batch_kp3 | tojson }};
     const batchKP4 = {{ batch_kp4 | tojson }};
+    const avgData = {{ avg_data | tojson }};
 
     // ============================================================
-    // CHART 01 — Achievement Level Profile (Bar)
+    // SPIDER CHART — Overall Skill Gap Analysis
     // ============================================================
-    const ctx1 = document.getElementById('chartKP').getContext('2d');
-    const gradGold = ctx1.createLinearGradient(0, 0, 0, 280); gradGold.addColorStop(0, '#ffcc00'); gradGold.addColorStop(1, '#332900');
-    const gradGreen = ctx1.createLinearGradient(0, 0, 0, 280); gradGreen.addColorStop(0, '#39ff14'); gradGreen.addColorStop(1, '#0b3304');
-    const gradBlue = ctx1.createLinearGradient(0, 0, 0, 280); gradBlue.addColorStop(0, '#00d2ff'); gradBlue.addColorStop(1, '#002a33');
-    new Chart(ctx1, { type: 'bar', data: { labels: kpLabels, datasets: [{ data: kpValues, backgroundColor: [gradGold, gradGreen, gradBlue], borderColor: ['#ffcc00', '#39ff14', '#00d2ff'], borderWidth: 2, borderRadius: 8, barThickness: 40 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', anchor: 'end', align: 'start', offset: 10, font: { weight: 'bold', size: 15 }, textStrokeColor: '#000', textStrokeWidth: 4 } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } }, x: { ticks: { font: { weight: 'bold' } }, grid: { display: false } } } } });
+    new Chart(document.getElementById('spiderAvgChart'), {
+        type: 'radar',
+        data: {
+            labels: ['Genba', 'Problem Solving', 'Observation', 'Kaizen', 'Implementation', 'Presentation'],
+            datasets: [{
+                label: 'Average Competency',
+                data: avgData,
+                backgroundColor: 'rgba(40, 199, 111, 0.2)',
+                borderColor: '#28C76F',
+                pointBackgroundColor: '#28C76F',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#28C76F',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    pointLabels: { color: '#8bb4d8', font: { size: 11, weight: 'bold' } },
+                    ticks: { display: false, max: 100 },
+                    suggestedMin: 0,
+                    suggestedMax: 100
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
 
     // ============================================================
-    // CHART 02 — Plant (Horizontal Bar)
+    // CHART 02 — Achievement Level Profile
     // ============================================================
-    const ctx2 = document.getElementById('chartPlant').getContext('2d');
-    const gradPink = ctx2.createLinearGradient(400, 0, 0, 0); gradPink.addColorStop(0, '#ff00a0'); gradPink.addColorStop(1, '#330020');
-    new Chart(ctx2, { type: 'bar', data: { labels: plantLabels, datasets: [{ data: plantData, backgroundColor: gradPink, borderRadius: 5, barThickness: 20 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', anchor: 'end', align: 'start', offset: 8, font: { weight: 'bold', size: 13 }, textStrokeColor: '#000', textStrokeWidth: 3 } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#ff00a0', font: { size: 12, weight: 'bold' } }, grid: { display: false } } } } });
+    new Chart(document.getElementById('chartLevel'), { 
+        type: 'bar', 
+        data: { 
+            labels: kpLabels, 
+            datasets: [{ 
+                data: kpValues, 
+                backgroundColor: ['#FF9F43', '#28C76F', '#00d2ff'], 
+                borderRadius: 8, 
+                barThickness: 45 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { display: false }, 
+                datalabels: { 
+                    display: true, 
+                    color: '#1E272E', 
+                    anchor: 'center', 
+                    align: 'center', 
+                    font: { weight: '900', size: 14 }
+                } 
+            }, 
+            scales: { 
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } }, 
+                x: { ticks: { font: { weight: 'bold' } }, grid: { display: false } } 
+            } 
+        } 
+    });
 
     // ============================================================
     // CHART 03 — Division (Doughnut)
     // ============================================================
-    new Chart(document.getElementById('chartDiv'), { type: 'doughnut', data: { labels: divLabels, datasets: [{ data: divData, backgroundColor: ['#00d2ff', '#39ff14', '#ff00a0', '#ffcc00', '#bc13fe', '#ff0055'], borderWidth: 3, borderColor: '#0b1019' }] }, options: { cutout: '70%', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } } } } });
+    new Chart(document.getElementById('chartDiv'), { 
+        type: 'doughnut', 
+        data: { 
+            labels: divLabels, 
+            datasets: [{ 
+                data: divData, 
+                backgroundColor: ['#00d2ff', '#28C76F', '#FF9F43', '#ff00a0', '#bc13fe'], 
+                borderWidth: 3, 
+                borderColor: '#0b1019' 
+            }] 
+        }, 
+        options: { 
+            cutout: '70%', 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { position: 'right', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } },
+                datalabels: { display: true, color: '#1E272E', backgroundColor: '#fff', borderRadius: 4 }
+            } 
+        } 
+    });
 
     // ============================================================
-    // CHART 04 — Dept (Horizontal Bar)
+    // CHART 04 — Plant (Horizontal Bar)
     // ============================================================
-    const ctx4 = document.getElementById('chartDept').getContext('2d');
-    const gradGolden = ctx4.createLinearGradient(400, 0, 0, 0); gradGolden.addColorStop(0, '#ffaa00'); gradGolden.addColorStop(1, '#662200');
-    new Chart(ctx4, { type: 'bar', data: { labels: deptLabels, datasets: [{ data: deptData, backgroundColor: gradGolden, borderColor: '#ffaa00', borderWidth: 1, borderRadius: 4, barThickness: 13 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', anchor: 'end', align: 'start', offset: 5, font: { weight: 'bold', size: 11 }, textStrokeColor: '#000', textStrokeWidth: 3 } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#ffcc00', font: { size: 10, weight: 'bold' } }, grid: { display: false } } } } });
+    new Chart(document.getElementById('chartPlant'), { 
+        type: 'bar', 
+        data: { 
+            labels: plantLabels, 
+            datasets: [{ 
+                data: plantData, 
+                backgroundColor: '#FF9F43', 
+                borderRadius: 5, 
+                barThickness: 20 
+            }] 
+        }, 
+        options: { 
+            indexAxis: 'y', 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { display: false }, 
+                datalabels: { 
+                    display: true, 
+                    color: '#1E272E', 
+                    anchor: 'center', 
+                    align: 'center', 
+                    font: { weight: 'bold', size: 12 }
+                } 
+            }, 
+            scales: { 
+                x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, 
+                y: { ticks: { color: '#FF9F43', font: { size: 12, weight: 'bold' } }, grid: { display: false } } 
+            } 
+        } 
+    });
 
     // ============================================================
-    // CHART 05 — Level Composition Doughnut (sama data level)
+    // CHART 05 — Batch Success Rate (Line)
     // ============================================================
-    new Chart(document.getElementById('levelChart'), { type: 'doughnut', data: { labels: levelLabels, datasets: [{ data: levelData, backgroundColor: ['rgba(245,158,11,0.8)', 'rgba(16,185,129,0.8)', 'rgba(10,116,255,0.8)', 'rgba(99,102,241,0.8)', 'rgba(255,0,160,0.8)'], borderWidth: 0, hoverOffset: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } } } } });
-
-    // ============================================================
-    // CHART 06 — Kaizen Status (Pie)
-    // ============================================================
-    new Chart(document.getElementById('statusChart'), { type: 'pie', data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6'], borderWidth: 0, hoverOffset: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } } } } });
-
-    // ============================================================
-    // CHART 07 — Pension Forecast (Bar)
-    // ============================================================
-    const ctx7 = document.getElementById('chartPension').getContext('2d');
-    const gradRed = ctx7.createLinearGradient(0, 0, 0, 280); gradRed.addColorStop(0, '#ff0055'); gradRed.addColorStop(1, '#330011');
-    new Chart(ctx7, { type: 'bar', data: { labels: forecastLabels, datasets: [{ data: forecastValues, backgroundColor: gradRed, borderColor: '#ff0055', borderWidth: 2, borderRadius: 6, barThickness: 40 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', anchor: 'end', align: 'start', offset: 10, font: { weight: 'bold', size: 14 }, textStrokeColor: '#000', textStrokeWidth: 4 } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' }, ticks: { precision: 0 } }, x: { grid: { display: false }, ticks: { color: '#ff0055', font: { size: 13, weight: 'bold' } } } } } });
-
-    // ============================================================
-    // CHART 08 — Age Risk (Polar Area)
-    // ============================================================
-    new Chart(document.getElementById('chartAge'), { type: 'polarArea', data: { labels: ageLabels, datasets: [{ data: ageValues, backgroundColor: ['rgba(57,255,20,0.55)', 'rgba(255,0,85,0.55)'], borderColor: ['#39ff14', '#ff0055'], borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18, font: { size: 11 } } } }, scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.08)' } } } } });
-
-    // ============================================================
-    // CHART 09 — Batch Success Rate (Line)
-    // ============================================================
-    const ctx9 = document.getElementById('chartBatch').getContext('2d');
-    const gradBKP3 = ctx9.createLinearGradient(0, 0, 0, 320); gradBKP3.addColorStop(0, 'rgba(57,255,20,0.4)'); gradBKP3.addColorStop(1, 'rgba(57,255,20,0)');
-    const gradBKP4 = ctx9.createLinearGradient(0, 0, 0, 320); gradBKP4.addColorStop(0, 'rgba(255,204,0,0.4)'); gradBKP4.addColorStop(1, 'rgba(255,204,0,0)');
-    const getPtColor = (ctx) => ctx.raw === 0 ? '#ff0055' : '#fff';
-    const getPtRadius = (ctx) => ctx.raw === 0 ? 8 : 4;
-    new Chart(ctx9, {
-        type: 'line', data: {
-            labels: batchLabels, datasets: [
-                { label: '% Lulus KP 3', data: batchKP3, borderColor: '#39ff14', backgroundColor: gradBKP3, borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: getPtColor, pointRadius: getPtRadius, pointBorderWidth: 2 },
-                { label: '% Lulus KP 4', data: batchKP4, borderColor: '#ffcc00', backgroundColor: gradBKP4, borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: getPtColor, pointRadius: getPtRadius, pointBorderWidth: 2 }
+    new Chart(document.getElementById('chartBatch'), {
+        type: 'line', 
+        data: {
+            labels: batchLabels, 
+            datasets: [
+                { 
+                    label: '% Lulus KP 3', 
+                    data: batchKP3, 
+                    borderColor: '#28C76F', 
+                    backgroundColor: 'rgba(40, 199, 111, 0.2)', 
+                    borderWidth: 3, 
+                    fill: true, 
+                    tension: 0.4, 
+                    pointRadius: 5,
+                    pointBackgroundColor: '#28C76F'
+                },
+                { 
+                    label: '% Lulus KP 4', 
+                    data: batchKP4, 
+                    borderColor: '#FF9F43', 
+                    backgroundColor: 'rgba(255, 159, 67, 0.2)', 
+                    borderWidth: 3, 
+                    fill: true, 
+                    tension: 0.4, 
+                    pointRadius: 5,
+                    pointBackgroundColor: '#FF9F43'
+                }
             ]
-        }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: '#fff', font: { size: 13, weight: 'bold' }, usePointStyle: true, padding: 20 } }, tooltip: { mode: 'index', intersect: false, padding: 14 }, datalabels: { display: false } }, scales: { y: { max: 100, beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' }, ticks: { callback: v => v + '%', font: { size: 12, weight: 'bold' } } }, x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#ff00a0', font: { size: 12, weight: 'bold' } } } }, interaction: { mode: 'nearest', axis: 'x', intersect: false } }
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { position: 'top', labels: { color: '#fff', font: { size: 13, weight: 'bold' }, usePointStyle: true, padding: 20 } }, 
+                tooltip: { mode: 'index', intersect: false, padding: 14 }, 
+                datalabels: { display: true, align: 'top', color: '#fff', formatter: v => v + '%' } 
+            }, 
+            scales: { 
+                y: { max: 100, beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' }, ticks: { callback: v => v + '%', font: { size: 12, weight: 'bold' } } }, 
+                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#00d2ff', font: { size: 12, weight: 'bold' } } } 
+            }
+        }
+    }); intersect: false } }
     });
 
 

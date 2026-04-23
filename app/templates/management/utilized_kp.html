@@ -9,14 +9,21 @@
         grid-template-columns: repeat(12, 1fr);
         gap: 25px;
     }
+
     .stat-card {
         background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 20px;
         padding: 25px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
     }
+
+    .stat-card:hover {
+        border-color: rgba(0, 209, 107, 0.3);
+    }
+
     .card-title {
         font-family: 'Oswald', sans-serif;
         font-size: 18px;
@@ -28,6 +35,7 @@
         gap: 10px;
         color: var(--accent-cyan);
     }
+
     .col-4 { grid-column: span 4; }
     .col-6 { grid-column: span 6; }
     .col-8 { grid-column: span 8; }
@@ -43,7 +51,11 @@
         margin-bottom: 20px;
         transition: 0.3s;
     }
-    .btn-back:hover { color: var(--accent-cyan); transform: translateX(-5px); }
+
+    .btn-back:hover {
+        color: var(--accent-cyan);
+        transform: translateX(-5px);
+    }
 
     .pie-center-text {
         position: absolute;
@@ -52,61 +64,104 @@
         transform: translate(-50%, -50%);
         text-align: center;
     }
+
     .pie-center-text .total {
         display: block;
         font-size: 36px;
         font-weight: 800;
         font-family: 'Oswald', sans-serif;
     }
+
     .pie-center-text .label {
         font-size: 12px;
         color: var(--text-muted);
         text-transform: uppercase;
     }
 
-    /* TOOLTIP FOR MAPPING */
+    /* ENHANCED TOOLTIP */
     #custom-tooltip {
         position: absolute;
         display: none;
-        background: rgba(5, 10, 20, 0.95);
+        background: rgba(10, 15, 25, 0.98);
         border: 1px solid var(--accent-cyan);
-        border-radius: 12px;
-        padding: 15px;
+        border-radius: 15px;
+        padding: 0;
         z-index: 1000;
-        width: 280px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        pointer-events: none;
+        width: 300px;
+        max-height: 400px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #custom-tooltip.pinned {
+        pointer-events: auto !important;
+        border-width: 2px;
+        box-shadow: 0 0 20px var(--accent-cyan);
     }
 
     .tooltip-header {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
         font-weight: 700;
-        margin-bottom: 12px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         color: var(--accent-cyan);
         display: flex;
         justify-content: space-between;
+        align-items: center;
+    }
+
+    .tooltip-body {
+        padding: 15px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .tooltip-close {
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--text-muted);
+        transition: 0.3s;
+    }
+
+    .tooltip-close:hover {
+        color: #ff4d4d;
     }
 
     .emp-item {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 12px;
+        padding: 8px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        transition: background 0.2s;
+    }
+
+    .emp-item:hover {
+        background: rgba(255, 255, 255, 0.05);
     }
 
     .emp-img {
-        width: 35px; height: 35px;
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
-        border: 2px solid;
         object-fit: cover;
     }
 
-    .lvl-4 { border-color: #FF8A00; }
-    .lvl-3 { border-color: #00D16B; }
+    .emp-info .name {
+        font-size: 12px;
+        font-weight: 600;
+    }
 
-    .emp-info .name { font-size: 12px; font-weight: 600; }
-    .emp-info .theme { font-size: 10px; color: var(--accent-gold); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .emp-info .theme {
+        font-size: 10px;
+        color: var(--accent-gold);
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
     /* BOTTOM SHEET PANEL */
     #bottom-sheet {
@@ -122,16 +177,21 @@
         z-index: 2000;
         transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         padding: 40px;
-        box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
+        box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.8);
         overflow-y: auto;
     }
 
-    #bottom-sheet.active { bottom: 0; }
+    #bottom-sheet.active {
+        bottom: 0;
+    }
 
     #sheet-overlay {
         position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.7);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
         backdrop-filter: blur(5px);
         display: none;
         z-index: 1999;
@@ -139,7 +199,8 @@
 
     .sheet-close {
         position: absolute;
-        top: 20px; right: 30px;
+        top: 20px;
+        right: 30px;
         font-size: 24px;
         color: var(--text-muted);
         cursor: pointer;
@@ -151,9 +212,13 @@
         gap: 40px;
     }
 
-    .profile-left { text-align: center; }
+    .profile-left {
+        text-align: center;
+    }
+
     .profile-photo {
-        width: 200px; height: 200px;
+        width: 200px;
+        height: 200px;
         border-radius: 20px;
         border: 4px solid var(--accent-cyan);
         object-fit: cover;
@@ -161,7 +226,7 @@
     }
 
     .detail-section {
-        background: rgba(255,255,255,0.03);
+        background: rgba(255, 255, 255, 0.03);
         border-radius: 15px;
         padding: 20px;
         margin-bottom: 25px;
@@ -172,18 +237,25 @@
         font-size: 16px;
         color: var(--accent-cyan);
         margin-bottom: 15px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding-bottom: 5px;
     }
 
-    .theme-list { list-style: none; padding: 0; }
+    .theme-list {
+        list-style: none;
+        padding: 0;
+    }
+
     .theme-item {
         display: flex;
         justify-content: space-between;
         padding: 10px 0;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .theme-item:last-child { border: none; }
+
+    .theme-item:last-child {
+        border: none;
+    }
 
     .score-badge {
         background: var(--accent-cyan);
@@ -200,24 +272,34 @@
         font-size: 11px;
         text-transform: uppercase;
     }
+
     .status-completed { background: #00D16B; color: #000; }
     .status-ongoing { background: #FF8A00; color: #000; }
 
-    /* Assessment Grid */
     .assessment-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 15px;
     }
+
     .assessment-card {
-        background: rgba(255,255,255,0.05);
+        background: rgba(255, 255, 255, 0.05);
         padding: 15px;
         border-radius: 12px;
         text-align: center;
     }
-    .assessment-val { font-size: 24px; font-weight: 800; color: var(--accent-cyan); }
-    .assessment-lbl { font-size: 10px; text-transform: uppercase; color: var(--text-muted); }
 
+    .assessment-val {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--accent-cyan);
+    }
+
+    .assessment-lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
 </style>
 {% endblock %}
 
@@ -227,15 +309,15 @@
 </a>
 
 <div class="dashboard-header mb-4">
-    <h2 class="mb-1" style="color: #FF8A00;">UTILIZED TPS KEY PERSON 3 & 4</h2>
-    <p class="text-muted">Analytical Mapping & Performance Tracking</p>
+    <h2 class="mb-1" style="color: #FF8A00; font-family: 'Oswald'; letter-spacing: 2px;">UTILIZED TPS KEY PERSON 3 & 4</h2>
+    <p class="text-muted">Analytical Mapping & Performance Tracking Dashboard</p>
 </div>
 
 <div class="module-container">
     <!-- 1. Progress TPS KP 4 & 3 -->
     <div class="stat-card col-4">
         <div class="card-title"><i class="fas fa-chart-pie"></i> Status KP 4 & 3</div>
-        <div style="position: relative; height: 300px;">
+        <div style="position: relative; height: 320px;">
             <canvas id="kpPieChart"></canvas>
             <div class="pie-center-text">
                 <span class="total">{{ kp_total }}</span>
@@ -247,7 +329,7 @@
     <!-- 2. Division Mapping -->
     <div class="stat-card col-8">
         <div class="card-title"><i class="fas fa-sitemap"></i> Division Tracking (KP 4 & 3)</div>
-        <div style="height: 300px;">
+        <div style="height: 320px;">
             <canvas id="divMappingChart"></canvas>
         </div>
     </div>
@@ -255,7 +337,7 @@
     <!-- 3. Department Mapping -->
     <div class="stat-card col-12">
         <div class="card-title"><i class="fas fa-building"></i> Department Tracking (KP 4 & 3)</div>
-        <div style="height: 350px;">
+        <div style="height: 400px;">
             <canvas id="deptMappingChart"></canvas>
         </div>
     </div>
@@ -263,51 +345,46 @@
     <!-- 4. Passing Rate -->
     <div class="stat-card col-4">
         <div class="card-title"><i class="fas fa-graduation-cap"></i> Passing Rate per Batch</div>
-        <div style="height: 250px;">
+        <div style="height: 350px;">
             <canvas id="batchChart"></canvas>
         </div>
     </div>
 
-    <!-- 5. Pension Projection -->
-    <div class="stat-card col-4">
-        <div class="card-title"><i class="fas fa-hourglass-half"></i> Retirement Forecast</div>
-        <div style="height: 250px;">
+    <!-- 5. Pension Projection - IMPROVED: WIDER -->
+    <div class="stat-card col-8">
+        <div class="card-title"><i class="fas fa-hourglass-half"></i> Retirement Forecast (55 Years Projection)</div>
+        <div style="height: 350px;">
             <canvas id="pensionChart"></canvas>
         </div>
     </div>
 
     <!-- 6. Demographics -->
-    <div class="stat-card col-4">
+    <div class="stat-card col-12">
         <div class="card-title"><i class="fas fa-users-cog"></i> KP Demographics (Risk @ 50+)</div>
-        <div id="demoContainer" style="display: flex; flex-direction: column; gap: 12px;">
+        <div id="demoContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             {% for level, data in demo_data.items() %}
-            <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 700;">
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; font-weight: 700;">
                     <span>{{ level }}</span>
-                    <span style="color: var(--text-muted);">Total: {{ data.prod + data.non }}</span>
+                    <span style="color: var(--accent-cyan);">Total: {{ data.prod + data.non }}</span>
                 </div>
-                <!-- Progress Bar Style Demographics -->
-                <div class="demo-bar-container" style="height: 25px; display: flex; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,0.1); cursor: help;">
+                <div class="demo-bar-container" style="height: 40px; display: flex; border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.1); cursor: pointer;">
                     {% if data.prod + data.non > 0 %}
-                    <div class="demo-bar-segment" 
-                         data-label="{{ level }} - Productive" 
-                         data-participants='{{ data.prod_list | tojson }}'
-                         style="width:{{ (data.prod / (data.prod + data.non) * 100)|round }}%; background: #00D16B; display: flex; align-items: center; padding-left: 10px; font-size: 10px; font-weight: 800;">
-                        PROD {{ (data.prod / (data.prod + data.non) * 100)|round }}%
+                    <div class="demo-bar-segment" data-label="{{ level }} - Productive" data-participants='{{ data.prod_list | tojson }}'
+                        style="width:{{ (data.prod / (data.prod + data.non) * 100)|round }}%; background: linear-gradient(90deg, #00D16B, #00A352); display: flex; align-items: center; padding-left: 15px; font-size: 12px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                        {{ (data.prod / (data.prod + data.non) * 100)|round }}% PROD
                     </div>
-                    <div class="demo-bar-segment" 
-                         data-label="{{ level }} - Retirement Risk" 
-                         data-participants='{{ data.non_list | tojson }}'
-                         style="width:{{ (data.non / (data.prod + data.non) * 100)|round }}%; background: #E3000F; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-size: 10px; font-weight: 800;">
+                    <div class="demo-bar-segment" data-label="{{ level }} - Retirement Risk" data-participants='{{ data.non_list | tojson }}'
+                        style="width:{{ (data.non / (data.prod + data.non) * 100)|round }}%; background: linear-gradient(90deg, #FF4D4D, #E3000F); display: flex; align-items: center; justify-content: flex-end; padding-right: 15px; font-size: 12px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
                         RISK {{ (data.non / (data.prod + data.non) * 100)|round }}%
                     </div>
                     {% else %}
-                    <div style="width: 100%; text-align: center; line-height: 25px; font-size: 10px; color: var(--text-muted);">NO DATA</div>
+                    <div style="width: 100%; text-align: center; line-height: 40px; font-size: 12px; color: var(--text-muted);">NO DATA AVAILABLE</div>
                     {% endif %}
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px; color: var(--text-muted);">
-                    <span>Productive (< 50): {{ data.prod }}</span>
-                    <span>Retirement Risk (≥ 50): {{ data.non }}</span>
+                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
+                    <span>Productive (< 50 yrs): <strong>{{ data.prod }}</strong></span>
+                    <span>Retirement Risk (≥ 50 yrs): <strong>{{ data.non }}</strong></span>
                 </div>
             </div>
             {% endfor %}
@@ -315,17 +392,31 @@
     </div>
 </div>
 
-<div id="custom-tooltip"></div>
+<!-- Custom Tooltip -->
+<div id="custom-tooltip">
+    <div class="tooltip-header">
+        <span id="tooltip-title">Title</span>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span id="tooltip-count" class="badge bg-primary" style="font-size: 10px;">0</span>
+            <i class="fas fa-times tooltip-close" onclick="closeTooltip()"></i>
+        </div>
+    </div>
+    <div id="tooltip-body" class="tooltip-body">
+        <!-- List Items -->
+    </div>
+    <div id="tooltip-footer" style="padding: 10px; font-size: 9px; color: #888; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
+        Click on items for full profile. Click bar to lock this view.
+    </div>
+</div>
 
 <!-- Bottom Sheet -->
 <div id="sheet-overlay" onclick="closeBottomSheet()"></div>
 <div id="bottom-sheet">
     <div class="sheet-close" onclick="closeBottomSheet()"><i class="fas fa-times"></i></div>
     <div id="sheet-content">
-        <!-- Content will be loaded via AJAX -->
         <div style="text-align: center; padding-top: 100px;">
             <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--accent-cyan);"></i>
-            <p class="mt-3">Loading details...</p>
+            <p class="mt-3">Loading participant data...</p>
         </div>
     </div>
 </div>
@@ -333,24 +424,44 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Add Chart.js DataLabels Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <script>
+    Chart.register(ChartDataLabels);
+
     const divDetails = {{ kp_div_details | tojson }};
     const deptDetails = {{ kp_dept_details | tojson }};
+    const allKpParticipants = Object.values(divDetails).flat();
+    let isTooltipPinned = false;
 
-    function showCustomTooltip(label, data, event) {
+    function showCustomTooltip(label, data, event, levelFilter = null, isPersistent = false) {
+        if (isTooltipPinned && !isPersistent) return;
+
         const tooltipEl = document.getElementById('custom-tooltip');
-        if (!data || data.length === 0) {
-            tooltipEl.style.display = 'none';
+        const titleEl = document.getElementById('tooltip-title');
+        const countEl = document.getElementById('tooltip-count');
+        const bodyEl = document.getElementById('tooltip-body');
+
+        let displayData = data;
+        if (levelFilter) {
+            displayData = data.filter(item => (item.level || "").includes(levelFilter.replace('KP ', '')));
+        }
+
+        if (!displayData || displayData.length === 0) {
+            if (!isTooltipPinned) tooltipEl.style.display = 'none';
             return;
         }
 
-        let html = `<div class="tooltip-header"><span>${label}</span> <span>${data.length} Total</span></div>`;
-        html += `<div style="font-size:9px; color:#888; margin-bottom:10px; text-align:center;">Click to view full detail</div>`;
-        data.sort((a, b) => (a.level || "").localeCompare(b.level || ""));
+        titleEl.innerText = label;
+        countEl.innerText = `${displayData.length} Pers`;
+        
+        displayData.sort((a, b) => (a.level || "").localeCompare(b.level || ""));
 
-        data.forEach(item => {
+        let html = '';
+        displayData.forEach(item => {
             html += `
-                <div class="emp-item" style="cursor: pointer; pointer-events: auto;" onclick="openParticipantDetail(${item.id})">
+                <div class="emp-item" style="cursor: pointer;" onclick="openParticipantDetail(${item.id})">
+                    <img src="/static/uploads/photos/${item.photo}" class="emp-img" onerror="this.src='/static/uploads/photos/default.png'">
                     <div class="emp-info">
                         <div class="name">${item.name} <span style="color:${(item.level || "").includes('4') ? '#FF8A00' : '#00D16B'}">(${(item.level || "")})</span></div>
                         <div class="theme">${item.theme}</div>
@@ -358,31 +469,45 @@
                 </div>`;
         });
 
-        tooltipEl.innerHTML = html;
-        tooltipEl.style.display = 'block';
-        tooltipEl.style.pointerEvents = 'auto'; // Allow clicking items inside
-        
-        let x = event.pageX + 20;
-        let y = event.pageY;
-        
-        if (x + 300 > window.innerWidth) x = event.pageX - 300;
-        
-        tooltipEl.style.left = x + 'px';
-        tooltipEl.style.top = y + 'px';
+        bodyEl.innerHTML = html;
+        tooltipEl.style.display = 'flex';
+
+        if (!isTooltipPinned) {
+            let x = event.pageX + 20;
+            let y = event.pageY;
+            if (x + 300 > window.innerWidth) x = event.pageX - 320;
+            if (y + 400 > window.innerHeight + window.scrollY) y = window.innerHeight + window.scrollY - 420;
+
+            tooltipEl.style.left = x + 'px';
+            tooltipEl.style.top = y + 'px';
+        }
+
+        if (isPersistent) {
+            isTooltipPinned = true;
+            tooltipEl.classList.add('pinned');
+        }
+    }
+
+    function closeTooltip() {
+        isTooltipPinned = false;
+        const tooltipEl = document.getElementById('custom-tooltip');
+        tooltipEl.style.display = 'none';
+        tooltipEl.classList.remove('pinned');
     }
 
     async function openParticipantDetail(id) {
+        if (!id) return;
         const overlay = document.getElementById('sheet-overlay');
         const sheet = document.getElementById('bottom-sheet');
         const content = document.getElementById('sheet-content');
-        
+
         overlay.style.display = 'block';
         sheet.classList.add('active');
-        
+
         try {
             const response = await fetch(`/management/participant_detail/${id}`);
             const data = await response.json();
-            
+
             let themesHtml = '';
             if (data.themes.length > 0) {
                 data.themes.forEach(t => {
@@ -398,15 +523,13 @@
                             </div>
                         </div>`;
                 });
-            } else {
-                themesHtml = '<p class="text-muted">No theme history found.</p>';
-            }
+            } else { themesHtml = '<p class="text-muted">No theme history found.</p>'; }
 
             let assessmentHtml = '';
             if (data.assessment) {
                 assessmentHtml = `
                     <div class="detail-section">
-                        <div class="section-title"><i class="fas fa-chart-bar"></i> OMDD Assessment (KP 3)</div>
+                        <div class="section-title"><i class="fas fa-chart-bar"></i> Workshop Evaluation (Spider)</div>
                         <div class="assessment-grid">
                             <div class="assessment-card"><div class="assessment-val">${data.assessment.genba}</div><div class="assessment-lbl">Genba</div></div>
                             <div class="assessment-card"><div class="assessment-val">${data.assessment.ps}</div><div class="assessment-lbl">Analysis</div></div>
@@ -414,10 +537,6 @@
                             <div class="assessment-card"><div class="assessment-val">${data.assessment.kaizen}</div><div class="assessment-lbl">Kaizen</div></div>
                             <div class="assessment-card"><div class="assessment-val">${data.assessment.impl}</div><div class="assessment-lbl">Impl</div></div>
                             <div class="assessment-card"><div class="assessment-val">${data.assessment.pres}</div><div class="assessment-lbl">Pres</div></div>
-                        </div>
-                        <div class="mt-3 p-3" style="background:rgba(255,255,255,0.05); border-radius:10px;">
-                            <div style="font-weight:700; color:var(--accent-cyan);">Decision: ${data.assessment.decision}</div>
-                            <p class="mb-0 small text-muted mt-1">"${data.assessment.notes || 'No notes available'}"</p>
                         </div>
                     </div>`;
             }
@@ -428,7 +547,7 @@
                         <img src="/static/uploads/photos/${data.photo}" class="profile-photo" onerror="this.src='/static/uploads/photos/default.png'">
                         <h3 class="mb-1">${data.name}</h3>
                         <div class="text-muted small mb-3">${data.username}</div>
-                        <div class="badge" style="background:var(--accent-cyan); color:#000; font-weight:800; padding:5px 15px;">${data.level}</div>
+                        <div class="badge" style="background:var(--accent-cyan); color:#000; font-weight:800; padding:8px 20px; font-size: 14px;">${data.level}</div>
                     </div>
                     <div class="profile-right">
                         <div class="detail-section">
@@ -440,20 +559,15 @@
                                 <div class="col-6"><div class="text-muted small uppercase">Department</div><div style="font-weight:600;">${data.department}</div></div>
                             </div>
                         </div>
-                        
                         <div class="detail-section">
                             <div class="section-title"><i class="fas fa-history"></i> Theme Activity History</div>
-                            <div class="theme-list">
-                                ${themesHtml}
-                            </div>
+                            <div class="theme-list">${themesHtml}</div>
                         </div>
-                        
                         ${assessmentHtml}
                     </div>
-                </div>
-            `;
+                </div>`;
         } catch (err) {
-            content.innerHTML = `<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3">Error loading details. Please try again.</p></div>`;
+            content.innerHTML = `<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3">Error loading details.</p></div>`;
         }
     }
 
@@ -462,8 +576,8 @@
         document.getElementById('bottom-sheet').classList.remove('active');
     }
 
-    // Event Delegation for Demographics
-    document.addEventListener('mouseover', function(e) {
+    // Demographics Events
+    document.addEventListener('mouseover', function (e) {
         if (e.target.classList.contains('demo-bar-segment')) {
             const label = e.target.getAttribute('data-label');
             const participants = JSON.parse(e.target.getAttribute('data-participants'));
@@ -471,55 +585,98 @@
         }
     });
 
-    document.addEventListener('mousemove', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.classList.contains('demo-bar-segment')) {
+            const label = e.target.getAttribute('data-label');
+            const participants = JSON.parse(e.target.getAttribute('data-participants'));
+            showCustomTooltip(label, participants, e, null, true);
+        } else if (!e.target.closest('#custom-tooltip')) {
+            // Close tooltip if clicking outside
+            // closeTooltip(); 
+        }
+    });
+
+    document.addEventListener('mousemove', function (e) {
+        if (e.target.classList.contains('demo-bar-segment') && !isTooltipPinned) {
             const tooltipEl = document.getElementById('custom-tooltip');
             let x = e.pageX + 20;
-            if (x + 300 > window.innerWidth) x = e.pageX - 300;
+            if (x + 300 > window.innerWidth) x = e.pageX - 320;
             tooltipEl.style.left = x + 'px';
             tooltipEl.style.top = e.pageY + 'px';
         }
     });
 
-    document.addEventListener('mouseout', function(e) {
-        if (e.target.classList.contains('demo-bar-segment')) {
+    document.addEventListener('mouseout', function (e) {
+        if (e.target.classList.contains('demo-bar-segment') && !isTooltipPinned) {
             document.getElementById('custom-tooltip').style.display = 'none';
         }
     });
 
+    // Chart Templates
     function createMappingChart(ctx, labels, data4, data3, details) {
         return new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'KP 4', data: data4, backgroundColor: '#FF8A00', borderRadius: 5 },
-                    { label: 'KP 3', data: data3, backgroundColor: '#00D16B', borderRadius: 5 }
+                    { 
+                        label: 'KP 4', 
+                        data: data4, 
+                        backgroundColor: '#FF9F43', // Modern Vibrant Orange
+                        borderRadius: 8,
+                        borderWidth: 0
+                    },
+                    { 
+                        label: 'KP 3', 
+                        data: data3, 
+                        backgroundColor: '#28C76F', // Modern Emerald Green
+                        borderRadius: 8,
+                        borderWidth: 0
+                    }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                onClick: (e, elements, chart) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const label = chart.data.labels[index];
+                        const datasetIndex = elements[0].datasetIndex;
+                        const datasetLabel = chart.data.datasets[datasetIndex].label;
+                        const data = details[label] || [];
+                        showCustomTooltip(`${label} (${datasetLabel})`, data, e.native, datasetLabel, true);
+                    }
+                },
                 scales: {
-                    x: { stacked: true, grid: { display: false }, ticks: { color: '#fff' } },
+                    x: { stacked: true, grid: { display: false }, ticks: { color: '#fff', font: { size: 10 } } },
                     y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } }
                 },
                 plugins: {
-                    legend: { position: 'top', labels: { color: '#8bb4d8' } },
+                    datalabels: {
+                        color: '#1E272E', // Dark contrast color
+                        font: { weight: '900', size: 11 },
+                        formatter: (val) => val > 0 ? val : '',
+                        anchor: 'center',
+                        align: 'center'
+                    },
+                    legend: { position: 'top', labels: { color: '#8bb4d8', font: { family: 'Oswald', size: 12 } } },
                     tooltip: {
                         enabled: false,
-                        external: function(context) {
+                        external: function (context) {
+                            if (isTooltipPinned) return;
                             const tooltipEl = document.getElementById('custom-tooltip');
                             if (context.tooltip.opacity === 0) {
                                 tooltipEl.style.display = 'none';
                                 return;
                             }
                             const label = context.tooltip.dataPoints[0].label;
+                            const datasetLabel = context.tooltip.dataPoints[0].dataset.label;
                             const data = details[label] || [];
-                            showCustomTooltip(label, data, {
+                            showCustomTooltip(`${label} (${datasetLabel})`, data, {
                                 pageX: context.chart.canvas.getBoundingClientRect().left + window.pageXOffset + context.tooltip.caretX,
                                 pageY: context.chart.canvas.getBoundingClientRect().top + window.pageYOffset + context.tooltip.caretY
-                            });
+                            }, datasetLabel);
                         }
                     }
                 }
@@ -534,58 +691,104 @@
             labels: ['KP 4', 'KP 3'],
             datasets: [{
                 data: [{{ kp4_count }}, {{ kp3_count }}],
-                backgroundColor: ['#FF8A00', '#00D16B'],
+                backgroundColor: ['#FF9F43', '#28C76F'],
                 borderWidth: 0,
                 hoverOffset: 15
             }]
         },
         options: {
-            cutout: '75%',
+            cutout: '70%',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { color: '#8bb4d8' } } }
+            plugins: {
+                datalabels: {
+                    color: '#1E272E',
+                    backgroundColor: '#fff',
+                    borderRadius: 4,
+                    padding: 4,
+                    font: { weight: 'bold', size: 12 },
+                    formatter: (val) => val
+                },
+                legend: { position: 'bottom', labels: { color: '#8bb4d8', font: { family: 'Oswald' } } },
+                tooltip: { enabled: false }
+            }
         }
     });
 
     // Division Mapping
-    createMappingChart(
-        document.getElementById('divMappingChart'),
-        {{ kp_div_labels | tojson }},
-        {{ kp_div_4 | tojson }},
-        {{ kp_div_3 | tojson }},
-        divDetails
-    );
+    createMappingChart(document.getElementById('divMappingChart'), {{ kp_div_labels | tojson }}, {{ kp_div_4 | tojson }}, {{ kp_div_3 | tojson }}, divDetails);
 
     // Department Mapping
-    createMappingChart(
-        document.getElementById('deptMappingChart'),
-        {{ kp_dept_labels | tojson }},
-        {{ kp_dept_4 | tojson }},
-        {{ kp_dept_3 | tojson }},
-        deptDetails
-    );
+    createMappingChart(document.getElementById('deptMappingChart'), {{ kp_dept_labels | tojson }}, {{ kp_dept_4 | tojson }}, {{ kp_dept_3 | tojson }}, deptDetails);
 
-    // BATCH STATS
+    // BATCH STATS - IMPROVED LOGIC
+    const batchDetails = {{ batch_details | tojson }};
     new Chart(document.getElementById('batchChart'), {
         type: 'bar',
         data: {
             labels: {{ batch_labels | tojson }},
             datasets: [
-                { label: 'KP 4 %', data: {{ batch_kp4 | tojson }}, backgroundColor: '#FF8A00' },
-                { label: 'KP 3 %', data: {{ batch_kp3 | tojson }}, backgroundColor: '#00D16B' }
+                { 
+                    label: 'KP 4 %', 
+                    data: {{ batch_kp4 | tojson }}, 
+                    backgroundColor: '#FF9F43',
+                    borderColor: '#FF9F43', 
+                    borderWidth: 1,
+                    borderRadius: 5
+                },
+                { 
+                    label: 'KP 3 %', 
+                    data: {{ batch_kp3 | tojson }}, 
+                    backgroundColor: '#28C76F',
+                    borderColor: '#28C76F', 
+                    borderWidth: 1,
+                    borderRadius: 5
+                }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            indexAxis: 'y',
             scales: {
-                y: { max: 100, ticks: { color: '#8bb4d8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                x: { ticks: { color: '#fff' }, grid: { display: false } }
+                x: { max: 100, ticks: { color: '#8bb4d8', callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                y: { ticks: { color: '#fff', font: { weight: 'bold' } }, grid: { display: false } }
+            },
+            plugins: {
+                datalabels: {
+                    color: '#1E272E',
+                    font: { weight: 'bold' },
+                    align: 'center',
+                    anchor: 'center',
+                    formatter: v => v > 0 ? v + '%' : ''
+                },
+                legend: { labels: { color: '#8bb4d8', font: { family: 'Oswald' } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const batchName = context.label;
+                            const details = batchDetails[batchName];
+                            if (details) {
+                                if (context.dataset.label.includes('KP 4')) {
+                                    return `KP 4: ${details.kp4_p}% (${details.kp4}/${details.total} Pers)`;
+                                } else {
+                                    return `KP 3: ${details.kp3_p}% (${details.kp3}/${details.total} Pers)`;
+                                }
+                            }
+                            return context.formattedValue + '%';
+                        },
+                        afterBody: function(context) {
+                            const batchName = context[0].label;
+                            const details = batchDetails[batchName];
+                            return details ? `\nTotal Participants: ${details.total}` : '';
+                        }
+                    }
+                }
             }
         }
     });
 
-    // PENSION FORECAST
+    // PENSION FORECAST - IMPROVED
     new Chart(document.getElementById('pensionChart'), {
         type: 'line',
         data: {
@@ -593,23 +796,42 @@
             datasets: [{
                 label: 'Retirement Count',
                 data: {{ forecast_values | tojson }},
-                borderColor: '#FF8A00',
-                backgroundColor: 'rgba(255, 138, 0, 0.1)',
+                borderColor: '#28C76F',
+                backgroundColor: 'rgba(40, 199, 111, 0.15)',
                 fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: '#FF8A00'
+                tension: 0.3,
+                pointRadius: 6,
+                pointHoverRadius: 10,
+                pointBackgroundColor: '#28C76F',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } },
-                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8', autoSkip: true, maxTicksLimit: 10 } }
+                y: { 
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,0.1)' }, 
+                    ticks: { color: '#8bb4d8', stepSize: 1, font: { size: 14, weight: 'bold' } } 
+                },
+                x: { 
+                    grid: { color: 'rgba(255,255,255,0.05)' }, 
+                    ticks: { color: '#fff', font: { size: 11 } } 
+                }
             },
-            plugins: { legend: { display: false } }
+            plugins: {
+                datalabels: {
+                    align: 'top',
+                    offset: 5,
+                    color: '#28C76F',
+                    font: { weight: '900', size: 14 },
+                    formatter: v => v > 0 ? v : ''
+                },
+                legend: { display: false }
+            }
         }
     });
 </script>
-{% endblock %}
+{% endblock %}%}

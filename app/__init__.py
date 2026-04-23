@@ -14,6 +14,10 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/tpsg_db'
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,
+    }
 
     # --- 2. INISIALISASI DATABASE ---
     db.init_app(app)

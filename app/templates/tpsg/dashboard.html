@@ -241,6 +241,40 @@
     </div>
 
     <div class="dashboard-grid">
+        <!-- OPERATIONAL CONTROL CARDS -->
+        <div class="col-12 mb-4">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="glass-panel text-center" style="border-top: 4px solid var(--neon-blue);">
+                        <div class="text-secondary small mb-1">TOTAL PARTICIPANTS</div>
+                        <div style="font-family: 'Oswald'; font-size: 32px; color: #fff;">{{ total_count }}</div>
+                        <div style="font-size: 10px; color: var(--neon-blue);">ACTIVE MASTER DATA</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="glass-panel text-center" style="border-top: 4px solid #FF9F43;">
+                        <div class="text-secondary small mb-1">PENDING APPROVAL</div>
+                        <div style="font-family: 'Oswald'; font-size: 32px; color: #FF9F43;">{{ pending_count }}</div>
+                        <div style="font-size: 10px; color: #FF9F43;">WAITING FOR REVIEW</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="glass-panel text-center" style="border-top: 4px solid #ff0055;">
+                        <div class="text-secondary small mb-1">INCOMPLETE PROFILE</div>
+                        <div style="font-family: 'Oswald'; font-size: 32px; color: #ff0055;">{{ incomplete_count }}</div>
+                        <div style="font-size: 10px; color: #ff0055;">MISSING PHOTO / CERT</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="glass-panel text-center" style="border-top: 4px solid #28C76F;">
+                        <div class="text-secondary small mb-1">DATA HEALTH</div>
+                        <div style="font-family: 'Oswald'; font-size: 32px; color: #28C76F;">{{ data_health }}%</div>
+                        <div style="font-size: 10px; color: #28C76F;">MASTER DATA INTEGRITY</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="glass-panel col-4">
             <h6 class="chart-title-premium">01. ACHIEVEMENT LEVEL PROFILE</h6>
             <div class="chart-wrapper"><canvas id="chartLevel"></canvas></div>
@@ -295,44 +329,244 @@
     Chart.register(ChartDataLabels);
     Chart.defaults.color = '#ffffff';
     Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.plugins.datalabels.display = false;
-
-    // CHART 01
+    Chart.defaults.plugins.datalabels.display = fals    // CHART 01
     const ctx1 = document.getElementById('chartLevel').getContext('2d');
-    const gradGold = ctx1.createLinearGradient(0, 0, 0, 300); gradGold.addColorStop(0, '#ffcc00'); gradGold.addColorStop(1, '#332900');
-    const gradGreen = ctx1.createLinearGradient(0, 0, 0, 300); gradGreen.addColorStop(0, '#39ff14'); gradGreen.addColorStop(1, '#0b3304');
-    const gradBlue = ctx1.createLinearGradient(0, 0, 0, 300); gradBlue.addColorStop(0, '#00d2ff'); gradBlue.addColorStop(1, '#002a33');
-    new Chart(ctx1, { type: 'bar', data: { labels: {{ kp_labels| tojson }}, datasets: [{ data: {{ kp_values| tojson }}, backgroundColor: [gradGold, gradGreen, gradBlue], borderColor: ['#ffcc00', '#39ff14', '#00d2ff'], borderWidth: 2, borderRadius: 8, barThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', anchor: 'end', align: 'start', offset: 10, font: { weight: 'bold', size: 16 }, textStrokeColor: '#000', textStrokeWidth: 4 } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { ticks: { font: { weight: 'bold' } } } } } });
+    new Chart(ctx1, { 
+        type: 'bar', 
+        data: { 
+            labels: {{ kp_labels| tojson }}, 
+            datasets: [{ 
+                data: {{ kp_values| tojson }}, 
+                backgroundColor: ['#FF9F43', '#28C76F', '#00d2ff'], 
+                borderWidth: 0, 
+                borderRadius: 8, 
+                barThickness: 45 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { display: false }, 
+                datalabels: { 
+                    display: true, 
+                    color: '#1E272E', // Dark contrast
+                    anchor: 'center', 
+                    align: 'center', 
+                    font: { weight: '900', size: 14 }
+                } 
+            }, 
+            scales: { 
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } }, 
+                x: { ticks: { font: { weight: 'bold' } } } 
+            } 
+        } 
+    });
 
     // CHART 02
     const ctx2 = document.getElementById('chartPlant').getContext('2d');
-    const gradOrange = ctx2.createLinearGradient(0, 0, 400, 0); gradOrange.addColorStop(0, '#ff9f43'); gradOrange.addColorStop(1, '#ee5253');
-    new Chart(ctx2, { type: 'bar', data: { labels: {{ plant_labels| tojson }}, datasets: [{ data: {{ plant_values| tojson }}, backgroundColor: gradOrange, borderRadius: 5, barThickness: 25 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', anchor: 'end', align: 'start', offset: 10, font: { weight: 'bold', size: 14 }, textStrokeColor: '#000', textStrokeWidth: 3 } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#00d2ff', font: { size: 13, weight: 'bold' } } } } } });
+    new Chart(ctx2, { 
+        type: 'bar', 
+        data: { 
+            labels: {{ plant_labels| tojson }}, 
+            datasets: [{ 
+                data: {{ plant_values| tojson }}, 
+                backgroundColor: '#FF9F43', 
+                borderRadius: 5, 
+                barThickness: 25 
+            }] 
+        }, 
+        options: { 
+            indexAxis: 'y', 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { display: false }, 
+                datalabels: { 
+                    display: true, 
+                    color: '#1E272E', 
+                    anchor: 'center', 
+                    align: 'center', 
+                    font: { weight: 'bold', size: 12 }
+                } 
+            }, 
+            scales: { 
+                x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, 
+                y: { ticks: { color: '#00d2ff', font: { size: 13, weight: 'bold' } } } 
+            } 
+        } 
+    });
 
     // CHART 03
-    new Chart(document.getElementById('chartDiv'), { type: 'doughnut', data: { labels: {{ div_labels| tojson }}, datasets: [{ data: {{ div_values| tojson }}, backgroundColor: ['#00d2ff', '#39ff14', '#bc13fe', '#ff0055', '#ffcc00'], borderWidth: 3, borderColor: '#0b1019' }] }, options: { cutout: '70%', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 15 } } } } });
+    new Chart(document.getElementById('chartDiv'), { 
+        type: 'doughnut', 
+        data: { 
+            labels: {{ div_labels| tojson }}, 
+            datasets: [{ 
+                data: {{ div_values| tojson }}, 
+                backgroundColor: ['#00d2ff', '#28C76F', '#FF9F43', '#ff0055', '#bc13fe'], 
+                borderWidth: 3, 
+                borderColor: '#0b1019' 
+            }] 
+        }, 
+        options: { 
+            cutout: '70%', 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { position: 'right', labels: { usePointStyle: true, padding: 15 } },
+                datalabels: {
+                    display: true,
+                    color: '#1E272E',
+                    backgroundColor: '#fff',
+                    borderRadius: 4,
+                    font: { weight: 'bold' }
+                }
+            } 
+        } 
+    });
 
     // CHART 04
     const ctx4 = document.getElementById('chartDept').getContext('2d');
-    const gradDept = ctx4.createLinearGradient(0, 0, 500, 0); gradDept.addColorStop(0, '#ffaa00'); gradDept.addColorStop(1, '#662200');
-    new Chart(ctx4, { type: 'bar', data: { labels: {{ dept_labels| tojson }}, datasets: [{ data: {{ dept_values| tojson }}, backgroundColor: gradDept, borderColor: '#ffaa00', borderWidth: 1, borderRadius: 4, barThickness: 15 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', anchor: 'end', align: 'start', offset: 6, font: { weight: 'bold', size: 12 }, textStrokeColor: '#000', textStrokeWidth: 3 } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#ffcc00', font: { size: 11, weight: 'bold' } } } } } });
+    new Chart(ctx4, { 
+        type: 'bar', 
+        data: { 
+            labels: {{ dept_labels| tojson }}, 
+            datasets: [{ 
+                data: {{ dept_values| tojson }}, 
+                backgroundColor: '#FF9F43', 
+                borderWidth: 0, 
+                borderRadius: 4, 
+                barThickness: 15 
+            }] 
+        }, 
+        options: { 
+            indexAxis: 'y', 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { display: false }, 
+                datalabels: { 
+                    display: true, 
+                    color: '#1E272E', 
+                    anchor: 'center', 
+                    align: 'center', 
+                    font: { weight: 'bold', size: 10 }
+                } 
+            }, 
+            scales: { 
+                x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, 
+                y: { ticks: { color: '#ffcc00', font: { size: 11, weight: 'bold' } } } 
+            } 
+        } 
+    });
 
     // CHART 05
     const ctx5 = document.getElementById('chartPension').getContext('2d');
-    const gradPension = ctx5.createLinearGradient(0, 0, 0, 300); gradPension.addColorStop(0, '#ff0055'); gradPension.addColorStop(1, '#330011');
-    new Chart(ctx5, { type: 'bar', data: { labels: {{ forecast_labels| tojson }}, datasets: [{ data: {{ forecast_values| tojson }}, backgroundColor: gradPension, borderColor: '#ff0055', borderWidth: 2, borderRadius: 6, barThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: true, color: '#fff', anchor: 'end', align: 'start', offset: 10, font: { weight: 'bold', size: 14 }, textStrokeColor: '#000', textStrokeWidth: 4 } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { precision: 0, font: { size: 14, weight: 'bold' } } }, x: { grid: { display: false }, ticks: { color: '#ff0055', font: { size: 14, weight: 'bold' } } } } } });
+    new Chart(ctx5, { 
+        type: 'bar', 
+        data: { 
+            labels: {{ forecast_labels| tojson }}, 
+            datasets: [{ 
+                data: {{ forecast_values| tojson }}, 
+                backgroundColor: '#28C76F', 
+                borderWidth: 0, 
+                borderRadius: 6, 
+                barThickness: 45 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { display: false }, 
+                datalabels: { 
+                    display: true, 
+                    color: '#1E272E', 
+                    anchor: 'center', 
+                    align: 'center', 
+                    font: { weight: 'bold', size: 14 }
+                } 
+            }, 
+            scales: { 
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { precision: 0, font: { size: 14, weight: 'bold' } } }, 
+                x: { grid: { display: false }, ticks: { color: '#28C76F', font: { size: 14, weight: 'bold' } } } 
+            } 
+        } 
+    });
 
     // CHART 06
-    new Chart(document.getElementById('chartAge'), { type: 'polarArea', data: { labels: {{ age_labels| tojson }}, datasets: [{ data: {{ age_values| tojson }}, backgroundColor: ['rgba(57, 255, 20, 0.6)', 'rgba(255, 0, 85, 0.6)'], borderColor: ['#39ff14', '#ff0055'], borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } }, scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.1)' } } } } });
+    new Chart(document.getElementById('chartAge'), { 
+        type: 'polarArea', 
+        data: { 
+            labels: {{ age_labels| tojson }}, 
+            datasets: [{ 
+                data: {{ age_values| tojson }}, 
+                backgroundColor: ['rgba(40, 199, 111, 0.6)', 'rgba(255, 159, 67, 0.6)'], 
+                borderColor: ['#28C76F', '#FF9F43'], 
+                borderWidth: 2 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
+                datalabels: { display: true, color: '#1E272E', backgroundColor: '#fff', borderRadius: 4 }
+            }, 
+            scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.1)' } } } 
+        } 
+    });
 
     // CHART 07
     const ctx7 = document.getElementById('chartBatch').getContext('2d');
-    const gradBatchKP3 = ctx7.createLinearGradient(0, 0, 0, 400); gradBatchKP3.addColorStop(0, 'rgba(57, 255, 20, 0.5)'); gradBatchKP3.addColorStop(1, 'rgba(57, 255, 20, 0.0)');
-    const gradBatchKP4 = ctx7.createLinearGradient(0, 0, 0, 400); gradBatchKP4.addColorStop(0, 'rgba(255, 204, 0, 0.5)'); gradBatchKP4.addColorStop(1, 'rgba(255, 204, 0, 0.0)');
-    const getPointColor = (ctx) => ctx.raw === 0 ? '#ff0055' : '#ffffff';
-    const getPointBorder = (ctx, defaultColor) => ctx.raw === 0 ? '#ff0055' : defaultColor;
-    const getPointRadius = (ctx) => ctx.raw === 0 ? 8 : 4;
-
-    new Chart(ctx7, { type: 'line', data: { labels: {{ batch_labels| tojson }}, datasets: [{ label: '% Lulus KP 3', data: {{ batch_kp3| tojson }}, borderColor: '#39ff14', backgroundColor: gradBatchKP3, borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: getPointColor, pointBorderColor: (ctx) => getPointBorder(ctx, '#39ff14'), pointRadius: getPointRadius, pointHoverRadius: 10, pointBorderWidth: 2 }, { label: '% Lulus KP 4', data: {{ batch_kp4| tojson }}, borderColor: '#ffcc00', backgroundColor: gradBatchKP4, borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: getPointColor, pointBorderColor: (ctx) => getPointBorder(ctx, '#ffcc00'), pointRadius: getPointRadius, pointHoverRadius: 10, pointBorderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: '#fff', font: { size: 14, weight: 'bold' }, usePointStyle: true, padding: 20 } }, tooltip: { mode: 'index', intersect: false, bodyFont: { size: 15, weight: 'bold' }, padding: 15 }, datalabels: { display: false } }, scales: { y: { max: 100, beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { callback: function (value) { return value + '%'; }, font: { size: 13, weight: 'bold' } } }, x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#00d2ff', font: { size: 13, weight: 'bold' } } } }, interaction: { mode: 'nearest', axis: 'x', intersect: false } } });
+    new Chart(ctx7, { 
+        type: 'line', 
+        data: { 
+            labels: {{ batch_labels| tojson }}, 
+            datasets: [
+                { 
+                    label: '% Lulus KP 3', 
+                    data: {{ batch_kp3| tojson }}, 
+                    borderColor: '#28C76F', 
+                    backgroundColor: 'rgba(40, 199, 111, 0.2)', 
+                    borderWidth: 3, 
+                    fill: true, 
+                    tension: 0.4, 
+                    pointRadius: 5,
+                    pointBackgroundColor: '#28C76F'
+                }, 
+                { 
+                    label: '% Lulus KP 4', 
+                    data: {{ batch_kp4| tojson }}, 
+                    borderColor: '#FF9F43', 
+                    backgroundColor: 'rgba(255, 159, 67, 0.2)', 
+                    borderWidth: 3, 
+                    fill: true, 
+                    tension: 0.4, 
+                    pointRadius: 5,
+                    pointBackgroundColor: '#FF9F43'
+                }
+            ] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { position: 'top', labels: { color: '#fff', font: { size: 14, weight: 'bold' }, usePointStyle: true, padding: 20 } }, 
+                tooltip: { mode: 'index', intersect: false }, 
+                datalabels: { 
+                    display: true, 
+                    align: 'top', 
+                    color: '#fff', 
+                    formatter: v => v + '%' 
+                } 
+            }, 
+            scales: { 
+                y: { max: 100, beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { callback: v => v + '%', font: { weight: 'bold' } } }, 
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#00d2ff', font: { weight: 'bold' } } } 
+            } 
+        } 
+    }); } });
 </script>
 {% endblock %}

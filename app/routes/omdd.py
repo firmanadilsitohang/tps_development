@@ -135,6 +135,18 @@ def dashboard():
     all_evals = WorkshopEvaluation.query.all()
     eval_map = {ev.employee_id: ev for ev in all_evals}
 
+    # 11. AVERAGE SCORES FOR SKILL GAP ANALYSIS (Spider Chart)
+    avg_scores = db.session.query(
+        func.avg(WorkshopEvaluation.score_genba),
+        func.avg(WorkshopEvaluation.score_problem_solving),
+        func.avg(WorkshopEvaluation.score_observasi),
+        func.avg(WorkshopEvaluation.score_kaizen),
+        func.avg(WorkshopEvaluation.score_implementation),
+        func.avg(WorkshopEvaluation.score_presentation)
+    ).first()
+    
+    avg_data = [float(s or 0) for s in avg_scores] if avg_scores else [0]*6
+
     return render_template('omdd/dashboard.html', 
                            stats=stats, 
                            level_labels=level_labels, level_data=level_data,
@@ -154,7 +166,8 @@ def dashboard():
                            age_values=[prod, risk],
                            batch_labels=b_labels, batch_kp3=b_kp3, batch_kp4=b_kp4,
                            # Data evaluasi workshop
-                           eval_map=eval_map)
+                           eval_map=eval_map,
+                           avg_data=avg_data)
 
 # ==========================================
 # FITUR EVALUASI TUGAS / ACTIVITY

@@ -128,16 +128,32 @@ def utilized_kp():
                 pension_forecast[str(p_year)] += 1
 
     # 5. PASSING RATE (Batch Stat)
-    batch_stats = BatchStat.query.all()
-    b_labels, b_kp3, b_kp4 = [], [], []
+    batch_stats = BatchStat.query.order_by(BatchStat.batch_name.desc()).all()
+    b_labels, b_kp3, b_kp4, b_details = [], [], [], {}
+    
     for bs in batch_stats:
         b_labels.append(bs.batch_name)
+        
         def parse_pct(val):
+            if not val: return 0
             v_str = str(val).replace('%', '').strip()
             try: return int(float(v_str))
             except: return 0
-        b_kp3.append(parse_pct(bs.kp3_percent))
-        b_kp4.append(parse_pct(bs.kp4_percent))
+            
+        kp3_p = parse_pct(bs.kp3_percent)
+        kp4_p = parse_pct(bs.kp4_percent)
+        
+        b_kp3.append(kp3_p)
+        b_kp4.append(kp4_p)
+        
+        # Add details for tooltip enrichment
+        b_details[bs.batch_name] = {
+            'total': bs.participant_count,
+            'kp3': bs.kp3_count,
+            'kp4': bs.kp4_count,
+            'kp3_p': kp3_p,
+            'kp4_p': kp4_p
+        }
 
     demo_data = get_demo_data(['KP 4', 'KP 3'], this_year)
 
@@ -148,7 +164,7 @@ def utilized_kp():
         kp_dept_labels=[r[0] for r in dept_results], kp_dept_4=[r[1] for r in dept_results], kp_dept_3=[r[2] for r in dept_results],
         kp_dept_details=kp_dept_details,
         forecast_labels=list(pension_forecast.keys()), forecast_values=list(pension_forecast.values()),
-        batch_labels=b_labels, batch_kp3=b_kp3, batch_kp4=b_kp4,
+        batch_labels=b_labels, batch_kp3=b_kp3, batch_kp4=b_kp4, batch_details=b_details,
         demo_data=demo_data
     )
 

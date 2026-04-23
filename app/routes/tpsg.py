@@ -83,15 +83,25 @@ def dashboard():
         r_batch_kp3 = [5, 95]
         r_batch_kp4 = [15, 0]
 
+    # OPERATIONAL METRICS FOR TPSG
+    pending_count = Employee.query.filter_by(status='pending').count()
+    incomplete_count = Employee.query.filter((Employee.photo == None) | (Employee.photo == '') | (Employee.certificate == None) | (Employee.certificate == '')).count()
+    total_count = Employee.query.count()
+    data_health = int(((total_count - incomplete_count) / total_count * 100)) if total_count > 0 else 0
+
     return render_template('tpsg/dashboard.html', 
         kp_labels=['TPS KP 4', 'TPS KP 3', 'TPS ADVANCE'], kp_values=[kp4, kp3, adv],
         plant_labels=[p[0] for p in plant_stats], plant_values=[p[1] for p in plant_stats],
         div_labels=[d[0] for d in div_stats], div_values=[d[1] for d in div_stats],
-        # PERBAIKAN: Mengirimkan data Departemen dan Batch ke HTML agar tidak error Undefined
         dept_labels=[dt[0] for dt in dept_stats], dept_values=[dt[1] for dt in dept_stats],
         forecast_labels=list(pension_forecast.keys()), forecast_values=list(pension_forecast.values()),
         age_labels=['Produktif (<50)', 'Risk Area (>=50)'], age_values=[prod, risk],
-        batch_labels=r_batch_labels, batch_kp3=r_batch_kp3, batch_kp4=r_batch_kp4
+        batch_labels=r_batch_labels, batch_kp3=r_batch_kp3, batch_kp4=r_batch_kp4,
+        # Operational Data
+        pending_count=pending_count,
+        incomplete_count=incomplete_count,
+        total_count=total_count,
+        data_health=data_health
     )
 
 # =======================================================
