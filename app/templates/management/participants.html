@@ -708,13 +708,13 @@
                             </div>
                             ${hasData ? `
                             <div class="omdd-grid mt-2">
-                                <div class="omdd-score"><span class="omdd-val">${ws.ws_1}</span><span class="omdd-lbl">WS 1</span></div>
-                                <div class="omdd-score"><span class="omdd-val">${ws.ws_2}</span><span class="omdd-lbl">WS 2</span></div>
-                                <div class="omdd-score"><span class="omdd-val">${ws.ws_3}</span><span class="omdd-lbl">WS 3</span></div>
-                                <div class="omdd-score"><span class="omdd-val">${ws.ws_4}</span><span class="omdd-lbl">WS 4</span></div>
-                                <div class="omdd-score"><span class="omdd-val">${ws.ws_5}</span><span class="omdd-lbl">WS 5</span></div>
-                                <div class="omdd-score"><span class="omdd-val">${ws.ws_6}</span><span class="omdd-lbl">WS 6</span></div>
-                                <div class="omdd-score"><span class="omdd-val">${ws.ws_7}</span><span class="omdd-lbl">WS 7</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_1}</span><span class="omdd-lbl">Workshop 1</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_2}</span><span class="omdd-lbl">Workshop 2</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_3}</span><span class="omdd-lbl">Workshop 3</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_4}</span><span class="omdd-lbl">Workshop 4</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_5}</span><span class="omdd-lbl">Workshop 5</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_6}</span><span class="omdd-lbl">Workshop 6</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_7}</span><span class="omdd-lbl">Workshop 7</span></div>
                             </div>
                             ${ws.notes ? `<div class="mt-3 small border-top border-secondary pt-2"><strong>Notes:</strong> ${ws.notes}</div>` : ''}` : ''}
                         `;
@@ -727,7 +727,7 @@
                             window.currentSpiderChart = new Chart(spiderCtx, {
                                 type: 'radar',
                                 data: {
-                                    labels: ['Genba', 'Analysis', 'Observasi', 'Kaizen', 'Implementation', 'Presentation', 'Skill Gap'],
+                                    labels: ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4', 'Workshop 5', 'Workshop 6', 'Workshop 7'],
                                     datasets: [{
                                         label: 'Score',
                                         data: [ws.ws_1, ws.ws_2, ws.ws_3, ws.ws_4, ws.ws_5, ws.ws_6, ws.ws_7],

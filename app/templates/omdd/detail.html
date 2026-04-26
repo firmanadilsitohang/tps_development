@@ -578,13 +578,13 @@
 
         <div class="eval-grid" style="grid-template-columns: repeat(6, 1fr);">
             {% set fields = [
-                ('WS 1: Genba', ev.ws_1 if ev else 0), 
-                ('WS 2: Analysis', ev.ws_2 if ev else 0), 
-                ('WS 3: Observasi', ev.ws_3 if ev else 0), 
-                ('WS 4: Kaizen', ev.ws_4 if ev else 0), 
-                ('WS 5: Implementation', ev.ws_5 if ev else 0), 
-                ('WS 6: Presentation', ev.ws_6 if ev else 0),
-                ('WS 7: Skill Gap', ev.ws_7 if ev else 0)
+                ('Workshop 1', ev.ws_1 if ev else 0), 
+                ('Workshop 2', ev.ws_2 if ev else 0), 
+                ('Workshop 3', ev.ws_3 if ev else 0), 
+                ('Workshop 4', ev.ws_4 if ev else 0), 
+                ('Workshop 5', ev.ws_5 if ev else 0), 
+                ('Workshop 6', ev.ws_6 if ev else 0),
+                ('Workshop 7', ev.ws_7 if ev else 0)
             ] %}
             {% for lbl, val in fields %}
             <div class="eval-item">
@@ -668,13 +668,13 @@
                     <!-- Input Angka -->
                     <div class="slider-section">
                         {% set aspects = [
-                        ('score_genba', 'WS 1: Genba', '#ff00a0'),
-                        ('score_problem_solving', 'WS 2: Analysis', '#00d2ff'),
-                        ('score_observasi', 'WS 3: Observasi', '#39ff14'),
-                        ('score_kaizen', 'WS 4: Kaizen', '#ffcc00'),
-                        ('score_implementation', 'WS 5: Implementation', '#bc13fe'),
-                        ('score_presentation', 'WS 6: Presentation', '#ff0055'),
-                        ('score_skillgap', 'WS 7: Skill Gap', '#00FF88')
+                        ('score_genba', 'Workshop 1', '#ff00a0'),
+                        ('score_problem_solving', 'Workshop 2', '#00d2ff'),
+                        ('score_observasi', 'Workshop 3', '#39ff14'),
+                        ('score_kaizen', 'Workshop 4', '#ffcc00'),
+                        ('score_implementation', 'Workshop 5', '#bc13fe'),
+                        ('score_presentation', 'Workshop 6', '#ff0055'),
+                        ('score_skillgap', 'Workshop 7', '#00FF88')
                         ] %}
                         {% for field, label, color in aspects %}
                         <div class="slider-item">
@@ -727,7 +727,7 @@
         spiderConfig = {
             type: 'radar',
             data: {
-                labels: ['WS 1', 'WS 2', 'WS 3', 'WS 4', 'WS 5', 'WS 6', 'WS 7'],
+                labels: ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4', 'Workshop 5', 'Workshop 6', 'Workshop 7'],
                 datasets: [{
                     label: 'Workshop Score',
                     data: dataArray,
