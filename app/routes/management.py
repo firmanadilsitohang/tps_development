@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from functools import wraps
 from app import db
@@ -128,7 +128,10 @@ def utilized_kp():
                 pension_forecast[str(p_year)] += 1
 
     # 5. PASSING RATE (Batch Stat)
-    batch_stats = BatchStat.query.order_by(BatchStat.batch_name.desc()).all()
+    # Sort batches numerically: extract number from name for proper ordering
+    import re as _re
+    batch_stats = BatchStat.query.all()
+    batch_stats.sort(key=lambda bs: int(_re.search(r'\d+', str(bs.batch_name)).group()) if _re.search(r'\d+', str(bs.batch_name)) else 0)
     b_labels, b_kp3, b_kp4, b_details = [], [], [], {}
     
     for bs in batch_stats:
@@ -219,47 +222,82 @@ def participants():
 @login_required
 @management_required
 def participant_detail(id):
-    emp = Employee.query.get_or_404(id)
-    
-    # Theme History
-    themes = []
-    for act in emp.workshop_activities:
-        themes.append({
-            'title': act.theme_title,
-            'status': act.status,
-            'score': act.score,
-            'date': act.submitted_at.strftime('%Y-%m-%d') if act.submitted_at else '-'
-        })
-    
-    # OMDD Assessment (WorkshopEvaluation) - specifically for KP 3
-    assessment = None
-    if emp.current_tps_level and '3' in emp.current_tps_level:
-        eval = emp.workshop_evaluations[-1] if emp.workshop_evaluations else None
+    try:
+        emp = Employee.query.get_or_404(id)
+        this_year = 2026
+        
+        # Personal Info safely
+        age = None
+        retirement_year = None
+        if emp.birth_date:
+            try:
+                # Handle both datetime.date and string if corrupt in DB
+                b_year = emp.birth_date.year if hasattr(emp.birth_date, 'year') else int(str(emp.birth_date)[:4])
+                age = this_year - b_year
+                retirement_year = b_year + 55
+            except:
+                pass
+
+        # Theme History Categorization
+        pass_themes = []
+        current_themes = []
+        
+        # From WorkshopActivity (OMDD System)
+        if hasattr(emp, 'workshop_activities'):
+            for act in emp.workshop_activities:
+                theme_data = {
+                    'title': act.theme_title,
+                    'status': act.status,
+                    'score': act.score,
+                    'progress': 0,
+                    'date': act.submitted_at.strftime('%Y-%m-%d') if act.submitted_at else '-',
+                    'type': 'Workshop/OMDD'
+                }
+                if str(act.status).lower() in ['pass', 'completed', 'verified']:
+                    pass_themes.append(theme_data)
+                else:
+                    current_themes.append(theme_data)
+        
+        # OMDD Assessment (WorkshopEvaluation)
+        assessment = None
+        eval = None
+        if hasattr(emp, 'workshop_evaluations') and emp.workshop_evaluations:
+            eval = emp.workshop_evaluations[-1]
+            
         if eval:
             assessment = {
-                'genba': eval.score_genba,
-                'ps': eval.score_problem_solving,
-                'obs': eval.score_observasi,
-                'kaizen': eval.score_kaizen,
-                'impl': eval.score_implementation,
-                'pres': eval.score_presentation,
+                'ws_1': eval.ws_1,
+                'ws_2': eval.ws_2,
+                'ws_3': eval.ws_3,
+                'ws_4': eval.ws_4,
+                'ws_5': eval.ws_5,
+                'ws_6': eval.ws_6,
+                'ws_7': eval.ws_7,
                 'decision': eval.final_decision,
-                'notes': eval.notes
+                'notes': eval.notes,
+                'date': eval.evaluated_at.strftime('%Y-%m-%d') if eval.evaluated_at else '-'
             }
 
-    return {
-        'id': emp.id,
-        'name': emp.name,
-        'username': emp.username,
-        'position': emp.position or '-',
-        'department': emp.department.name if emp.department else '-',
-        'division': emp.division.name if emp.division else '-',
-        'plant': emp.plant.name if emp.plant else '-',
-        'photo': emp.photo or 'default.png',
-        'level': emp.current_tps_level,
-        'themes': themes,
-        'assessment': assessment
-    }
+        return jsonify({
+            'id': emp.id,
+            'name': emp.name,
+            'username': emp.username,
+            'position': emp.position or '-',
+            'age': int(age) if age is not None else '-',
+            'retirement_year': int(retirement_year) if retirement_year is not None else '-',
+            'department': emp.department.name if emp.department else '-',
+            'division': emp.division.name if emp.division else '-',
+            'plant': emp.plant.name if emp.plant else '-',
+            'photo': emp.photo or 'default.png',
+            'level': emp.current_tps_level or '-',
+            'pass_themes': pass_themes,
+            'current_themes': current_themes,
+            'assessment': assessment
+        })
+    except Exception as e:
+        import traceback
+        print(f"Error in participant_detail: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({'error': str(e)}), 500
 
 @management.route('/home')
 @login_required

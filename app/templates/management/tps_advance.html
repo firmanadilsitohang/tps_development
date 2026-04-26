@@ -226,6 +226,7 @@
         data.forEach(item => {
             html += `
                 <div class="emp-item" style="cursor: pointer; pointer-events: auto;" onclick="openParticipantDetail(${item.id})">
+                    <img src="/static/uploads/photos/${item.photo}" class="emp-img" onerror="this.src='/static/uploads/photos/default.png'">
                     <div class="emp-info">
                         <div class="name">${item.name}</div>
                         <div class="theme">${item.theme}</div>
@@ -250,19 +251,36 @@
         try {
             const response = await fetch(`/management/participant_detail/${id}`);
             const data = await response.json();
-            let themesHtml = '';
-            if (data.themes.length > 0) {
-                data.themes.forEach(t => {
-                    themesHtml += `
+            // Pass Themes
+            let passThemesHtml = '';
+            if (data.pass_themes.length > 0) {
+                data.pass_themes.forEach(t => {
+                    passThemesHtml += `
                         <div class="theme-item">
-                            <div><div style="font-weight:600;">${t.title}</div><div style="font-size:10px; color:#888;">Submitted: ${t.date}</div></div>
+                            <div><div style="font-weight:600;">${t.title}</div><div style="font-size:10px; color:#888;">${t.type} • ${t.date}</div></div>
                             <div style="text-align:right;">
-                                <span class="status-badge ${t.status === 'completed' ? 'status-completed' : 'status-ongoing'}">${t.status}</span>
-                                <div class="score-badge mt-1">${t.score} pts</div>
+                                <span class="status-badge status-completed">${t.status}</span>
+                                <div class="score-badge mt-1">${t.score || 0} pts</div>
                             </div>
                         </div>`;
                 });
-            } else { themesHtml = '<p class="text-muted">No theme history found.</p>'; }
+            } else { passThemesHtml = '<p class="text-muted small">No past themes found.</p>'; }
+
+            // Current Themes
+            let currentThemesHtml = '';
+            if (data.current_themes.length > 0) {
+                data.current_themes.forEach(t => {
+                    currentThemesHtml += `
+                        <div class="theme-item">
+                            <div><div style="font-weight:600;">${t.title}</div><div style="font-size:10px; color:#888;">${t.type} • ${t.date}</div></div>
+                            <div style="text-align:right;">
+                                <span class="status-badge status-ongoing">${t.status}</span>
+                                <div class="score-badge mt-1" style="background:#f59e0b; color:#000;">${t.progress || 0}%</div>
+                            </div>
+                        </div>`;
+                });
+            } else { currentThemesHtml = '<p class="text-muted small">No current themes in progress.</p>'; }
+
             content.innerHTML = `
                 <div class="profile-grid">
                     <div class="profile-left">
@@ -270,6 +288,11 @@
                         <h3 class="mb-1">${data.name}</h3>
                         <div class="text-muted small mb-3">${data.username}</div>
                         <div class="badge" style="background:#0A74FF; color:#fff; font-weight:800; padding:5px 15px;">${data.level}</div>
+                        
+                        <div class="mt-4 p-3" style="background:rgba(255,255,255,0.05); border-radius:12px; text-align:left;">
+                            <div class="mb-2"><span class="text-muted small">Umur:</span> <strong class="float-end">${data.age} Thn</strong></div>
+                            <div><span class="text-muted small">Tahun Pensiun:</span> <strong class="float-end">${data.retirement_year}</strong></div>
+                        </div>
                     </div>
                     <div class="profile-right">
                         <div class="detail-section">
@@ -281,12 +304,61 @@
                                 <div class="col-6"><div class="text-muted small uppercase">Department</div><div style="font-weight:600;">${data.department}</div></div>
                             </div>
                         </div>
-                        <div class="detail-section">
-                            <div class="section-title"><i class="fas fa-history"></i> Theme Activity History</div>
-                            <div class="theme-list">${themesHtml}</div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="detail-section">
+                                    <div class="section-title"><i class="fas fa-check-circle"></i> Pass Theme</div>
+                                    <div class="theme-list">${passThemesHtml}</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="detail-section">
+                                    <div class="section-title"><i class="fas fa-spinner"></i> Current Theme</div>
+                                    <div class="theme-list">${currentThemesHtml}</div>
+                                </div>
+                            </div>
                         </div>
+                        ${assessmentHtml}
                     </div>
                 </div>`;
+
+            if (data.assessment) {
+                setTimeout(() => {
+                    const spiderCtx = document.getElementById('spiderChart').getContext('2d');
+                    new Chart(spiderCtx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['WS 1', 'WS 2', 'WS 3', 'WS 4', 'WS 5', 'WS 6', 'WS 7'],
+                            datasets: [{
+                                label: 'Score',
+                                data: [
+                                    data.assessment.ws_1, data.assessment.ws_2, data.assessment.ws_3,
+                                    data.assessment.ws_4, data.assessment.ws_5, data.assessment.ws_6,
+                                    data.assessment.ws_7
+                                ],
+                                backgroundColor: 'rgba(10, 116, 255, 0.2)',
+                                borderColor: '#0A74FF',
+                                pointBackgroundColor: '#0A74FF',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                r: {
+                                    angleLines: { color: 'rgba(255,255,255,0.1)' },
+                                    grid: { color: 'rgba(255,255,255,0.1)' },
+                                    pointLabels: { color: '#8bb4d8', font: { size: 10 } },
+                                    ticks: { display: false, stepSize: 20 },
+                                    suggestedMin: 0, suggestedMax: 100
+                                }
+                            },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                }, 100);
+            }
         } catch (err) { content.innerHTML = '<div class="text-center p-5"><p>Error loading details.</p></div>'; }
     }
 
@@ -327,9 +399,9 @@
             datasets: [{
                 label: 'Employees',
                 data: {{ adv_div_values | tojson }},
-                backgroundColor: 'rgba(10, 116, 255, 0.6)',
-                borderColor: '#0A74FF',
-                borderWidth: 1,
+                backgroundColor: 'rgba(0, 229, 255, 0.4)',
+                borderColor: '#00E5FF',
+                borderWidth: 2,
                 borderRadius: 5
             }]
         },

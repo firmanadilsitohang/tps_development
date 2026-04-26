@@ -37,8 +37,8 @@
                                     {% for bs in batch_stats %}
                                     <tr>
                                         <td>
-                                            <strong>{{ bs.batch_name }}</strong>
                                             <input type="hidden" name="batch_id" value="{{ bs.id }}">
+                                            <input type="text" name="batch_name_{{ bs.id }}" value="{{ bs.batch_name }}" class="form-control form-control-sm bg-dark text-white border-secondary font-weight-bold">
                                         </td>
                                         <td>
                                             <div class="input-group input-group-sm">
@@ -54,13 +54,32 @@
                                         </td>
                                     </tr>
                                     {% endfor %}
+                                    
+                                    <!-- New Batch Row -->
+                                    <tr class="table-info text-dark">
+                                        <td>
+                                            <input type="text" name="new_batch_name" placeholder="Add New Batch (e.g. B-12)" class="form-control form-control-sm border-info">
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="new_kp4_pct" placeholder="0" class="form-control border-info">
+                                                <span class="input-group-text border-info">%</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="new_kp3_pct" placeholder="0" class="form-control border-info">
+                                                <span class="input-group-text border-info">%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                         
                         <div class="text-end mt-3">
                             <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save me-1"></i> Simpan Perubahan
+                                <i class="fas fa-save me-1"></i> Simpan & Update Grafik
                             </button>
                         </div>
                     </form>

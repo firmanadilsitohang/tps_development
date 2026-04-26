@@ -16,7 +16,7 @@ tpsg = Blueprint('tpsg', __name__, url_prefix='/tpsg')
 def tpsg_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role != 'tpsg':
+        if not current_user.is_authenticated or current_user.role not in ['tpsg', 'management', 'admin']:
             flash('Akses ditolak.', 'danger')
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
@@ -149,14 +149,17 @@ def import_excel():
         for sheet_name in excel_file.sheet_names:
             # Baca header-nya saja dulu untuk mendeteksi jenis sheet
             df_header = excel_file.parse(sheet_name, nrows=0)
-            cols_check = [str(c).strip().upper() for c in df_header.columns]
+            cols_raw = [str(c).strip() for c in df_header.columns]
+            cols_upper = [c.upper() for c in cols_raw]
             
-            if "BATCH" in cols_check and "PARTICIPAN" in cols_check and "KP 3" in cols_check:
+            # Deteksi: Sheet harus punya kolom "BATCH" dan salah satu dari "KP 3", "KP 4", atau "PARTICIPAN"
+            is_stats_sheet = any("BATCH" in c for c in cols_upper) and \
+                             (any("KP 3" in c for c in cols_upper) or any("KP 4" in c for c in cols_upper))
+
+            if is_stats_sheet:
                 is_batch_stats = True
-                
-                # Baca seluruh isi sheet sebagai STRING (Teks) untuk menjaga integritas data
                 df = excel_file.parse(sheet_name, dtype=str)
-                df.columns = cols_check
+                df.columns = cols_upper
                 
                 BatchStat.query.delete()
                 
@@ -164,22 +167,28 @@ def import_excel():
                     try:
                         if pd.notnull(val) and str(val).strip().lower() != 'nan': 
                             return int(float(val))
-                    except ValueError:
-                        pass
+                    except: pass
                     return 0
 
+                def get_col_val(row, keywords):
+                    """Mencari nilai kolom berdasarkan kumpulan keyword"""
+                    for c in row.index:
+                        if any(k.upper() in str(c).upper() for k in keywords):
+                            return row[c]
+                    return ''
+
                 for _, row in df.iterrows():
-                    b_val = str(row['BATCH']).strip()
-                    if b_val.upper() in ['TOTAL', 'NAN', 'N/A', 'NONE', '']:
+                    b_val = get_col_val(row, ['BATCH'])
+                    if not b_val or str(b_val).strip().upper() in ['TOTAL', 'NAN', 'N/A', 'NONE', '']:
                         continue
                         
                     stat = BatchStat(
-                        batch_name=b_val,
-                        participant_count=safe_int(row.get('PARTICIPAN')),
-                        kp3_count=safe_int(row.get('KP 3')),
-                        kp4_count=safe_int(row.get('KP 4')),
-                        kp3_percent=str(row.get('%KP3', '')).replace('nan', '').strip(),
-                        kp4_percent=str(row.get('%KP4', '')).replace('nan', '').strip()
+                        batch_name=str(b_val).strip(),
+                        participant_count=safe_int(get_col_val(row, ['PARTICIPAN', 'PESERTA', 'TOTAL'])),
+                        kp3_count=safe_int(get_col_val(row, ['KP 3', 'KP3'])),
+                        kp4_count=safe_int(get_col_val(row, ['KP 4', 'KP4'])),
+                        kp3_percent=str(get_col_val(row, ['%KP3', '% KP 3', 'PERCENTAGE KP 3', 'PASSING RATE KP 3'])).replace('nan', '').strip(),
+                        kp4_percent=str(get_col_val(row, ['%KP4', '% KP 4', 'PERCENTAGE KP 4', 'PASSING RATE KP 4'])).replace('nan', '').strip()
                     )
                     db.session.add(stat)
                 
@@ -450,14 +459,26 @@ def generate_dummy():
 @tpsg_required
 def manage_charts():
     if request.method == 'POST':
-        # Update Batch Stats
+        # 1. Update/Add Batch Stats
         batch_ids = request.form.getlist('batch_id')
         for bid in batch_ids:
             stat = BatchStat.query.get(bid)
             if stat:
+                stat.batch_name = request.form.get(f'batch_name_{bid}', stat.batch_name)
                 stat.kp3_percent = request.form.get(f'kp3_pct_{bid}')
                 stat.kp4_percent = request.form.get(f'kp4_pct_{bid}')
         
+        # 2. Handle New Batch Addition
+        new_batch_name = request.form.get('new_batch_name')
+        if new_batch_name:
+            new_stat = BatchStat(
+                batch_name=new_batch_name,
+                kp3_percent=request.form.get('new_kp3_pct', '0'),
+                kp4_percent=request.form.get('new_kp4_pct', '0'),
+                participant_count=0
+            )
+            db.session.add(new_stat)
+
         try:
             db.session.commit()
             flash('Data grafik berhasil diperbarui!', 'success')

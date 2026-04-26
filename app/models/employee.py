@@ -61,12 +61,14 @@ class WorkshopEvaluation(db.Model):
     __tablename__ = 'workshop_evaluations'
     id = db.Column(db.Integer, primary_key=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
-    score_genba = db.Column(db.Integer, default=0)
-    score_problem_solving = db.Column(db.Integer, default=0)
-    score_observasi = db.Column(db.Integer, default=0)
-    score_kaizen = db.Column(db.Integer, default=0)
-    score_implementation = db.Column(db.Integer, default=0)
-    score_presentation = db.Column(db.Integer, default=0)
+    # Mapping to Workshop 1-7
+    ws_1 = db.Column(db.Integer, default=0) # Genba
+    ws_2 = db.Column(db.Integer, default=0) # Problem Solving
+    ws_3 = db.Column(db.Integer, default=0) # Observasi
+    ws_4 = db.Column(db.Integer, default=0) # Kaizen
+    ws_5 = db.Column(db.Integer, default=0) # Implementation
+    ws_6 = db.Column(db.Integer, default=0) # Presentation
+    ws_7 = db.Column(db.Integer, default=0) # Additional Workshop
     final_decision = db.Column(db.String(20), default='PASS')
     notes = db.Column(db.Text, nullable=True)
     evaluated_by = db.Column(db.String(100), nullable=True)

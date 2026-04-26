@@ -42,9 +42,73 @@
             display: flex; flex-direction: column; z-index: 100;
         }
 
-        .sidebar-brand { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border-glass); }
-        .sidebar-brand h1 { font-family: 'Oswald', sans-serif; font-size: 32px; letter-spacing: 2px; }
-        .sidebar-brand h1 span { color: var(--accent-red); }
+        .sidebar-brand { 
+            padding: 35px 25px; 
+            border-bottom: 1px solid var(--border-glass);
+            background: linear-gradient(to bottom, rgba(10, 116, 255, 0.1), transparent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-logo {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .logo-content {
+            position: relative;
+        }
+
+        .logo-tps {
+            font-family: 'Oswald', sans-serif;
+            font-size: 38px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -1px;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(10, 116, 255, 0.4);
+        }
+
+        .logo-g {
+            font-family: 'Oswald', sans-serif;
+            font-size: 38px;
+            font-weight: 800;
+            color: var(--accent-red);
+            letter-spacing: -1px;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(227, 0, 15, 0.4);
+        }
+
+        .logo-line {
+            width: 40px;
+            height: 4px;
+            background: var(--accent-cyan);
+            margin: 8px 0;
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .logo-system {
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .logo-accent {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(10, 116, 255, 0.2) 0%, transparent 70%);
+            z-index: -1;
+        }
 
         .sidebar-nav { padding: 20px 0; flex-grow: 1; overflow-y: auto; }
         .nav-category { padding: 10px 25px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
@@ -72,8 +136,19 @@
 
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <h1>TPS<span>-G</span></h1>
-            <p style="font-size: 10px; color: var(--text-muted);">TMMIN Development System</p>
+            <div class="modern-logo">
+                <div class="logo-content">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="background: var(--accent-cyan); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(10, 116, 255, 0.5);">
+                            <i class="fas fa-project-diagram" style="color: #fff; font-size: 16px;"></i>
+                        </div>
+                        <span class="logo-tps" style="font-size: 28px;">TPS<span style="color:var(--accent-red)">-G</span></span>
+                    </div>
+                    <div style="margin-top: 4px; font-size: 8px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; border-left: 2px solid var(--accent-cyan); padding-left: 8px;">
+                        Toyota Development System
+                    </div>
+                </div>
+            </div>
         </div>
 
         <nav class="sidebar-nav">
@@ -110,8 +185,14 @@
                     <a href="{{ url_for('management.dashboard') }}" class="nav-link {% if request.endpoint == 'management.dashboard' %}active{% endif %}">
                         <i class="fas fa-chart-pie"></i> Dashboard Utama
                     </a>
+                    
+                    <div class="nav-category" style="margin-top: 10px;">Data</div>
                     <a href="{{ url_for('management.participants') }}" class="nav-link {% if request.endpoint == 'management.participants' %}active{% endif %}">
                         <i class="fas fa-users"></i> Database Partisipan
+                    </a>
+                    <a href="{{ url_for('tpsg.manage_charts') }}" class="nav-link {% if request.endpoint == 'tpsg.manage_charts' %}active{% endif %}" title="Input & update persentase kelulusan per batch untuk grafik Passing Rate">
+                        <i class="fas fa-chart-bar"></i> Edit Data Grafik
+                        <span style="font-size: 9px; color: var(--text-muted); display: block; margin-left: 35px; margin-top: -3px;">Passing Rate per Batch</span>
                     </a>
                 {% endif %}
             {% endif %}

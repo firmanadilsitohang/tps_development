@@ -72,32 +72,69 @@
     .table {
         margin-bottom: 0;
         width: 100%;
+        table-layout: fixed;
         color: #c9d1d9 !important;
     }
 
     .table th {
         background: #1f242c !important;
-        color: var(--text-muted) !important;
+        color: #8b949e !important;
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
-        padding: 15px;
+        letter-spacing: 0.5px;
+        padding: 14px 12px;
         border-bottom: 2px solid var(--border-dark) !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .table td {
         vertical-align: middle;
-        padding: 15px;
+        padding: 12px;
         border-bottom: 1px solid #21262d !important;
         background: #161b22 !important;
+        overflow: hidden;
     }
 
+    /* Fixed column widths */
+    .col-foto  { width: 64px; }
+    .col-profil { width: 22%; }
+    .col-org   { width: 25%; }
+    .col-level { width: 130px; }
+    .col-umur  { width: 72px; }
+    .col-pensiun { width: 80px; }
+    .col-aksi  { width: 90px; }
+
     .photo-circle {
-        width: 45px;
-        height: 45px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        border: 2px solid var(--border-dark);
+        border: 2px solid #30363d;
         object-fit: cover;
+        display: block;
+        margin: 0 auto;
+    }
+
+    /* Badge centering inside fixed-width cell */
+    .level-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .text-center-force {
+        text-align: center !important;
+    }
+
+    /* Fixed alignment for specific columns */
+    .table td:nth-child(5), 
+    .table td:nth-child(6),
+    .table td:nth-child(7) {
+        text-align: center !important;
     }
 
     .emp-name {
@@ -187,6 +224,184 @@
         font-weight: 700;
         font-size: 12px;
     }
+
+    .btn-detail {
+        background: linear-gradient(135deg, #0A74FF, #004494);
+        border: none;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-detail:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #0088ff, #003366);
+        box-shadow: 0 4px 12px rgba(10, 116, 255, 0.4);
+    }
+
+    /* Slide-over Panel */
+    .detail-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .detail-panel {
+        position: fixed;
+        top: 0; right: -500px;
+        width: 500px; height: 100vh;
+        background: #0d1117;
+        border-left: 1px solid var(--border-dark);
+        z-index: 1001;
+        box-shadow: -10px 0 50px rgba(0, 0, 0, 0.5);
+        transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+        color: #e6edf3;
+    }
+
+    .detail-panel.active {
+        right: 0;
+    }
+
+    .detail-header {
+        padding: 25px;
+        border-bottom: 1px solid var(--border-dark);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(to right, #161b22, #0d1117);
+    }
+
+    .detail-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 25px;
+    }
+
+    .close-panel {
+        background: rgba(255, 255, 255, 0.05);
+        border: none;
+        color: #fff;
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .close-panel:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: rotate(90deg);
+    }
+
+    .info-card {
+        background: #161b22;
+        border: 1px solid var(--border-dark);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 10px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .info-item span {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .theme-container {
+        margin-top: 15px;
+    }
+
+    .theme-item {
+        background: rgba(255, 255, 255, 0.03);
+        border-left: 3px solid var(--accent-blue);
+        padding: 12px;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 10px;
+        font-size: 12px;
+    }
+
+    .theme-item.pass { border-left-color: var(--accent-green); }
+    .theme-item.current { border-left-color: var(--accent-gold); }
+
+    .theme-title { font-weight: 700; display: block; margin-bottom: 4px; }
+    .theme-meta { font-size: 11px; color: var(--text-muted); }
+
+    .omdd-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .omdd-score {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 8px;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .omdd-val { font-weight: 800; font-size: 16px; display: block; }
+    .omdd-lbl { font-size: 9px; text-transform: uppercase; color: var(--text-muted); }
+
+    .emp-row { cursor: pointer; transition: background 0.2s; }
+    .emp-row:hover { background: rgba(10, 116, 255, 0.05) !important; }
+
+    .section-label {
+        font-family: 'Oswald', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent-blue);
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--border-dark);
+    }
+
+    /* Profile header photo enlarged */
+    #detPhoto {
+        width: 60px !important;
+        height: 60px !important;
+        border-radius: 50%;
+        border: 2px solid var(--accent-blue);
+        object-fit: cover;
+    }
+
+    /* Spider chart container must have min-height */
+    #detSpiderChartWrap {
+        height: 260px;
+        position: relative;
+        margin-bottom: 15px;
+    }
 </style>
 {% endblock %}
 
@@ -229,14 +444,24 @@
     <div class="table-container">
         <div class="table-responsive">
             <table class="table" id="empTable">
+                <colgroup>
+                    <col class="col-foto">
+                    <col class="col-profil">
+                    <col class="col-org">
+                    <col class="col-level">
+                    <col class="col-umur">
+                    <col class="col-pensiun">
+                    <col class="col-aksi">
+                </colgroup>
                 <thead>
                     <tr>
                         <th class="text-center">FOTO</th>
-                        <th>PROFILE PARTISIPAN</th>
+                        <th>PROFIL PARTISIPAN</th>
                         <th>ORGANISASI</th>
-                        <th>TPS LEVEL</th>
+                        <th class="text-center">TPS LEVEL</th>
                         <th class="text-center">UMUR</th>
-                        <th class="text-center">TAHUN PENSIUN</th>
+                        <th class="text-center">PENSIUN</th>
+                        <th class="text-center">AKSI</th>
                     </tr>
                 </thead>
                 <tbody id="empTableBody">
@@ -246,11 +471,14 @@
                     {% set a_name = emp.plant.name if emp.plant else 'N/A' %}
                     {% set d_name = emp.division.name if emp.division else 'N/A' %}
                     {% set dp_name = emp.department.name if emp.department else 'N/A' %}
-                    <tr class="emp-row" data-area="{{ a_name }}" data-div="{{ d_name }}" data-dept="{{ dp_name }}"
-                        data-level="{{ emp.current_tps_level | upper }}">
+                    <tr class="emp-row" data-id="{{ emp.id }}" data-area="{{ a_name }}" data-div="{{ d_name }}" data-dept="{{ dp_name }}"
+                        data-level="{{ emp.current_tps_level | upper }}" onclick="openDetail({{ emp.id }})">
                         <td class="text-center">
-                            <img src="{{ emp.photo or 'default.png' }}" class="photo-circle"
-                                onerror="this.src='/static/uploads/photos/default.png'">
+                            {% if emp.photo and (emp.photo.startswith('http://') or emp.photo.startswith('https://')) %}
+                                <img src="{{ emp.photo }}" class="photo-circle" onerror="this.src='/static/uploads/photos/default.png'">
+                            {% else %}
+                                <img src="/static/uploads/photos/{{ emp.photo or 'default.png' }}" class="photo-circle" onerror="this.src='/static/uploads/photos/default.png'">
+                            {% endif %}
                         </td>
                         <td>
                             <div class="emp-name">{{ emp.name }}</div>
@@ -265,18 +493,16 @@
                             </div>
                         </td>
                         <td>
+                            <div class="level-cell">
                             {% if emp.current_tps_level %}
-                            {% if '4' in emp.current_tps_level.upper() %}<span class="badge-level badge-kp4">TPS KP
-                                4</span>{% endif %}
-                            {% if '3' in emp.current_tps_level.upper() %}<span class="badge-level badge-kp3">TPS KP
-                                3</span>{% endif %}
-                            {% if 'ADV' in emp.current_tps_level.upper() %}<span class="badge-level badge-adv">TPS
-                                ADVANCE</span>{% endif %}
-                            {% if 'JIS' in emp.current_tps_level.upper() %}<span
-                                class="badge-level badge-jis">JISHUKEN</span>{% endif %}
+                                {% if '4' in emp.current_tps_level.upper() %}<span class="badge-level badge-kp4">TPS KP 4</span>{% endif %}
+                                {% if '3' in emp.current_tps_level.upper() %}<span class="badge-level badge-kp3">TPS KP 3</span>{% endif %}
+                                {% if 'ADV' in emp.current_tps_level.upper() %}<span class="badge-level badge-adv">ADVANCE</span>{% endif %}
+                                {% if 'JIS' in emp.current_tps_level.upper() %}<span class="badge-level badge-jis">JISHUKEN</span>{% endif %}
                             {% else %}
-                            <span class="text-muted small">-</span>
+                                <span class="text-muted small">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         <td class="text-center">
                             {% if age > 0 %}
@@ -290,6 +516,11 @@
                         <td class="text-center ret-year">
                             {{ ret_year }}
                         </td>
+                        <td class="text-center">
+                            <button class="btn-detail" onclick="event.stopPropagation(); openDetail({{ emp.id }})">
+                                <i class="fas fa-id-card me-1"></i> DETAIL
+                            </button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -298,7 +529,63 @@
     </div>
 </div>
 
+<!-- Slide-over Detail Panel -->
+<div class="detail-overlay" id="detailOverlay"></div>
+<div class="detail-panel" id="detailPanel">
+    <div class="detail-header">
+        <div class="d-flex align-items-center gap-3">
+            <img id="detPhoto" src="/static/uploads/photos/default.png" onerror="this.src='/static/uploads/photos/default.png'">
+            <div>
+                <h4 id="detName" class="mb-0 fw-bold" style="font-size: 16px; color:#fff;">-</h4>
+                <p id="detNIK" class="mb-0 text-muted small" style="font-family: monospace;">-</p>
+                <p id="detLevelBadge" class="mb-0 mt-1" style="font-size: 11px;"></p>
+            </div>
+        </div>
+        <button class="close-panel" onclick="closeDetail()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="detail-body">
+        <div class="section-label mb-3">Informasi Pribadi</div>
+        <div class="info-card">
+            <div class="info-grid">
+                <div class="info-item"><label>Umur</label><span id="detAge">-</span></div>
+                <div class="info-item"><label>Tahun Pensiun</label><span id="detRet">-</span></div>
+                <div class="info-item"><label>Jabatan</label><span id="detPos">-</span></div>
+                <div class="info-item"><label>Level TPS</label><span id="detLevel">-</span></div>
+            </div>
+            <hr style="border-color: var(--border-dark); margin: 15px 0;">
+            <div class="info-grid">
+                <div class="info-item"><label>Plant / Area</label><span id="detPlant">-</span></div>
+                <div class="info-item"><label>Divisi</label><span id="detDiv">-</span></div>
+                <div class="info-item"><label>Departemen</label><span id="detDept">-</span></div>
+            </div>
+        </div>
+
+        <div class="section-label mb-3">Evaluasi OMDD (Workshop)</div>
+        <div id="detAssessment" class="info-card">
+            <!-- Assessment scores will be injected here -->
+            <div class="text-center text-muted py-3 small">Tidak ada data evaluasi OMDD</div>
+        </div>
+
+        <div class="section-label mb-3 mt-4">Historis Tema (Pass Theme)</div>
+        <div id="detPassThemes" class="theme-container mb-4">
+            <div class="text-muted small">Belum ada history tema</div>
+        </div>
+
+        <div class="section-label mb-3">Tema Activity (Current Theme)</div>
+        <div id="detCurrentThemes" class="theme-container mb-4">
+            <div class="text-muted small">Tidak ada activity berjalan</div>
+        </div>
+    </div>
+</div>
+
 <script>
+    // ✅ HELPER: Smart photo URL - handles both full URLs and local filenames
+    function getPhotoUrl(photo) {
+        if (!photo || typeof photo !== 'string' || photo === 'default.png' || photo === '-') return '/static/uploads/photos/default.png';
+        if (photo.indexOf('http://') === 0 || photo.indexOf('https://') === 0) return photo;
+        return '/static/uploads/photos/' + photo;
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         const rows = Array.from(document.querySelectorAll('.emp-row'));
         const totalDisplay = document.getElementById('totalCount');
@@ -355,6 +642,171 @@
         }
 
         Object.values(filters).forEach(f => f.addEventListener('input', applyFilters));
+
+        // Detail Panel Logic
+        window.openDetail = function(id) {
+            const overlay = document.getElementById('detailOverlay');
+            const panel = document.getElementById('detailPanel');
+            
+            overlay.style.display = 'block';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                panel.classList.add('active');
+            }, 10);
+
+            // Fetch Data
+            fetch(`/management/participant_detail/${id}`, { cache: 'no-store' })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        console.error("Server error:", data.error);
+                        alert("Gagal memuat data: " + data.error);
+                        return;
+                    }
+                    // ✅ Set onerror BEFORE src to guarantee fallback works
+                    const photoEl = document.getElementById('detPhoto');
+                    photoEl.onerror = function() { this.src = '/static/uploads/photos/default.png'; };
+                    photoEl.src = getPhotoUrl(data.photo);
+                    document.getElementById('detName').textContent = data.name;
+                    document.getElementById('detNIK').textContent = data.username;
+                    document.getElementById('detAge').textContent = data.age + ' Tahun';
+                    document.getElementById('detRet').textContent = data.retirement_year;
+                    document.getElementById('detPos').textContent = data.position;
+                    document.getElementById('detLevel').textContent = data.level;
+                    document.getElementById('detPlant').textContent = data.plant;
+                    document.getElementById('detDiv').textContent = data.division;
+                    document.getElementById('detDept').textContent = data.department;
+
+                    // Level badge in header
+                    const lvlBadge = document.getElementById('detLevelBadge');
+                    const lvl = (data.level || '');
+                    let lvlColor = lvl.includes('4') ? '#FF8A00' : lvl.includes('3') ? '#00D16B' : lvl.includes('ADV') ? '#0A74FF' : '#9333ea';
+                    lvlBadge.innerHTML = `<span style="background:${lvlColor}20; color:${lvlColor}; border:1px solid ${lvlColor}50; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:800;">${lvl}</span>`;
+
+                    try {
+                        // Assessment — always render spider chart section
+                        const assDiv = document.getElementById('detAssessment');
+                        const ws = data.assessment || { ws_1:0, ws_2:0, ws_3:0, ws_4:0, ws_5:0, ws_6:0, ws_7:0, decision:'-', date:'-', notes:'' };
+                        const hasData = !!data.assessment;
+
+                        assDiv.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                ${hasData
+                                    ? `<span class="badge ${ws.decision === 'PASS' ? 'bg-success' : 'bg-danger'}">${ws.decision}</span>
+                                       <span class="small text-muted">${ws.date}</span>`
+                                    : `<span class="small text-muted">Belum ada data evaluasi OMDD</span>
+                                       <span class="small text-muted" style="font-style:italic;">Spider chart kosong</span>`
+                                }
+                            </div>
+                            <div id="detSpiderChartWrap">
+                                <canvas id="detSpiderChart"></canvas>
+                            </div>
+                            ${hasData ? `
+                            <div class="omdd-grid mt-2">
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_1}</span><span class="omdd-lbl">WS 1</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_2}</span><span class="omdd-lbl">WS 2</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_3}</span><span class="omdd-lbl">WS 3</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_4}</span><span class="omdd-lbl">WS 4</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_5}</span><span class="omdd-lbl">WS 5</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_6}</span><span class="omdd-lbl">WS 6</span></div>
+                                <div class="omdd-score"><span class="omdd-val">${ws.ws_7}</span><span class="omdd-lbl">WS 7</span></div>
+                            </div>
+                            ${ws.notes ? `<div class="mt-3 small border-top border-secondary pt-2"><strong>Notes:</strong> ${ws.notes}</div>` : ''}` : ''}
+                        `;
+
+                        // Always render Spider Chart (zeros if no data)
+                        setTimeout(() => {
+                            const spiderCtx = document.getElementById('detSpiderChart').getContext('2d');
+                            if (window.currentSpiderChart) window.currentSpiderChart.destroy();
+                            
+                            window.currentSpiderChart = new Chart(spiderCtx, {
+                                type: 'radar',
+                                data: {
+                                    labels: ['Genba', 'Analysis', 'Observasi', 'Kaizen', 'Implementation', 'Presentation', 'Skill Gap'],
+                                    datasets: [{
+                                        label: 'Score',
+                                        data: [ws.ws_1, ws.ws_2, ws.ws_3, ws.ws_4, ws.ws_5, ws.ws_6, ws.ws_7],
+                                        backgroundColor: hasData ? 'rgba(10, 116, 255, 0.25)' : 'rgba(100,100,100,0.1)',
+                                        borderColor: hasData ? '#0A74FF' : 'rgba(255,255,255,0.2)',
+                                        pointBackgroundColor: hasData ? '#0A74FF' : 'rgba(255,255,255,0.3)',
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        r: {
+                                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                                            grid: { color: 'rgba(255,255,255,0.1)' },
+                                            pointLabels: { color: '#8bb4d8', font: { size: 10 } },
+                                            ticks: { display: false, stepSize: 20 },
+                                            suggestedMin: 0, suggestedMax: 100
+                                        }
+                                    },
+                                    plugins: { 
+                                        legend: { display: false },
+                                        datalabels: { display: false }
+                                    }
+                                }
+                            });
+                        }, 100);
+
+                        // Pass Themes
+                        const passDiv = document.getElementById('detPassThemes');
+                        passDiv.innerHTML = data.pass_themes.length ? '' : '<div class="text-muted small">Belum ada history tema</div>';
+                        data.pass_themes.forEach(t => {
+                            passDiv.innerHTML += `
+                                <div class="theme-item pass">
+                                    <span class="theme-title">${t.title}</span>
+                                    <div class="theme-meta">
+                                        <span><i class="fas fa-tag me-1"></i> ${t.type}</span> • 
+                                        <span><i class="fas fa-calendar me-1"></i> ${t.date}</span>
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        // Current Themes
+                        const currDiv = document.getElementById('detCurrentThemes');
+                        currDiv.innerHTML = data.current_themes.length ? '' : '<div class="text-muted small">Tidak ada activity berjalan</div>';
+                        data.current_themes.forEach(t => {
+                            currDiv.innerHTML += `
+                                <div class="theme-item current">
+                                    <span class="theme-title">${t.title}</span>
+                                    <div class="theme-meta">
+                                        <span><i class="fas fa-spinner fa-spin me-1"></i> ${t.status}</span> • 
+                                        <span><i class="fas fa-tasks me-1"></i> ${t.progress || 0}%</span>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } catch (err) {
+                        console.error("Error populating participant detail:", err);
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                });
+        };
+
+        window.closeDetail = function() {
+            const overlay = document.getElementById('detailOverlay');
+            const panel = document.getElementById('detailPanel');
+            
+            panel.classList.remove('active');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
+        };
+
+        document.getElementById('detailOverlay').addEventListener('click', closeDetail);
     });
 </script>
 {% endblock %}

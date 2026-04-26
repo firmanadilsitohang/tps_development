@@ -805,111 +805,83 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center w-100">
+        <!-- COMPACT STAT CARDS (TOTAL & PENDING) RIGHT-ALIGNED -->
+        <div style="display: flex; flex-direction: row; justify-content: flex-end; gap: 15px; width: 100%; margin-top: -5px;">
+            <div style="display: flex; align-items: center; gap: 10px; background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 8px; padding: 6px 16px;">
+                <span style="font-size: 10px; color: #8b949e; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">TOTAL PARTICIPANTS</span>
+                <span style="font-family: 'Oswald'; font-size: 18px; color: #fff; line-height: 1;">{{ stats.total_karyawan }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; background: rgba(255, 159, 67, 0.05); border: 1px solid rgba(255, 159, 67, 0.3); border-radius: 8px; padding: 6px 16px;">
+                <span style="font-size: 10px; color: #8b949e; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">PENDING APPROVAL</span>
+                <span style="font-family: 'Oswald'; font-size: 18px; color: #FF9F43; line-height: 1;">{{ stats.pending_review }}</span>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center w-100 flex-wrap mt-1">
             <div class="d-flex align-items-center gap-3">
                 <div class="header-icon">
-                    <i class="fas fa-satellite-dish" style="font-size: 26px; color: var(--neon-pink);"></i>
+                    <i class="fas fa-radar" style="font-size: 28px; color: var(--neon-blue);"></i>
                 </div>
                 <div>
                     <h1 class="page-title">OMDD COMMAND CENTER</h1>
-                    <p class="m-0" style="font-size: 11px; color: #8b949e; letter-spacing: 2px;">OPERATIONAL MANAGEMENT
-                        & DEVELOPMENT DIVISION</p>
+                    <p class="m-0" style="font-size: 11px; color: #8b949e; letter-spacing: 2px;">OPERATIONAL MANAGEMENT & DEVELOPMENT DIVISION</p>
                 </div>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-end" style="border-right: 1px solid rgba(255,255,255,0.08); padding-right: 20px;">
-                    <div id="liveClock"
-                        style="font-family: 'Oswald'; font-size: 22px; color: var(--neon-green); letter-spacing: 2px;">
-                        00:00:00</div>
-                    <div id="liveDate" class="text-secondary"
-                        style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">MEMUAT...</div>
-                </div>
+
+            <!-- Clock Section -->
+            <div class="text-end ps-2">
+                <div id="liveClock" style="font-family: 'Oswald'; font-size: 24px; color: var(--neon-green); letter-spacing: 2px; line-height: 1;">00:00:00</div>
+                <div id="liveDate" class="text-secondary mt-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; line-height: 1;">MEMUAT...</div>
             </div>
         </div>
+
     </div>
 
-    <!-- ========== STAT CARDS ========== -->
-    <div class="stats-grid">
-        <div class="stat-card" style="border-top: 2px solid rgba(0,210,255,0.4);">
-            <i class="fas fa-users"></i>
-            <p class="stat-label">Total Participants</p>
-            <p class="stat-value" style="color: var(--neon-blue);">{{ stats.total_karyawan }}</p>
-        </div>
-        <div class="stat-card" style="border-top: 2px solid rgba(255,204,0,0.4);">
-            <i class="fas fa-certificate"></i>
-            <p class="stat-label">TPS Key Person 4</p>
-            <p class="stat-value" style="color: var(--neon-gold);">{{ stats.total_kp4 if stats.total_kp4 else '0' }}</p>
-        </div>
-        <div class="stat-card" style="border-top: 2px solid rgba(57,255,20,0.4);">
-            <i class="fas fa-tasks"></i>
-            <p class="stat-label">Active Kaizen Activity</p>
-            <p class="stat-value" style="color: var(--neon-green);">{{ stats.total_kaizen }}</p>
-        </div>
-        <div class="stat-card" style="border-top: 2px solid rgba(255,0,85,0.4);">
-            <i class="fas fa-hourglass-half"></i>
-            <div class="stat-label">Total Participants</div>
-            <h2 class="stat-value">{{ stats.total_karyawan }}</h2>
-        </div>
-        <div class="stat-card" style="border-top: 4px solid #FF9F43;">
-            <i class="fas fa-file-signature"></i>
-            <div class="stat-label">Pending Review</div>
-            <h2 class="stat-value" style="color: #FF9F43;">{{ stats.pending_review }}</h2>
-        </div>
-        <div class="stat-card" style="border-top: 4px solid #28C76F;">
-            <i class="fas fa-chart-line"></i>
-            <div class="stat-label">Total Kaizen Themes</div>
-            <h2 class="stat-value" style="color: #28C76F;">{{ stats.total_kaizen }}</h2>
-        </div>
-        <div class="stat-card" style="border-top: 4px solid var(--neon-gold);">
-            <i class="fas fa-crown"></i>
-            <div class="stat-label">Key Person 4</div>
-            <h2 class="stat-value" style="color: var(--neon-gold);">{{ stats.total_kp4 }}</h2>
-        </div>
-    </div>
+    <style>
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 20px rgba(0, 210, 255, 0.5); transform: scale(1); }
+            50% { text-shadow: 0 0 40px rgba(0, 210, 255, 0.8), 0 0 60px rgba(0, 210, 255, 0.5); transform: scale(1.02); }
+            100% { text-shadow: 0 0 20px rgba(0, 210, 255, 0.5); transform: scale(1); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .welcome-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 6.5rem;
+            color: #fff;
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+            animation: pulseGlow 4s infinite alternate, fadeInUp 1s ease-out forwards;
+        }
+        .welcome-subtitle {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--neon-blue);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+    </style>
 
-    <div class="dashboard-grid">
-        <!-- SKILL GAP ANALYSIS (SPIDER CHART) -->
-        <div class="glass-panel col-6">
-            <h6 class="chart-title-premium" style="color: #28C76F; border-color: #28C76F;">01. OVERALL SKILL GAP ANALYSIS (AVG)</h6>
-            <div class="chart-wrapper-tall"><canvas id="spiderAvgChart"></canvas></div>
-        </div>
-
-        <div class="glass-panel col-6">
-            <h6 class="chart-title-premium">02. ACHIEVEMENT LEVEL PROFILE</h6>
-            <div class="chart-wrapper-tall"><canvas id="chartLevel"></canvas></div>
-        </div>
-
-        <div class="glass-panel col-4">
-            <h6 class="chart-title-premium">03. POPULATION BY DIVISION</h6>
-            <div class="chart-wrapper"><canvas id="chartDiv"></canvas></div>
-        </div>
-            <div class="chart-wrapper"><canvas id="levelChart"></canvas></div>
-        </div>
-        <div class="glass-panel col-6">
-            <h6 class="chart-title-premium"><i class="fas fa-heartbeat me-2"></i>06. KAIZEN ACTIVITY HEALTH</h6>
-            <div class="chart-wrapper"><canvas id="statusChart"></canvas></div>
-        </div>
-    </div>
-
-    <!-- GRAFIK ROW 4 -->
     <div class="dashboard-grid mb-4">
-        <div class="glass-panel col-8">
-            <h6 class="chart-title-premium"><i class="fas fa-calendar-times me-2"></i>07. PENSION FORECAST (HEADCOUNT /
-                YEAR)</h6>
-            <div class="chart-wrapper"><canvas id="chartPension"></canvas></div>
-        </div>
-        <div class="glass-panel col-4">
-            <h6 class="chart-title-premium"><i class="fas fa-user-clock me-2"></i>08. MANPOWER AGE RISK PROFILE</h6>
-            <div class="chart-wrapper"><canvas id="chartAge"></canvas></div>
-        </div>
-    </div>
-
-    <!-- GRAFIK ROW 5 — BATCH SUCCESS RATE -->
-    <div class="dashboard-grid mb-4">
-        <div class="glass-panel col-12">
-            <h6 class="chart-title-premium"><i class="fas fa-chart-line me-2"></i>09. BATCH SUCCESS RATE (% KELULUSAN KP
-                3 & KP 4)</h6>
-            <div class="chart-wrapper-tall"><canvas id="chartBatch"></canvas></div>
+        <!-- WELCOME BANNER -->
+        <div class="col-12">
+            <div class="glass-panel" style="min-height: 550px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(0, 210, 255, 0.05), rgba(11, 16, 25, 0.95)); border: 1px solid rgba(0, 210, 255, 0.2); text-align: center; position: relative; overflow: hidden;">
+                <!-- Decorative background elements -->
+                <div style="position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,210,255,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,210,255,0.05) 0%, transparent 70%); border-radius: 50%;"></div>
+                
+                <h1 class="welcome-title">WELCOME TO TPS-G</h1>
+                <p class="welcome-subtitle">
+                    With Hitozukuri & Monozukuri for Best Company
+                </p>
+                <div style="margin-top: 60px; opacity: 0.8; animation: fadeInUp 1s ease-out 0.6s forwards;">
+                    <i class="fas fa-network-wired" style="font-size: 4rem; color: rgba(0, 210, 255, 0.6);"></i>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -937,214 +909,6 @@
         document.getElementById('liveDate').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }
     setInterval(updateClock, 1000); updateClock();
-
-    // ============================================================
-    // CHART DEFAULTS
-    // ============================================================
-    Chart.register(ChartDataLabels);
-    Chart.defaults.color = '#ffffff';
-    Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.plugins.datalabels.display     // -------- DATA FROM FLASK --------
-    const kpLabels = {{ kp_labels | tojson }};
-    const kpValues = {{ kp_values | tojson }};
-    const plantLabels = {{ plant_labels | tojson }};
-    const plantData = {{ plant_data | tojson }};
-    const divLabels = {{ div_labels | tojson }};
-    const divData = {{ div_data | tojson }};
-    const deptLabels = {{ dept_labels | tojson }};
-    const deptData = {{ dept_data | tojson }};
-    const levelLabels = {{ level_labels | tojson }};
-    const levelData = {{ level_data | tojson }};
-    const statusLabels = {{ status_labels | tojson }};
-    const statusData = {{ status_data | tojson }};
-    const forecastLabels = {{ forecast_labels | tojson }};
-    const forecastValues = {{ forecast_values | tojson }};
-    const ageLabels = {{ age_labels | tojson }};
-    const ageValues = {{ age_values | tojson }};
-    const batchLabels = {{ batch_labels | tojson }};
-    const batchKP3 = {{ batch_kp3 | tojson }};
-    const batchKP4 = {{ batch_kp4 | tojson }};
-    const avgData = {{ avg_data | tojson }};
-
-    // ============================================================
-    // SPIDER CHART — Overall Skill Gap Analysis
-    // ============================================================
-    new Chart(document.getElementById('spiderAvgChart'), {
-        type: 'radar',
-        data: {
-            labels: ['Genba', 'Problem Solving', 'Observation', 'Kaizen', 'Implementation', 'Presentation'],
-            datasets: [{
-                label: 'Average Competency',
-                data: avgData,
-                backgroundColor: 'rgba(40, 199, 111, 0.2)',
-                borderColor: '#28C76F',
-                pointBackgroundColor: '#28C76F',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: '#28C76F',
-                borderWidth: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                r: {
-                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                    pointLabels: { color: '#8bb4d8', font: { size: 11, weight: 'bold' } },
-                    ticks: { display: false, max: 100 },
-                    suggestedMin: 0,
-                    suggestedMax: 100
-                }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
-
-    // ============================================================
-    // CHART 02 — Achievement Level Profile
-    // ============================================================
-    new Chart(document.getElementById('chartLevel'), { 
-        type: 'bar', 
-        data: { 
-            labels: kpLabels, 
-            datasets: [{ 
-                data: kpValues, 
-                backgroundColor: ['#FF9F43', '#28C76F', '#00d2ff'], 
-                borderRadius: 8, 
-                barThickness: 45 
-            }] 
-        }, 
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            plugins: { 
-                legend: { display: false }, 
-                datalabels: { 
-                    display: true, 
-                    color: '#1E272E', 
-                    anchor: 'center', 
-                    align: 'center', 
-                    font: { weight: '900', size: 14 }
-                } 
-            }, 
-            scales: { 
-                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' } }, 
-                x: { ticks: { font: { weight: 'bold' } }, grid: { display: false } } 
-            } 
-        } 
-    });
-
-    // ============================================================
-    // CHART 03 — Division (Doughnut)
-    // ============================================================
-    new Chart(document.getElementById('chartDiv'), { 
-        type: 'doughnut', 
-        data: { 
-            labels: divLabels, 
-            datasets: [{ 
-                data: divData, 
-                backgroundColor: ['#00d2ff', '#28C76F', '#FF9F43', '#ff00a0', '#bc13fe'], 
-                borderWidth: 3, 
-                borderColor: '#0b1019' 
-            }] 
-        }, 
-        options: { 
-            cutout: '70%', 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            plugins: { 
-                legend: { position: 'right', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } },
-                datalabels: { display: true, color: '#1E272E', backgroundColor: '#fff', borderRadius: 4 }
-            } 
-        } 
-    });
-
-    // ============================================================
-    // CHART 04 — Plant (Horizontal Bar)
-    // ============================================================
-    new Chart(document.getElementById('chartPlant'), { 
-        type: 'bar', 
-        data: { 
-            labels: plantLabels, 
-            datasets: [{ 
-                data: plantData, 
-                backgroundColor: '#FF9F43', 
-                borderRadius: 5, 
-                barThickness: 20 
-            }] 
-        }, 
-        options: { 
-            indexAxis: 'y', 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            plugins: { 
-                legend: { display: false }, 
-                datalabels: { 
-                    display: true, 
-                    color: '#1E272E', 
-                    anchor: 'center', 
-                    align: 'center', 
-                    font: { weight: 'bold', size: 12 }
-                } 
-            }, 
-            scales: { 
-                x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, 
-                y: { ticks: { color: '#FF9F43', font: { size: 12, weight: 'bold' } }, grid: { display: false } } 
-            } 
-        } 
-    });
-
-    // ============================================================
-    // CHART 05 — Batch Success Rate (Line)
-    // ============================================================
-    new Chart(document.getElementById('chartBatch'), {
-        type: 'line', 
-        data: {
-            labels: batchLabels, 
-            datasets: [
-                { 
-                    label: '% Lulus KP 3', 
-                    data: batchKP3, 
-                    borderColor: '#28C76F', 
-                    backgroundColor: 'rgba(40, 199, 111, 0.2)', 
-                    borderWidth: 3, 
-                    fill: true, 
-                    tension: 0.4, 
-                    pointRadius: 5,
-                    pointBackgroundColor: '#28C76F'
-                },
-                { 
-                    label: '% Lulus KP 4', 
-                    data: batchKP4, 
-                    borderColor: '#FF9F43', 
-                    backgroundColor: 'rgba(255, 159, 67, 0.2)', 
-                    borderWidth: 3, 
-                    fill: true, 
-                    tension: 0.4, 
-                    pointRadius: 5,
-                    pointBackgroundColor: '#FF9F43'
-                }
-            ]
-        }, 
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            plugins: { 
-                legend: { position: 'top', labels: { color: '#fff', font: { size: 13, weight: 'bold' }, usePointStyle: true, padding: 20 } }, 
-                tooltip: { mode: 'index', intersect: false, padding: 14 }, 
-                datalabels: { display: true, align: 'top', color: '#fff', formatter: v => v + '%' } 
-            }, 
-            scales: { 
-                y: { max: 100, beginAtZero: true, grid: { color: 'rgba(255,255,255,0.08)' }, ticks: { callback: v => v + '%', font: { size: 12, weight: 'bold' } } }, 
-                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#00d2ff', font: { size: 12, weight: 'bold' } } } 
-            }
-        }
-    }); intersect: false } }
-    });
 
 
 

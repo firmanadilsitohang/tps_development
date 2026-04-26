@@ -502,9 +502,9 @@
         <div style="position: relative;">
             {% if employee.photo %}
                 <div class="profile-photo">
-                    <img src="{{ employee.photo if employee.photo.startswith('http') else url_for('static', filename='uploads/photos/' + employee.photo) }}"
+                    <img src="/static/uploads/photos/{{ employee.photo }}"
                          alt="Foto"
-                         onerror="this.src='https://ui-avatars.com/api/?name={{ employee.name|urlencode }}&background=0b1019&color=00d2ff&size=200'">
+                         onerror="this.src='/static/uploads/photos/default.png'">
                 </div>
             {% else %}
                 <div class="profile-photo-placeholder">{{ employee.name[0] | upper }}</div>
@@ -578,12 +578,13 @@
 
         <div class="eval-grid" style="grid-template-columns: repeat(6, 1fr);">
             {% set fields = [
-                ('Genba', ev.score_genba if ev else 0), 
-                ('Analysis/PS', ev.score_problem_solving if ev else 0), 
-                ('Observation', ev.score_observasi if ev else 0), 
-                ('Kaizen', ev.score_kaizen if ev else 0), 
-                ('Implementation', ev.score_implementation if ev else 0), 
-                ('Presentation', ev.score_presentation if ev else 0)
+                ('WS 1: Genba', ev.ws_1 if ev else 0), 
+                ('WS 2: Analysis', ev.ws_2 if ev else 0), 
+                ('WS 3: Observasi', ev.ws_3 if ev else 0), 
+                ('WS 4: Kaizen', ev.ws_4 if ev else 0), 
+                ('WS 5: Implementation', ev.ws_5 if ev else 0), 
+                ('WS 6: Presentation', ev.ws_6 if ev else 0),
+                ('WS 7: Skill Gap', ev.ws_7 if ev else 0)
             ] %}
             {% for lbl, val in fields %}
             <div class="eval-item">
@@ -667,12 +668,13 @@
                     <!-- Input Angka -->
                     <div class="slider-section">
                         {% set aspects = [
-                        ('score_genba', 'Genba', '#ff00a0'),
-                        ('score_problem_solving', 'Problem Solving', '#00d2ff'),
-                        ('score_observasi', 'Observation', '#39ff14'),
-                        ('score_kaizen', 'Kaizen', '#ffcc00'),
-                        ('score_implementation', 'Implementation', '#bc13fe'),
-                        ('score_presentation', 'Presentation', '#ff0055')
+                        ('score_genba', 'WS 1: Genba', '#ff00a0'),
+                        ('score_problem_solving', 'WS 2: Analysis', '#00d2ff'),
+                        ('score_observasi', 'WS 3: Observasi', '#39ff14'),
+                        ('score_kaizen', 'WS 4: Kaizen', '#ffcc00'),
+                        ('score_implementation', 'WS 5: Implementation', '#bc13fe'),
+                        ('score_presentation', 'WS 6: Presentation', '#ff0055'),
+                        ('score_skillgap', 'WS 7: Skill Gap', '#00FF88')
                         ] %}
                         {% for field, label, color in aspects %}
                         <div class="slider-item">
@@ -725,9 +727,9 @@
         spiderConfig = {
             type: 'radar',
             data: {
-                labels: ['Genba', 'Problem Solving', 'Observation', 'Kaizen', 'Implementation', 'Presentation'],
+                labels: ['WS 1', 'WS 2', 'WS 3', 'WS 4', 'WS 5', 'WS 6', 'WS 7'],
                 datasets: [{
-                    label: 'Skor Kompetensi',
+                    label: 'Workshop Score',
                     data: dataArray,
                     backgroundColor: 'rgba(255, 0, 160, 0.2)',
                     borderColor: '#ff00a0',
@@ -768,7 +770,8 @@
                 document.getElementById('input_score_observasi').value,
                 document.getElementById('input_score_kaizen').value,
                 document.getElementById('input_score_implementation').value,
-                document.getElementById('input_score_presentation').value
+                document.getElementById('input_score_presentation').value,
+                document.getElementById('input_score_skillgap').value
             ];
             spiderChartObj.data.datasets[0].data = arr;
             spiderChartObj.update();
@@ -793,12 +796,13 @@
 
         // Set inputs based on new 6 fields
         const initialScores = [
-            {{ ev.score_genba if ev else 0 }},
-            {{ ev.score_problem_solving if ev else 0 }},
-            {{ ev.score_observasi if ev else 0 }},
-            {{ ev.score_kaizen if ev else 0 }},
-            {{ ev.score_implementation if ev else 0 }},
-            {{ ev.score_presentation if ev else 0 }}
+            {{ ev.ws_1 if ev else 0 }},
+            {{ ev.ws_2 if ev else 0 }},
+            {{ ev.ws_3 if ev else 0 }},
+            {{ ev.ws_4 if ev else 0 }},
+            {{ ev.ws_5 if ev else 0 }},
+            {{ ev.ws_6 if ev else 0 }},
+            {{ ev.ws_7 if ev else 0 }}
         ];
 
         document.getElementById('input_score_genba').value = initialScores[0];

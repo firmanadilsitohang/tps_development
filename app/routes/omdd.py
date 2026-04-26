@@ -137,15 +137,16 @@ def dashboard():
 
     # 11. AVERAGE SCORES FOR SKILL GAP ANALYSIS (Spider Chart)
     avg_scores = db.session.query(
-        func.avg(WorkshopEvaluation.score_genba),
-        func.avg(WorkshopEvaluation.score_problem_solving),
-        func.avg(WorkshopEvaluation.score_observasi),
-        func.avg(WorkshopEvaluation.score_kaizen),
-        func.avg(WorkshopEvaluation.score_implementation),
-        func.avg(WorkshopEvaluation.score_presentation)
+        func.avg(WorkshopEvaluation.ws_1),
+        func.avg(WorkshopEvaluation.ws_2),
+        func.avg(WorkshopEvaluation.ws_3),
+        func.avg(WorkshopEvaluation.ws_4),
+        func.avg(WorkshopEvaluation.ws_5),
+        func.avg(WorkshopEvaluation.ws_6),
+        func.avg(WorkshopEvaluation.ws_7)
     ).first()
     
-    avg_data = [float(s or 0) for s in avg_scores] if avg_scores else [0]*6
+    avg_data = [float(s or 0) for s in avg_scores] if avg_scores else [0]*7
 
     return render_template('omdd/dashboard.html', 
                            stats=stats, 
@@ -400,12 +401,13 @@ def submit_workshop_evaluation(emp_id):
         db.session.add(evaluation)
 
     try:
-        evaluation.score_genba = int(request.form.get('score_genba', 0))
-        evaluation.score_problem_solving = int(request.form.get('score_problem_solving', 0))
-        evaluation.score_observasi = int(request.form.get('score_observasi', 0))
-        evaluation.score_kaizen = int(request.form.get('score_kaizen', 0))
-        evaluation.score_implementation = int(request.form.get('score_implementation', 0))
-        evaluation.score_presentation = int(request.form.get('score_presentation', 0))
+        evaluation.ws_1 = int(request.form.get('score_genba', 0))
+        evaluation.ws_2 = int(request.form.get('score_problem_solving', 0))
+        evaluation.ws_3 = int(request.form.get('score_observasi', 0))
+        evaluation.ws_4 = int(request.form.get('score_kaizen', 0))
+        evaluation.ws_5 = int(request.form.get('score_implementation', 0))
+        evaluation.ws_6 = int(request.form.get('score_presentation', 0))
+        evaluation.ws_7 = int(request.form.get('score_skillgap', 0))
         evaluation.final_decision = request.form.get('final_decision', 'PASS')
         evaluation.notes = request.form.get('notes', '')
         evaluation.evaluated_by = current_user.username
