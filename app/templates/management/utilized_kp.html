@@ -36,10 +36,21 @@
         color: var(--accent-cyan);
     }
 
-    .col-4 { grid-column: span 4; }
-    .col-6 { grid-column: span 6; }
-    .col-8 { grid-column: span 8; }
-    .col-12 { grid-column: span 12; }
+    .col-4 {
+        grid-column: span 4;
+    }
+
+    .col-6 {
+        grid-column: span 6;
+    }
+
+    .col-8 {
+        grid-column: span 8;
+    }
+
+    .col-12 {
+        grid-column: span 12;
+    }
 
     .btn-back {
         display: inline-flex;
@@ -273,8 +284,15 @@
         text-transform: uppercase;
     }
 
-    .status-completed { background: #00D16B; color: #000; }
-    .status-ongoing { background: #FF8A00; color: #000; }
+    .status-completed {
+        background: #00D16B;
+        color: #000;
+    }
+
+    .status-ongoing {
+        background: #FF8A00;
+        color: #000;
+    }
 
     .assessment-grid {
         display: grid;
@@ -300,6 +318,36 @@
         text-transform: uppercase;
         color: var(--text-muted);
     }
+
+    /* METRIC CARDS FOR NEW CHART */
+    .metric-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .metric-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .metric-item .val {
+        display: block;
+        font-size: 24px;
+        font-weight: 800;
+        font-family: 'Oswald', sans-serif;
+    }
+
+    .metric-item .lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+    }
 </style>
 {% endblock %}
 
@@ -309,7 +357,8 @@
 </a>
 
 <div class="dashboard-header mb-4">
-    <h2 class="mb-1" style="color: #FF8A00; font-family: 'Oswald'; letter-spacing: 2px;">UTILIZED TPS KEY PERSON 3 & 4</h2>
+    <h2 class="mb-1" style="color: #FF8A00; font-family: 'Oswald'; letter-spacing: 2px;">UTILIZED TPS KEY PERSON 3 & 4
+    </h2>
     <p class="text-muted">Analytical Mapping & Performance Tracking Dashboard</p>
 </div>
 
@@ -347,13 +396,14 @@
         <div class="card-title"><i class="fas fa-graduation-cap"></i> Passing Rate per Batch</div>
         <div style="height: 350px; position: relative;">
             {% if batch_labels %}
-                <canvas id="batchChart"></canvas>
+            <canvas id="batchChart"></canvas>
             {% else %}
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); border: 1px dashed rgba(255,255,255,0.1); border-radius: 15px;">
-                    <i class="fas fa-database mb-2" style="font-size: 24px;"></i>
-                    <p style="font-size: 12px;">No batch data found.</p>
-                    <p style="font-size: 10px;">Please import or add data via TPSG Admin.</p>
-                </div>
+            <div
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); border: 1px dashed rgba(255,255,255,0.1); border-radius: 15px;">
+                <i class="fas fa-database mb-2" style="font-size: 24px;"></i>
+                <p style="font-size: 12px;">No batch data found.</p>
+                <p style="font-size: 10px;">Please import or add data via TPSG Admin.</p>
+            </div>
             {% endif %}
         </div>
     </div>
@@ -366,31 +416,67 @@
         </div>
     </div>
 
-    <!-- 6. Demographics -->
+    <!-- 6. Target Projection - MOVED UP -->
     <div class="stat-card col-12">
-        <div class="card-title"><i class="fas fa-users-cog"></i> KP Demographics (Risk @ 50+)</div>
+        <div class="card-title"><i class="fas fa-bullseye"></i> Proyeksi Target TPS Key Person 4 until 2030</div>
+
+        <div class="metric-row">
+            <div class="metric-item">
+                <span class="val" style="color: #185FA5;">27</span>
+                <span class="lbl">Initial Count 2026</span>
+            </div>
+            <div class="metric-item">
+                <span class="val" style="color: #185FA5;">60</span>
+                <span class="lbl">Final Target 2030</span>
+            </div>
+            <div class="metric-item">
+                <span class="val" style="color: #E24B4A;">26</span>
+                <span class="lbl">Total Retirement</span>
+            </div>
+            <div class="metric-item">
+                <span class="val" style="color: #39ff6b;">71</span>
+                <span class="lbl">Total Regeneration</span>
+            </div>
+        </div>
+
+        <div style="height: 320px; border-radius: 15px; padding: 15px;">
+            <canvas id="kp4ProjectionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 7. Demographics - MOVED DOWN -->
+    <div class="stat-card col-12">
+        <div class="card-title"><i class="fas fa-users-cog"></i> KP Demographic (Retirement 2030 @ 55 yrs)</div>
         <div id="demoContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             {% for level, data in demo_data.items() %}
-            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; font-weight: 700;">
+            <div
+                style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                <div
+                    style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; font-weight: 700;">
                     <span>{{ level }}</span>
                     <span style="color: var(--accent-cyan);">Total: {{ data.prod + data.non }}</span>
                 </div>
-                <div class="demo-bar-container" style="height: 40px; display: flex; border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.1); cursor: pointer;">
+                <div class="demo-bar-container"
+                    style="height: 40px; display: flex; border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.1); cursor: pointer;">
                     {% if data.prod + data.non > 0 %}
-                    <div class="demo-bar-segment" data-label="{{ level }} - Productive" data-participants='{{ data.prod_list | tojson }}'
+                    <div class="demo-bar-segment" data-label="{{ level }} - Productive"
+                        data-participants='{{ data.prod_list | tojson }}'
                         style="width:{{ (data.prod / (data.prod + data.non) * 100)|round }}%; background: linear-gradient(90deg, #00D16B, #00A352); display: flex; align-items: center; padding-left: 15px; font-size: 12px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
                         {{ (data.prod / (data.prod + data.non) * 100)|round }}% PROD
                     </div>
-                    <div class="demo-bar-segment" data-label="{{ level }} - Retirement Risk" data-participants='{{ data.non_list | tojson }}'
+                    <div class="demo-bar-segment" data-label="{{ level }} - Retirement Risk"
+                        data-participants='{{ data.non_list | tojson }}'
                         style="width:{{ (data.non / (data.prod + data.non) * 100)|round }}%; background: linear-gradient(90deg, #FF4D4D, #E3000F); display: flex; align-items: center; justify-content: flex-end; padding-right: 15px; font-size: 12px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
                         RISK {{ (data.non / (data.prod + data.non) * 100)|round }}%
                     </div>
                     {% else %}
-                    <div style="width: 100%; text-align: center; line-height: 40px; font-size: 12px; color: var(--text-muted);">NO DATA AVAILABLE</div>
+                    <div
+                        style="width: 100%; text-align: center; line-height: 40px; font-size: 12px; color: var(--text-muted);">
+                        NO DATA AVAILABLE</div>
                     {% endif %}
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
+                <div
+                    style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
                     <span>Productive (< 50 yrs): <strong>{{ data.prod }}</strong></span>
                     <span>Retirement Risk (≥ 50 yrs): <strong>{{ data.non }}</strong></span>
                 </div>
@@ -398,6 +484,15 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- 8. Target Chart Image -->
+    <!-- <div class="stat-card col-12">
+        <div class="card-title"><i class="fas fa-chart-line"></i> Target KPI & Achievement Projection</div>
+        <div style="text-align: center; padding: 10px;">
+            <img src="{{ url_for('static', filename='img/chart_target.png') }}" alt="Target Chart"
+                style="width: 100%; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        </div>
+    </div> -->
 </div>
 
 <!-- Custom Tooltip -->
@@ -412,7 +507,8 @@
     <div id="tooltip-body" class="tooltip-body">
         <!-- List Items -->
     </div>
-    <div id="tooltip-footer" style="padding: 10px; font-size: 9px; color: #888; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
+    <div id="tooltip-footer"
+        style="padding: 10px; font-size: 9px; color: #888; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
         Click on items for full profile. Click bar to lock this view.
     </div>
 </div>
@@ -444,8 +540,8 @@
         return '/static/uploads/photos/' + photo;
     }
 
-    const divDetails = {{ kp_div_details | tojson }};
-    const deptDetails = {{ kp_dept_details | tojson }};
+    const divDetails = {{ kp_div_details | tojson if kp_div_details is not none else '{}' }};
+    const deptDetails = {{ kp_dept_details | tojson if kp_dept_details is not none else '{}' }};
     const allKpParticipants = Object.values(divDetails).flat();
     let isTooltipPinned = false;
 
@@ -469,7 +565,7 @@
 
         titleEl.innerText = label;
         countEl.innerText = `${displayData.length} Pers`;
-        
+
         displayData.sort((a, b) => (a.level || "").localeCompare(b.level || ""));
 
         let html = '';
@@ -590,8 +686,8 @@
                         <div class="badge" style="background:var(--accent-cyan); color:#000; font-weight:800; padding:8px 20px; font-size: 14px;">${data.level}</div>
                         
                         <div class="mt-4 p-3" style="background:rgba(255,255,255,0.05); border-radius:12px; text-align:left;">
-                            <div class="mb-2"><span class="text-muted small">Umur:</span> <strong class="float-end">${data.age} Thn</strong></div>
-                            <div><span class="text-muted small">Tahun Pensiun:</span> <strong class="float-end">${data.retirement_year}</strong></div>
+                            <div class="mb-2"><span class="text-muted small">Age:</span> <strong class="float-end">${data.age} Yrs</strong></div>
+                            <div><span class="text-muted small">Retirement Year:</span> <strong class="float-end">${data.retirement_year}</strong></div>
                         </div>
                     </div>
                     <div class="profile-right">
@@ -629,7 +725,7 @@
                     new Chart(spiderCtx, {
                         type: 'radar',
                         data: {
-                                    labels: ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4', 'Workshop 5', 'Workshop 6', 'Workshop 7'],
+                            labels: ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4', 'Workshop 5', 'Workshop 6', 'Workshop 7'],
                             datasets: [{
                                 label: 'Score',
                                 data: [
@@ -714,16 +810,16 @@
             data: {
                 labels: labels,
                 datasets: [
-                    { 
-                        label: 'KP 4', 
-                        data: data4, 
+                    {
+                        label: 'KP 4',
+                        data: data4,
                         backgroundColor: '#FF8A00', // Vibrant Orange
                         borderRadius: 8,
                         borderWidth: 0
                     },
-                    { 
-                        label: 'KP 3', 
-                        data: data3, 
+                    {
+                        label: 'KP 3',
+                        data: data3,
                         backgroundColor: '#00FF88', // Neon Green
                         borderRadius: 8,
                         borderWidth: 0
@@ -785,29 +881,30 @@
         data: {
             labels: ['KP 4', 'KP 3'],
             datasets: [{
-                data: [{{ kp4_count }}, {{ kp3_count }}],
-                backgroundColor: ['#FF8A00', '#00FF88'],
-                borderWidth: 0,
-                hoverOffset: 15
-            }]
+                data: [{{ kp4_count|default(0)
+            }}, {{ kp3_count|default(0) }}],
+        backgroundColor: ['#FF8A00', '#00FF88'],
+        borderWidth: 0,
+        hoverOffset: 15
+    }]
         },
         options: {
-            cutout: '70%',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                datalabels: {
-                    color: '#1E272E',
-                    backgroundColor: '#fff',
-                    borderRadius: 4,
-                    padding: 4,
-                    font: { weight: 'bold', size: 12 },
-                    formatter: (val) => val
-                },
-                legend: { position: 'bottom', labels: { color: '#8bb4d8', font: { family: 'Oswald' } } },
-                tooltip: { enabled: false }
-            }
+        cutout: '70%',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            datalabels: {
+                color: '#1E272E',
+                backgroundColor: '#fff',
+                borderRadius: 4,
+                padding: 4,
+                font: { weight: 'bold', size: 12 },
+                formatter: (val) => val
+            },
+            legend: { position: 'bottom', labels: { color: '#8bb4d8', font: { family: 'Oswald' } } },
+            tooltip: { enabled: false }
         }
+    }
     });
 
     // Division Mapping
@@ -817,28 +914,30 @@
     createMappingChart(document.getElementById('deptMappingChart'), {{ kp_dept_labels | tojson }}, {{ kp_dept_4 | tojson }}, {{ kp_dept_3 | tojson }}, deptDetails);
 
     // BATCH STATS - IMPROVED LOGIC
-    const batchDetails = {{ batch_details | tojson }};
-    const batchLabels = {{ batch_labels | tojson }};
-    
+    const batchDetails = {{ batch_details | tojson if batch_details is not none else '{}' }};
+    const batchLabels = {{ batch_labels | tojson if batch_labels is not none else '[]' }};
+    const batchDataKp4 = {{ batch_kp4 | tojson if batch_kp4 is not none else '[]' }};
+    const batchDataKp3 = {{ batch_kp3 | tojson if batch_kp3 is not none else '[]' }};
+
     if (batchLabels.length > 0) {
         new Chart(document.getElementById('batchChart'), {
             type: 'bar',
             data: {
                 labels: batchLabels,
                 datasets: [
-                    { 
-                        label: 'KP 4 %', 
-                        data: {{ batch_kp4 | tojson }}, 
+                    {
+                        label: 'KP 4 %',
+                        data: batchDataKp4,
                         backgroundColor: '#FF8A00',
-                        borderColor: '#FF8A00', 
+                        borderColor: '#FF8A00',
                         borderWidth: 1,
                         borderRadius: 5
                     },
-                    { 
-                        label: 'KP 3 %', 
-                        data: {{ batch_kp3 | tojson }}, 
+                    {
+                        label: 'KP 3 %',
+                        data: batchDataKp3,
                         backgroundColor: '#00FF88',
-                        borderColor: '#00FF88', 
+                        borderColor: '#00FF88',
                         borderWidth: 1,
                         borderRadius: 5
                     }
@@ -849,21 +948,29 @@
                 maintainAspectRatio: false,
                 indexAxis: 'y',
                 scales: {
-                    x: { max: 100, ticks: { color: '#8bb4d8', callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    y: { ticks: { color: '#fff', font: { weight: 'bold' } }, grid: { display: false } }
+                    x: {
+                        max: 100,
+                        ticks: { color: '#8bb4d8', callback: v => v + '%' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    y: {
+                        ticks: { color: '#fff', font: { weight: 'bold' } },
+                        grid: { display: false }
+                    }
                 },
                 plugins: {
                     datalabels: {
                         color: '#1E272E',
                         font: { weight: 'bold' },
                         align: 'center',
-                        anchor: 'center',
-                        formatter: v => v > 0 ? v + '%' : ''
+                        formatter: v => v + '%'
                     },
-                    legend: { labels: { color: '#8bb4d8', font: { family: 'Oswald' } } },
+                    legend: {
+                        labels: { color: '#8bb4d8', font: { family: 'Oswald' } }
+                    },
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const batchName = context.label;
                                 const details = batchDetails[batchName];
                                 if (details) {
@@ -875,7 +982,7 @@
                                 }
                                 return context.formattedValue + '%';
                             },
-                            afterBody: function(context) {
+                            afterBody: function (context) {
                                 const batchName = context[0].label;
                                 const details = batchDetails[batchName];
                                 return details ? `\nTotal Participants: ${details.total}` : '';
@@ -892,45 +999,151 @@
         type: 'line',
         data: {
             labels: {{ forecast_labels | tojson }},
-            datasets: [{
-                label: 'Retirement Count',
-                data: {{ forecast_values | tojson }},
-                borderColor: '#28C76F',
-                backgroundColor: 'rgba(40, 199, 111, 0.15)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 6,
-                pointHoverRadius: 10,
-                pointBackgroundColor: '#28C76F',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2
+        datasets: [{
+            label: 'Retirement Count',
+            data: {{ forecast_values | tojson }},
+        borderColor: '#28C76F',
+        backgroundColor: 'rgba(40, 199, 111, 0.15)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 6,
+        pointHoverRadius: 10,
+        pointBackgroundColor: '#28C76F',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2
             }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.1)' },
+                ticks: { color: '#8bb4d8', stepSize: 1, font: { size: 14, weight: 'bold' } }
+            },
+            x: {
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: '#fff', font: { size: 11 } }
+            }
+        },
+        plugins: {
+            datalabels: {
+                align: 'top',
+                offset: 5,
+                color: '#28C76F',
+                font: { weight: '900', size: 14 },
+                formatter: v => v > 0 ? v : ''
+            },
+            legend: { display: false }
+        }
+    }
+    });
+
+    // 7. KP 4 PROJECTION CHART
+    new Chart(document.getElementById('kp4ProjectionChart'), {
+        type: 'bar',
+        data: {
+            labels: ['2026', '2027', '2028', '2029', '2030'],
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Jumlah Akhir TPS KP 4',
+                    data: [27, 36, 43, 55, 60],
+                    borderColor: '#FFFF00',
+                    backgroundColor: '#FFFF00',
+                    borderWidth: 4,
+                    pointBackgroundColor: '#FF8A00',
+                    pointBorderColor: '#fff',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    fill: false,
+                    order: 0,
+                    datalabels: {
+                        align: 'top',
+                        offset: 5,
+                        color: '#fff',
+                        font: { weight: 'bold', size: 12 },
+                        formatter: (val) => val
+                    }
+                },
+                {
+                    label: 'Jumlah Pensiun',
+                    data: [2, 5, 7, 2, 10],
+                    backgroundColor: '#FF0000',
+                    borderColor: '#000',
+                    borderWidth: 1,
+                    order: 2,
+                    datalabels: {
+                        display: true,
+                        color: '#fff',
+                        font: { weight: 'bold', size: 11 },
+                        anchor: 'center',
+                        align: 'center'
+                    }
+                },
+                {
+                    label: 'Kandidat Naik / Regenerasi',
+                    data: [14, 14, 14, 14, 15],
+                    backgroundColor: 'lightgreen',
+                    borderColor: '#000',
+                    borderWidth: 1,
+                    order: 1,
+                    datalabels: {
+                        display: true,
+                        color: '#000',
+                        font: { weight: 'bold', size: 11 },
+                        anchor: 'center',
+                        align: 'center'
+                    }
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { top: 20 } },
             scales: {
-                y: { 
+                y: {
                     beginAtZero: true,
-                    grid: { color: 'rgba(255,255,255,0.1)' }, 
-                    ticks: { color: '#8bb4d8', stepSize: 1, font: { size: 14, weight: 'bold' } } 
+                    max: 70,
+                    ticks: {
+                        stepSize: 10,
+                        color: '#8bb4d8',
+                        font: { size: 12 }
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)',
+                        drawBorder: false
+                    }
                 },
-                x: { 
-                    grid: { color: 'rgba(255,255,255,0.05)' }, 
-                    ticks: { color: '#fff', font: { size: 11 } } 
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#fff', font: { size: 12, weight: 'bold' } }
                 }
             },
             plugins: {
-                datalabels: {
-                    align: 'top',
-                    offset: 5,
-                    color: '#28C76F',
-                    font: { weight: '900', size: 14 },
-                    formatter: v => v > 0 ? v : ''
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: false,
+                        boxWidth: 40,
+                        padding: 20,
+                        color: '#fff',
+                        font: { family: 'Oswald', size: 13 }
+                    }
                 },
-                legend: { display: false }
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    titleColor: '#FFFF00',
+                    bodyColor: '#fff',
+                    borderColor: '#FFFF00',
+                    borderWidth: 1
+                }
             }
         }
     });
 </script>
-{% endblock %}%}
+{% endblock %}

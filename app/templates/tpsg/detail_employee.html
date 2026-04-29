@@ -1,276 +1,857 @@
 {% extends "base.html" %}
-{% block title %}Detail Partisipan | TPS-G{% endblock %}
+
+{% block title %}Participant Details | TPS-G System{% endblock %}
+
 {% block extra_css %}
 <style>
-    .form-section {
-        background: #080f1e;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 30px;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    :root {
+        --bg-cyber: #04070d;
+        --panel-bg: #0b1019;
+        --neon-blue: #00d2ff;
+        --neon-green: #39ff14;
+        --neon-pink: #ff00a0;
+        --neon-gold: #ffcc00;
+        --neon-red: #ff0055;
+        --border-glass: rgba(255, 255, 255, 0.07);
     }
 
-    .section-title {
+    body { background-color: var(--bg-cyber); color: #e0e6ed; font-family: 'Inter', sans-serif; }
+
+    .detail-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* Page Header */
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-glass);
+    }
+
+    .detail-header h2 {
         font-family: 'Oswald', sans-serif;
-        color: #fff;
-        margin-top: 0;
-        margin-bottom: 20px;
-        letter-spacing: 1px;
-        font-size: 18px;
-        border-bottom: 1px solid #1e293b;
-        padding-bottom: 10px;
-    }
-
-    .form-label {
-        color: #94a3b8;
-        font-size: 11px;
-        font-weight: bold;
         text-transform: uppercase;
-        margin-bottom: 6px;
-        display: block;
-        letter-spacing: 0.5px;
+        margin: 0;
+        color: var(--neon-blue);
+        letter-spacing: 2px;
+        font-size: 20px;
     }
 
-    .form-control,
-    .form-select {
-        width: 100%;
-        background: #0f172a;
-        border: 1px solid #334155;
+    .btn-back {
         color: #fff;
-        padding: 12px 15px;
+        text-decoration: none;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 9px 18px;
         border-radius: 8px;
         font-size: 13px;
-        margin-bottom: 15px;
         transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-back:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.3); }
+
+    .btn-eval-page {
+        color: #000;
+        text-decoration: none;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ff00a0, #cc0080);
+        border: none;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .btn-eval-page:hover { box-shadow: 0 0 20px rgba(255,0,160,0.5); transform: translateY(-2px); }
+
+    /* Profile Card */
+    .profile-card {
+        background: linear-gradient(145deg, #080d1a, #040710);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        margin-bottom: 24px;
+        display: flex;
+        gap: 36px;
+        flex-wrap: wrap;
+        align-items: flex-start;
     }
 
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #0A74FF;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(10, 116, 255, 0.2);
+    .profile-photo {
+        flex-shrink: 0;
+        width: 160px;
+        height: 160px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 3px solid rgba(0,210,255,0.3);
+        box-shadow: 0 0 25px rgba(0,210,255,0.15);
+        position: relative;
     }
 
-    .form-control:disabled {
-        background: rgba(255, 255, 255, 0.02);
-        color: #64748b;
-        cursor: not-allowed;
+    .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    .profile-photo-placeholder {
+        width: 160px;
+        height: 160px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.03);
+        border: 3px dashed rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        color: #30363d;
+        font-family: 'Oswald', sans-serif;
+        font-weight: 700;
     }
 
-    /* Ganti warna opsi dropdown agar terlihat di mode gelap */
-    option {
-        background: #0f172a;
+    .incomplete-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--neon-red);
         color: #fff;
-        padding: 10px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 800;
+        box-shadow: 0 0 12px rgba(255,0,85,0.5);
+    }
+
+    .profile-info { flex-grow: 1; min-width: 0; }
+
+    .profile-name {
+        font-family: 'Oswald', sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 0 4px;
+    }
+
+    .profile-nik {
+        font-family: monospace;
+        font-size: 15px;
+        color: var(--neon-green);
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+    }
+
+    .info-item {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border-glass);
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+
+    .info-label {
+        font-size: 10px;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* Level Panels */
+    .level-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .level-card {
+        background: #080d1a;
+        border: 1px solid var(--border-glass);
+        border-radius: 12px;
+        padding: 18px 20px;
+    }
+
+    /* Eval Section */
+    .eval-section {
+        background: linear-gradient(145deg, #0a0f1e, #050a14);
+        border: 1px solid rgba(255,0,160,0.2);
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 0 25px rgba(255,0,160,0.05);
+        margin-bottom: 24px;
+    }
+
+    .eval-section-title {
+        font-family: 'Oswald', sans-serif;
+        color: var(--neon-pink);
+        font-size: 15px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border-left: 4px solid var(--neon-pink);
+        padding-left: 14px;
+        margin-bottom: 20px;
+    }
+
+    .eval-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .eval-item {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border-glass);
+        border-radius: 10px;
+        padding: 14px 5px;
+        text-align: center;
+    }
+
+    .eval-lbl { font-size: 9px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .eval-score { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; }
+    .score-high { color: var(--neon-green); }
+    .score-mid  { color: var(--neon-gold); }
+    .score-low  { color: var(--neon-red); }
+    .score-none { color: #30363d; }
+
+    /* Activity Timeline */
+    .activity-section {
+        background: rgba(16,185,129,0.03);
+        border: 1px solid rgba(16,185,129,0.15);
+        border-radius: 12px;
+        padding: 20px 24px;
+    }
+
+    .activity-title {
+        font-size: 11px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 1px;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #04070d; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+/* ========================= MODAL EVALUASI (SPIDER) ========================= */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 14, 0.92);
+        backdrop-filter: blur(8px);
+        z-index: 2000;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+    .modal-box {
+        background: #070d1a;
+        border: 1px solid rgba(255, 0, 160, 0.3);
+        border-radius: 18px;
+        width: 100%;
+        max-width: 800px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        padding: 22px 28px 18px;
+        border-bottom: 1px solid rgba(255, 0, 160, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 0, 160, 0.05);
+        border-radius: 18px 18px 0 0;
+    }
+
+    .modal-title {
+        font-family: 'Oswald', sans-serif;
+        color: var(--neon-pink);
+        font-size: 18px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .btn-modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #8b949e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-modal-close:hover {
+        background: rgba(255, 0, 85, 0.15);
+        color: #ff0055;
+    }
+
+    .modal-body {
+        padding: 24px 28px;
+    }
+
+    .modal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .spider-wrap {
+        position: relative;
+        height: 320px;
+    }
+
+    .slider-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .slider-item label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10px;
+        font-weight: 700;
+        color: #ccd6f6;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+
+    .score-display {
+        background: rgba(255, 0, 160, 0.12);
+        color: var(--neon-pink);
+        border: 1px solid rgba(255, 0, 160, 0.3);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-family: 'Oswald', sans-serif;
+        font-size: 14px;
+        min-width: 40px;
+        text-align: center;
+    }
+
+    .score-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 8px 10px;
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        transition: 0.3s;
+        font-family: 'Oswald';
+        text-align: center;
+    }
+    .score-input:focus { border-color: var(--neon-pink); background: rgba(255, 0, 160, 0.05); }
+
+    .profile-summary {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-glass);
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .profile-avatar-lg {
+        width: 58px;
+        height: 58px;
+        border-radius: 12px;
+        border: 2px solid rgba(255, 0, 160, 0.3);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .profile-avatar-lg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .notes-area {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 12px 14px;
+        color: #e0e6ed;
+        font-size: 13px;
+        resize: vertical;
+        min-height: 80px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+    .notes-area:focus { border-color: rgba(255, 0, 160, 0.4); }
+
+    .btn-save-eval {
+        width: 100%;
+        background: linear-gradient(135deg, #ff00a0, #cc0080);
+        color: #fff;
+        border: none;
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 20px;
+    }
+
+    .btn-save-eval:hover {
+        box-shadow: 0 0 25px rgba(255, 0, 160, 0.5);
+        transform: translateY(-2px);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-{% set umur_ns = namespace(value=0, pensiun=0) %}
-{% if emp.birth_date %}
-{% set birth_year = emp.birth_date.year %}
-{% set current_year = 2026 %}
-{% set umur_ns.value = current_year - birth_year %}
-{% set umur_ns.pensiun = birth_year + 55 %}
-{% endif %}
+<div class="container-fluid p-3 p-md-4">
+<div class="detail-wrapper">
 
-<div style="max-width: 1000px; margin: 30px auto;">
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <a href="{{ url_for('tpsg.employees') }}"
-            style="color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: bold; transition: 0.3s;"><i
-                class="fas fa-arrow-left"></i> Kembali ke Direktori</a>
-        <h3 style="font-family: 'Oswald', sans-serif; color: #fff; margin: 0; letter-spacing: 1px; font-size: 22px;">
-            PENGATURAN PROFIL PARTISIPAN</h3>
-    </div>
-
-    <div
-        style="background: linear-gradient(135deg, #0f172a 0%, #050a14 100%); padding: 30px; border-radius: 16px; border: 1px solid #1e293b; display: flex; align-items: center; gap: 30px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-        {% if emp.photo %}
-        <img src="{{ emp.photo if emp.photo.startswith('http') else url_for('static', filename='uploads/photos/' + emp.photo) }}"
-            style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #0A74FF;">
-        {% else %}
-        <div
-            style="width: 100px; height: 100px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #fff; border: 4px solid #334155;">
-            {{ emp.name[0] | upper }}</div>
-        {% endif %}
+    <!-- Header -->
+    <div class="detail-header">
         <div>
-            <h2 style="color: #fff; margin: 0 0 12px 0; font-size: 26px;">{{ emp.name }}</h2>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <span
-                    style="background: rgba(10, 116, 255, 0.1); color: #38bdf8; padding: 5px 12px; border-radius: 6px; font-family: monospace; font-weight: bold; font-size: 13px;"><i
-                        class="fas fa-fingerprint"></i> NIK: {{ emp.username }}</span>
-                <span
-                    style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 13px;"><i
-                        class="fas fa-check-circle"></i> {{ emp.status | capitalize }}</span>
+            <h2><i class="fas fa-id-card me-2"></i>Full Participant Profile</h2>
+            <p style="color: #8b949e; font-size: 12px; margin: 4px 0 0; letter-spacing: 1px;">TPS-G — Consolidated Command Center</p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if '3' in employee.current_tps_level %}
+            <button class="btn-eval-page" onclick="openSpiderModal()">
+                <i class="fas fa-edit"></i> PARTICIPANT EVALUATION
+            </button>
+            {% endif %}
+            <a href="{{ url_for('tpsg.employees') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
 
-                <span
-                    style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 13px;">
-                    <i class="fas fa-birthday-cake"></i> Usia: {{ umur_ns.value ~ ' Thn' if emp.birth_date else 'Belum
-                    Diatur' }}
-                </span>
-                <span
-                    style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 13px;">
-                    <i class="fas fa-hourglass-half"></i> Pensiun: {{ umur_ns.pensiun if emp.birth_date else 'Belum
-                    Diatur' }}
-                </span>
+    <!-- Profile Card -->
+    <div class="profile-card">
+        <div style="position: relative;">
+            {% if employee.photo %}
+                <div class="profile-photo">
+                    {% if employee.photo.startswith('http') or employee.photo.startswith('/') %}
+                        <img src="{{ employee.photo }}" alt="Foto" onerror="this.src='{{ url_for('static', filename='uploads/photos/photo_' + employee.username + '.jpeg') }}'; this.onerror=function(){this.src='/static/uploads/photos/default.png'};">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='uploads/photos/' + employee.photo) }}" alt="Foto" onerror="this.src='{{ url_for('static', filename='uploads/photos/photo_' + employee.username + '.jpeg') }}'; this.onerror=function(){this.src='/static/uploads/photos/default.png'};">
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="profile-photo">
+                    <img src="{{ url_for('static', filename='uploads/photos/photo_' + employee.username + '.jpeg') }}" alt="Foto" onerror="this.src='/static/uploads/photos/default.png'">
+                </div>
+            {% endif %}
+            {% if not employee.birth_date or not employee.position or not employee.current_tps_level %}
+                <div class="incomplete-badge"><i class="fas fa-exclamation-triangle me-1"></i>Data Incomplete</div>
+            {% endif %}
+        </div>
+
+        <div class="profile-info">
+            <div class="profile-name">{{ employee.name }}</div>
+            <div class="profile-nik">NPK: {{ "%08d" | format(employee.username|int) if employee.username.isdigit() else employee.username }}</div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Age</div>
+                    <div class="info-value">{{ umur ~ ' Yrs' if umur else '—' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Position</div>
+                    <div class="info-value">{{ employee.position if employee.position else '—' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Plant Area</div>
+                    <div class="info-value" style="color: var(--neon-green);">{{ employee.plant.name if employee.plant else '—' }}</div>
+                </div>
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <div class="info-label">Division / Department</div>
+                    <div class="info-value">
+                        {{ employee.division.name if employee.division else '—' }}
+                        <span style="color: #64748b; margin: 0 6px;">/</span>
+                        {{ employee.department.name if employee.department else '—' }}
+                    </div>
+                </div>
+                <div class="info-item" style="border-left: 3px solid var(--neon-blue);">
+                    <div class="info-label">Batch Workshop</div>
+                    <div class="info-value" style="color: var(--neon-blue); font-family: 'Oswald', sans-serif; font-size: 18px;">{{ employee.batch if employee.batch else '—' }}</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <form action="{{ url_for('tpsg.detail_employee', id=emp.id) }}" method="POST" enctype="multipart/form-data">
-
-        <div class="form-section">
-            <h4 class="section-title"><i class="fas fa-user-tie" style="color: #0A74FF;"></i> Data Personal & Jabatan
-            </h4>
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="form-label">Nama Lengkap</label>
-                    <input type="text" name="name" class="form-control" value="{{ emp.name }}" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">NIK Karyawan</label>
-                    <input type="text" name="username" class="form-control" value="{{ emp.username }}" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Tanggal Lahir (Penentu Usia)</label>
-                    <input type="date" name="birth_date" class="form-control"
-                        value="{{ emp.birth_date.strftime('%Y-%m-%d') if emp.birth_date else '' }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Jabatan Saat Ini</label>
-                    <input type="text" name="position" class="form-control"
-                        value="{{ emp.position if emp.position else '' }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Area Kerja (Plant)</label>
-                    <select name="plant" class="form-select">
-                        <option value="" {% if not emp.plant %}selected{% endif %}>-- Pilih Area Kerja --</option>
-                        {% set areas = ['Sunter 1', 'Sunter 2', 'Karawang 1', 'Karawang 2', 'Karawang 3', 'HO (Head
-                        Office)'] %}
-                        {% for area in areas %}
-                        <option value="{{ area }}" {% if emp.plant and emp.plant.name==area %}selected{% endif %}>{{
-                            area }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Division</label>
-                    <input type="text" name="division" class="form-control"
-                        value="{{ emp.division.name if emp.division else '' }}"
-                        placeholder="Contoh: Production Division">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Department</label>
-                    <input type="text" name="department" class="form-control"
-                        value="{{ emp.department.name if emp.department else '' }}"
-                        placeholder="Contoh: Assy Production Dept">
-                </div>
-                <div class="col-md-12">
-                    <label class="form-label">Reset Password Akun</label>
-                    <input type="password" name="password" class="form-control"
-                        placeholder="Kosongkan jika tidak ingin merubah password saat ini">
-                </div>
+    <!-- TPS Level -->
+    {% set level_color = '#ffcc00' if '4' in employee.current_tps_level else '#39ff14' if '3' in employee.current_tps_level else '#cbd5e1' %}
+    <div class="level-grid">
+        <div class="level-card" style="border-left: 4px solid {{ level_color }};">
+            <div class="info-label">Current TPS Level</div>
+            <div style="color: {{ level_color }}; font-size: 17px; font-weight: 700; margin: 6px 0 4px;">
+                {{ employee.current_tps_level if employee.current_tps_level else '—' }}
+            </div>
+            <div style="font-size: 12px; color: #64748b;">
+                <i class="fas fa-calendar-alt me-1"></i>Graduation Year: {{ employee.tahun_lulus_saat_ini | default('—') }}
             </div>
         </div>
-
-        <div class="form-section">
-            <h4 class="section-title"><i class="fas fa-medal" style="color: #f59e0b;"></i> Kompetensi & Activity TPS
-            </h4>
-            <div class="row">
-                {% set tps_levels = ['TPS BASIC', 'TPS SW', 'TPS STEP UP', 'TPS ADVANCE', 'TPS KEY PERSON 3', 'TPS KEY
-                PERSON 4', 'Belum Ada'] %}
-
-                <div class="col-md-6">
-                    <label class="form-label">Level TPS Sebelumnya</label>
-                    <select name="previous_tps_level" class="form-select">
-                        <option value="">-- Pilih Level Sebelumnya --</option>
-                        {% for lvl in tps_levels %}
-                        <option value="{{ lvl }}" {% if emp.previous_tps_level==lvl %}selected{% endif %}>{{ lvl }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Tahun Lulus Level Sebelumnya</label>
-                    <input type="text" name="tahun_lulus_terakhir" class="form-control"
-                        value="{{ emp.tahun_lulus_terakhir if emp.tahun_lulus_terakhir else '' }}"
-                        placeholder="Contoh: 2022">
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Level TPS Saat Ini</label>
-                    <select name="current_tps_level" class="form-select">
-                        <option value="">-- Pilih Level Sekarang --</option>
-                        {% for lvl in tps_levels %}
-                        <option value="{{ lvl }}" {% if emp.current_tps_level==lvl %}selected{% endif %}>{{ lvl }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Tahun Lulus Level Saat Ini</label>
-                    <input type="text" name="tahun_lulus_saat_ini" class="form-control"
-                        value="{{ emp.tahun_lulus_saat_ini if emp.tahun_lulus_saat_ini else '' }}"
-                        placeholder="Contoh: 2024">
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Tipe Aktivitas Terakhir</label>
-                    <select name="last_activity_type" class="form-select">
-                        <option value="">-- Pilih Tipe --</option>
-                        {% set act_types = ['Kaizen', 'Jishuken', 'Problem Solving', 'QCC', 'Belum Ada'] %}
-                        {% for t in act_types %}
-                        <option value="{{ t }}" {% if emp.last_activity_type==t %}selected{% endif %}>{{ t }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Tema Activity Terakhir</label>
-                    <input type="text" name="last_activity_theme" class="form-control"
-                        value="{{ emp.last_activity_theme if emp.last_activity_theme else '' }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Batch Workshop (Dev TPS)</label>
-                    <input type="text" name="batch" class="form-control" value="{{ emp.batch if emp.batch else '' }}"
-                        placeholder="Contoh: #01">
-                </div>
+        <div class="level-card">
+            <div class="info-label">Previous TPS Level</div>
+            <div style="color: #cbd5e1; font-size: 17px; font-weight: 700; margin: 6px 0 4px;">
+                {{ employee.previous_tps_level if employee.previous_tps_level else 'None' }}
+            </div>
+            <div style="font-size: 12px; color: #64748b;">
+                <i class="fas fa-calendar-alt me-1"></i>Graduation Year: {{ employee.tahun_lulus_terakhir | default('—') }}
             </div>
         </div>
+    </div>
 
-        <div class="form-section">
-            <h4 class="section-title"><i class="fas fa-folder-open" style="color: #10b981;"></i> Upload Dokumen</h4>
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="form-label">Ubah Pas Foto (JPG/PNG)</label>
-                    <input type="file" name="photo" class="form-control" accept=".jpg, .jpeg, .png">
-                    {% if emp.photo and not emp.photo.startswith('http') %}
-                    <div style="font-size: 11px; color: #10b981; margin-top: -5px;"><i class="fas fa-check"></i> Foto
-                        lokal sudah tersimpan.</div>
-                    {% endif %}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Upload Sertifikat TPS Terakhir (JPG/PDF)</label>
-                    <input type="file" name="certificate" class="form-control" accept=".jpg, .jpeg, .png, .pdf">
-                    {% if emp.certificate %}
-                    <div style="font-size: 11px; color: #10b981; margin-top: -5px;">
-                        <i class="fas fa-file-alt"></i> Sertifikat tersimpan: <a
-                            href="{{ url_for('static', filename='uploads/certificates/' + emp.certificate) }}"
-                            target="_blank" style="color: #38bdf8;">Lihat File</a>
-                    </div>
-                    {% endif %}
-                </div>
+    <!-- Workshop Evaluation Scores -->
+    {% set ev = employee.workshop_evaluations[0] if employee.workshop_evaluations else none %}
+    <div class="eval-section">
+        <div class="eval-section-title"><i class="fas fa-spider me-2"></i>Workshop Evaluation Scores (7 Parameters)</div>
+
+        {% macro score_cls(v) %}{% if v >= 75 %}score-high{% elif v >= 50 %}score-mid{% elif v > 0 %}score-low{% else %}score-none{% endif %}{% endmacro %}
+
+        <div class="eval-grid">
+            {% set fields = [
+                ('Workshop 1', ev.ws_1 if ev else 0), 
+                ('Workshop 2', ev.ws_2 if ev else 0), 
+                ('Workshop 3', ev.ws_3 if ev else 0), 
+                ('Workshop 4', ev.ws_4 if ev else 0), 
+                ('Workshop 5', ev.ws_5 if ev else 0), 
+                ('Workshop 6', ev.ws_6 if ev else 0),
+                ('Workshop 7', ev.ws_7 if ev else 0)
+            ] %}
+            {% for lbl, val in fields %}
+            <div class="eval-item">
+                <div class="eval-lbl">{{ lbl }}</div>
+                <div class="eval-score {{ score_cls(val) }}">{{ val|int if val else '—' }}</div>
             </div>
+            {% endfor %}
         </div>
 
-        <div style="text-align: right; margin-bottom: 50px;">
-            <button type="submit"
-                style="padding: 15px 40px; background: linear-gradient(135deg, #0A74FF 0%, #0056CC 100%); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; box-shadow: 0 5px 15px rgba(10, 116, 255, 0.4); transition: 0.3s;">
-                <i class="fas fa-save" style="margin-right: 8px;"></i> Simpan Semua Perubahan
-            </button>
+        {% if ev and ev.notes %}
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #94a3b8;">
+            <span style="color: var(--neon-pink); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px;"><i class="fas fa-sticky-note me-1"></i>Evaluator Notes</span>
+            {{ ev.notes }}
         </div>
-    </form>
+        {% endif %}
+
+        {% if ev %}
+        <div style="margin-top: 12px; font-size: 11px; color: #64748b;">
+            <i class="fas fa-user-check me-1"></i>Evaluated by: <strong style="color: #8b949e;">{{ ev.evaluated_by }}</strong>
+            {% if ev.evaluated_at %} &bull; {{ ev.evaluated_at.strftime('%d %b %Y, %H:%M') }}{% endif %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 10px; color: #64748b; font-size: 13px; font-style: italic;">
+            No workshop evaluation for this participant yet. Please click "PARTICIPANT EVALUATION" above.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="activity-section">
+        <div class="activity-title">
+            <i class="fas fa-history" style="color: #10b981;"></i>
+            Activity History — {{ employee.last_activity_type if employee.last_activity_type else 'No Type' }}
+        </div>
+        <div id="theme-timeline">
+            {% if employee.last_activity_theme %}
+                <p id="raw-theme-text" style="display:none;">{{ employee.last_activity_theme }}</p>
+            {% else %}
+                <div style="color: #64748b; font-size: 13px; font-style: italic; padding: 10px 0;">
+                    This participant does not have any activity history or Kaizen themes yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
 </div>
+</div>
+
+<!-- ====================================================
+     MODAL: SPIDER CHART EVALUASI WORKSHOP
+==================================================== -->
+<div class="modal-overlay" id="spiderModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-title"><i class="fas fa-chart-radar me-2"></i>Workshop Evaluation (TPS-G Control)</span>
+            <button class="btn-modal-close" onclick="closeSpiderModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Participant Profile -->
+            <div class="profile-summary">
+                <div class="profile-avatar-lg">
+                    <img id="spiderEmpPhoto" src="" alt="" onerror="this.src='/static/uploads/photos/default.png'">
+                </div>
+                <div>
+                    <div style="font-weight: 800; color: #fff; font-size: 15px;" id="spiderEmpName">-</div>
+                    <div style="font-size: 12px; color: #8b949e; font-family: monospace;" id="spiderEmpNik">-</div>
+                    <div style="font-size: 12px; color: #8b949e;" id="spiderEmpPos">-</div>
+                </div>
+            </div>
+            
+            <form id="spiderForm" method="POST" action="{{ url_for('tpsg.submit_workshop_evaluation', emp_id=employee.id) }}">
+                <div class="modal-grid">
+                    <!-- Spider Chart -->
+                    <div>
+                        <div style="text-align: center; margin-bottom: 10px; font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px;">Preview Spider Chart</div>
+                        <div class="spider-wrap"><canvas id="spiderChart"></canvas></div>
+                    </div>
+
+                    <!-- Input Angka -->
+                    <div class="slider-section">
+                        {% set aspects = [
+                            ('score_genba', 'Workshop 1', '#ff00a0'),
+                            ('score_problem_solving', 'Workshop 2', '#00d2ff'),
+                            ('score_observasi', 'Workshop 3', '#39ff14'),
+                            ('score_kaizen', 'Workshop 4', '#ffcc00'),
+                            ('score_implementation', 'Workshop 5', '#bc13fe'),
+                            ('score_presentation', 'Workshop 6', '#ff0055'),
+                            ('score_skillgap', 'Workshop 7', '#00FF88')
+                        ] %}
+                        {% for field, label, color in aspects %}
+                        <div class="slider-item">
+                            <label>
+                                <span>{{ label }}</span>
+                                <span class="score-display" id="display_{{ field }}">0</span>
+                            </label>
+                            <input type="number" id="input_{{ field }}" name="{{ field }}" min="0" max="100" step="1"
+                                value="0" class="score-input" oninput="syncInput('{{ field }}')">
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Status Kelulusan -->
+                        <div class="slider-item" style="grid-column: span 2;">
+                            <label>FINAL DECISION</label>
+                            <select name="final_decision" class="form-control" style="background:#1e293b; color:#fff; border:1px solid #334155; height: 40px; font-weight: bold;">
+                                <option value="PASS" {% if ev and ev.final_decision == 'PASS' %}selected{% endif %}>PASS</option>
+                                <option value="FAIL" {% if ev and ev.final_decision == 'FAIL' %}selected{% endif %}>FAIL</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Catatan -->
+                <div style="margin-top: 20px;">
+                    <label style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">
+                        Evaluation Notes / Recommendations
+                    </label>
+                    <textarea name="notes" id="spiderNotes" class="notes-area"
+                        placeholder="Enter evaluation notes for these 7 workshops..."></textarea>
+                </div>
+                <button type="submit" class="btn-save-eval">SAVE WORKSHOP EVALUATION</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // --- SPIDER CHART LOGIC ---
+    let spiderConfig = null;
+    let spiderChartObj = null;
+
+    function initSpiderChart(dataArray) {
+        const ctx = document.getElementById('spiderChart').getContext('2d');
+        spiderConfig = {
+            type: 'radar',
+            data: {
+                labels: ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4', 'Workshop 5', 'Workshop 6', 'Workshop 7'],
+                datasets: [{
+                    label: 'Workshop Score',
+                    data: dataArray,
+                    backgroundColor: 'rgba(255, 0, 160, 0.2)',
+                    borderColor: '#ff00a0',
+                    pointBackgroundColor: '#00d2ff',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#39ff14',
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255,255,255,0.1)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        pointLabels: { color: '#8b949e', font: { size: 10, family: 'Inter', weight: 'bold' } },
+                        ticks: { display: false, min: 0, max: 100, stepSize: 20 }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        };
+        if(spiderChartObj) spiderChartObj.destroy();
+        spiderChartObj = new Chart(ctx, spiderConfig);
+    }
+
+    function syncInput(field) {
+        const val = document.getElementById('input_' + field).value;
+        const display = document.getElementById('display_' + field);
+        if(display) display.innerText = val;
+        
+        if (spiderChartObj) {
+            const arr = [
+                document.getElementById('input_score_genba').value,
+                document.getElementById('input_score_problem_solving').value,
+                document.getElementById('input_score_observasi').value,
+                document.getElementById('input_score_kaizen').value,
+                document.getElementById('input_score_implementation').value,
+                document.getElementById('input_score_presentation').value,
+                document.getElementById('input_score_skillgap').value
+            ];
+            spiderChartObj.data.datasets[0].data = arr;
+            spiderChartObj.update();
+        }
+    }
+
+    function openSpiderModal() {
+        document.getElementById('spiderModal').classList.add('show');
+        
+        const photoUrl = '{{ employee.photo if employee.photo and (employee.photo.startswith('http') or employee.photo.startswith('/')) else url_for('static', filename='uploads/photos/' + employee.photo) if employee.photo else "" }}';
+        const name = '{{ employee.name }}';
+        const empNameObj = encodeURIComponent(name);
+        document.getElementById('spiderEmpPhoto').src = photoUrl ? photoUrl : "https://ui-avatars.com/api/?name=" + empNameObj + "&background=0d1117&color=c9d1d9&size=120";
+        document.getElementById('spiderEmpName').innerText = name;
+        document.getElementById('spiderEmpNik').innerText = 'NPK: {{ employee.username }}';
+        document.getElementById('spiderEmpPos').innerText = '{{ employee.position or "-" }}';
+
+        const initialScores = [
+            {{ ev.ws_1 if ev else 0 }},
+            {{ ev.ws_2 if ev else 0 }},
+            {{ ev.ws_3 if ev else 0 }},
+            {{ ev.ws_4 if ev else 0 }},
+            {{ ev.ws_5 if ev else 0 }},
+            {{ ev.ws_6 if ev else 0 }},
+            {{ ev.ws_7 if ev else 0 }}
+        ];
+
+        document.getElementById('input_score_genba').value = initialScores[0];
+        document.getElementById('input_score_problem_solving').value = initialScores[1];
+        document.getElementById('input_score_observasi').value = initialScores[2];
+        document.getElementById('input_score_kaizen').value = initialScores[3];
+        document.getElementById('input_score_implementation').value = initialScores[4];
+        document.getElementById('input_score_presentation').value = initialScores[5];
+        document.getElementById('input_score_skillgap').value = initialScores[6];
+
+        ['score_genba','score_problem_solving','score_observasi','score_kaizen','score_implementation','score_presentation','score_skillgap'].forEach(field => syncInput(field));
+        
+        document.getElementById('spiderNotes').value = `{{ ev.notes if ev and ev.notes else "" }}`;
+        initSpiderChart(initialScores);
+    }
+
+    function closeSpiderModal() {
+        document.getElementById('spiderModal').classList.remove('show');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const rawTextEl = document.getElementById('raw-theme-text');
+        const timelineContainer = document.getElementById('theme-timeline');
+
+        if(rawTextEl && rawTextEl.innerText.trim() !== '') {
+            let text = rawTextEl.innerText;
+            let regex = /(Theme\s*\d+|Thema\s*lv\.?\s*\d+)/gi;
+
+            if(regex.test(text)) {
+                let formattedText = text.replace(regex, '|||$1');
+                let parts = formattedText.split('|||').filter(p => p.trim() !== '');
+
+                parts.forEach((part, index) => {
+                    let content = part.trim();
+                    let match = content.match(/^(Theme\s*\d+|Thema\s*lv\.?\s*\d+)\s*(?:->|:|-)?\s*(.*)/i);
+                    let label = match ? match[1] : `Activity ${index + 1}`;
+                    let desc = match ? match[2] : content;
+
+                    let card = document.createElement('div');
+                    card.style.cssText = 'background:rgba(0,0,0,0.25);border:1px solid rgba(16,185,129,0.2);padding:15px;border-radius:8px;display:flex;gap:15px;align-items:flex-start;transition:0.3s;margin-bottom:10px;';
+                    card.innerHTML = `
+                        <div style="background:rgba(16,185,129,0.15);color:#10b981;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <div style="color:#10b981;font-weight:bold;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">${label.toUpperCase()}</div>
+                            <div style="color:#e2e8f0;font-size:14px;line-height:1.5;">${desc}</div>
+                        </div>
+                    `;
+                    card.onmouseover = () => card.style.borderColor = 'rgba(16,185,129,0.5)';
+                    card.onmouseout  = () => card.style.borderColor = 'rgba(16,185,129,0.2)';
+                    timelineContainer.appendChild(card);
+                });
+            } else {
+                timelineContainer.innerHTML = `
+                    <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(16,185,129,0.2);padding:15px;border-radius:8px;display:flex;gap:15px;align-items:flex-start;">
+                        <div style="background:rgba(16,185,129,0.15);color:#10b981;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <div style="color:#10b981;font-weight:bold;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">ACTIVITY LOG</div>
+                            <div style="color:#e2e8f0;font-size:14px;line-height:1.5;">${text}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    });
+</script>
 {% endblock %}

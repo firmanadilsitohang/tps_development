@@ -194,19 +194,19 @@
 </div>
 
 <div class="panel-card" style="margin-bottom: 25px; border-left: 4px solid var(--accent-cyan); padding: 20px 30px;">
-    <h3 class="panel-header" style="margin-bottom: 15px;"><i class="fas fa-bullhorn" style="margin-right: 8px;"></i> Informasi & Pengumuman Terbaru</h3>
+    <h3 class="panel-header" style="margin-bottom: 15px;"><i class="fas fa-bullhorn" style="margin-right: 8px;"></i> Latest Information & Announcements</h3>
     <div class="widget-list">
         {% for news in news_events %}
         <div class="widget-item {% if news.target_type == 'specific' %}urgent{% endif %}">
             <div style="flex-grow: 1; padding-right: 20px;">
                 <span class="news-badge news-badge-{{ news.category | lower }}">{{ news.category }}</span>
                 {% if news.target_type == 'specific' %}
-                    <span class="news-badge news-badge-private"><i class="fas fa-envelope-open-text"></i> Pesan Khusus</span>
+                    <span class="news-badge news-badge-private"><i class="fas fa-envelope-open-text"></i> Special Message</span>
                 {% endif %}
                 
                 <h4 class="widget-item-title" style="margin-top: 5px;">{{ news.title }}</h4>
                 <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 5px 0;">
-                    <i class="far fa-clock" style="margin-right: 4px;"></i> Diterbitkan: {{ news.created_at.strftime('%d %b %Y, %H:%M') }}
+                    <i class="far fa-clock" style="margin-right: 4px;"></i> Published: {{ news.created_at.strftime('%d %b %Y, %H:%M') }}
                 </p>
                 <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">{{ news.content }}</div>
             </div>
@@ -214,7 +214,7 @@
         {% else %}
         <div style="text-align: center; padding: 10px;">
             <i class="far fa-bell-slash" style="font-size: 20px; color: #475569; margin-bottom: 8px; display: block;"></i>
-            <p style="color: #64748b; font-size: 12px; margin: 0;">Belum ada pengumuman terbaru untuk Anda saat ini.</p>
+            <p style="color: #64748b; font-size: 12px; margin: 0;">No latest announcements for you at the moment.</p>
         </div>
         {% endfor %}
     </div>
@@ -244,7 +244,7 @@
         {% if show_evaluation %}
         <div class="spider-panel" style="margin-top: 25px; background: rgba(0,0,0,0.4); border-color: rgba(10, 116, 255, 0.2);">
             <h4 style="font-family:'Oswald'; font-size:12px; color:#fff; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
-                <span><i class="fas fa-chart-radar me-2 text-info"></i> EVALUASI KOMPETENSI</span>
+                <span><i class="fas fa-chart-radar me-2 text-info"></i> COMPETENCY EVALUATION</span>
                 <span style="font-size:9px; color:var(--text-muted);">OMDD ASSESS</span>
             </h4>
             <div class="spider-container" style="height: 200px;">
@@ -256,22 +256,22 @@
                 </div>
             {% else %}
                 <div style="margin-top: 12px; font-size: 10px; color: #475569; font-style: italic; text-align: center;">
-                    <i class="fas fa-hourglass-half me-1"></i> Menunggu penilaian OMDD
+                    <i class="fas fa-hourglass-half me-1"></i> Awaiting OMDD assessment
                 </div>
             {% endif %}
         </div>
         {% endif %}
         
         <div style="margin-top: 20px;">
-            <button onclick="openEditModal()" class="btn-sm" style="width: 100%;"><i class="fas fa-user-edit"></i> Edit Data Profil</button>
+            <button onclick="openEditModal()" class="btn-sm" style="width: 100%;"><i class="fas fa-user-edit"></i> Edit Profile Data</button>
         </div>
     </div>
 
     <div class="panel-card">
-        <h3 class="panel-header">Informasi Kompetensi & Profil</h3>
+        <h3 class="panel-header">Competency & Profile Information</h3>
         <div class="info-grid">
             <div class="info-item">
-                <label>Area Kerja / Plant</label>
+                <label>Work Area / Plant</label>
                 <div>{{ employee.plant.name if employee and employee.plant else '-' }}</div>
             </div>
             <div class="info-item">
@@ -280,7 +280,7 @@
             </div>
             
             <div class="info-item">
-                <label>Level TPS Saat Ini</label>
+                <label>Current TPS Level</label>
                 {% set check_lvl = employee.current_tps_level | string | upper if employee else '' %}
                 {% if 'KEY PERSON 4' in check_lvl or 'KP 4' in check_lvl or 'KP4' in check_lvl %}
                     <div class="badge-gold">{{ employee.current_tps_level }}</div>
@@ -289,27 +289,27 @@
                 {% endif %}
             </div>
             <div class="info-item">
-                <label>Tema Aktivitas Terakhir</label>
-                <div>{{ employee.last_activity_theme if employee and employee.last_activity_theme else 'Belum ada data aktivitas' }}</div>
+                <label>Last Activity Theme</label>
+                <div>{{ employee.last_activity_theme if employee and employee.last_activity_theme else 'No activity data yet' }}</div>
             </div>
 
             <div class="info-item">
-                <label>Usia Saat Ini</label>
+                <label>Current Age</label>
                 <div>
                     {% if umur %}
-                        {{ umur }} Tahun
+                        {{ umur }} Yrs
                     {% else %}
-                        <span style="color: #ef4444; font-size: 11px; font-style: italic;"><i class="fas fa-exclamation-circle"></i> Belum diatur</span>
+                        <span style="color: #ef4444; font-size: 11px; font-style: italic;"><i class="fas fa-exclamation-circle"></i> Not set</span>
                     {% endif %}
                 </div>
             </div>
             <div class="info-item">
-                <label>Estimasi Tahun Pensiun</label>
+                <label>Estimated Retirement Year</label>
                 <div>
                     {% if tahun_pensiun %}
-                        {{ tahun_pensiun }} <span style="font-size: 10px; color: var(--text-muted);">(Usia 55)</span>
+                        {{ tahun_pensiun }} <span style="font-size: 10px; color: var(--text-muted);">(Age 55)</span>
                     {% else %}
-                        <span style="color: #ef4444; font-size: 11px; font-style: italic;"><i class="fas fa-exclamation-circle"></i> Belum diatur</span>
+                        <span style="color: #ef4444; font-size: 11px; font-style: italic;"><i class="fas fa-exclamation-circle"></i> Not set</span>
                     {% endif %}
                 </div>
             </div>
@@ -322,7 +322,7 @@
 
 <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
     <div class="panel-card">
-        <h3 class="panel-header"><i class="fas fa-calendar-alt me-2"></i> Jadwal Training & Workshop</h3>
+        <h3 class="panel-header"><i class="fas fa-calendar-alt me-2"></i> Training & Workshop Schedule</h3>
         <div class="widget-list">
             {% for t in trainings %}
             <div class="widget-item">
@@ -345,14 +345,14 @@
             {% else %}
             <div style="text-align: center; padding: 20px; color: var(--text-muted);">
                 <i class="fas fa-calendar-times mb-2 d-block" style="font-size: 24px;"></i>
-                <p style="font-size: 12px;">Belum ada jadwal pelatihan terdekat.</p>
+                <p style="font-size: 12px;">No upcoming training schedule.</p>
             </div>
             {% endfor %}
         </div>
     </div>
 
     <div class="panel-card">
-        <h3 class="panel-header"><i class="fas fa-book-open me-2"></i> Modul Pembelajaran Terbaru</h3>
+        <h3 class="panel-header"><i class="fas fa-book-open me-2"></i> Latest Learning Modules</h3>
         <div>
             {% for mod in recent_modules %}
             <a href="{{ url_for('participant.modules') }}" class="module-card">
@@ -361,18 +361,18 @@
                 </div>
                 <div style="flex-grow: 1;">
                     <div style="color: #fff; font-size: 13px; font-weight: 600; margin-bottom: 2px;">{{ mod.title }}</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Diterbitkan: {{ mod.created_at.strftime('%d %b %Y') }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Published: {{ mod.created_at.strftime('%d %b %Y') }}</div>
                 </div>
                 <div style="color: var(--accent-cyan); font-size: 16px;">
                     <i class="fas fa-chevron-right"></i>
                 </div>
             </a>
             {% else %}
-            <p style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">Belum ada modul yang diunggah.</p>
+            <p style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">No modules uploaded yet.</p>
             {% endfor %}
             {% if recent_modules %}
             <div class="text-center mt-3">
-                <a href="{{ url_for('participant.modules') }}" class="btn-sm" style="width: 100%; text-align: center;">Lihat Semua Modul</a>
+                <a href="{{ url_for('participant.modules') }}" class="btn-sm" style="width: 100%; text-align: center;">View All Modules</a>
             </div>
             {% endif %}
         </div>
@@ -380,7 +380,7 @@
 </div>
 
 <div class="panel-card" style="margin-top: 25px;">
-    <h3 class="panel-header"><i class="fas fa-tasks" style="margin-right: 8px;"></i> Progres Aktivitas (Kaizen) Terbaru</h3>
+    <h3 class="panel-header"><i class="fas fa-tasks" style="margin-right: 8px;"></i> Latest Activity (Kaizen) Progress</h3>
     <div class="widget-list">
         {% for activity in activities %}
         <div class="widget-item">
@@ -388,10 +388,10 @@
                 <h4 class="widget-item-title">{{ activity.theme_title }}</h4>
                 <p style="font-size: 11px; color: var(--accent-gold); margin: 0;">STATUS: {{ activity.status | upper }}</p>
             </div>
-            <a href="{{ url_for('participant.activity') }}" class="btn-sm">Detail Aktivitas</a>
+            <a href="{{ url_for('participant.activity') }}" class="btn-sm">Activity Details</a>
         </div>
         {% else %}
-        <p style="color: #64748b; font-size: 12px; margin: 0; padding: 10px; text-align: center;">Belum ada aktivitas yang berjalan.</p>
+        <p style="color: #64748b; font-size: 12px; margin: 0; padding: 10px; text-align: center;">No active activities.</p>
         {% endfor %}
     </div>
 </div>
@@ -400,21 +400,21 @@
     <div class="modal-content">
         <span class="close-btn" onclick="closeEditModal()"><i class="fas fa-times"></i></span>
         <h3 style="color: #fff; font-family: 'Oswald'; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;">
-            <i class="fas fa-user-cog" style="margin-right: 8px;"></i> Perbarui Profil
+            <i class="fas fa-user-cog" style="margin-right: 8px;"></i> Update Profile
         </h3>
         
         <form action="{{ url_for('participant.update_profile') }}" method="POST">
-            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">NAMA LENGKAP</label>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">FULL NAME</label>
             <input type="text" name="name" class="form-input-dark" value="{{ employee.name }}" required>
 
-            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">TANGGAL LAHIR (Tentukan Usia & Pensiun)</label>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">DATE OF BIRTH (Determines Age & Retirement)</label>
             <input type="date" name="birth_date" class="form-input-dark" value="{{ employee.birth_date.strftime('%Y-%m-%d') if employee.birth_date else '' }}" required>
 
-            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">TEMA AKTIVITAS TERAKHIR</label>
-            <input type="text" name="last_activity_theme" class="form-input-dark" value="{{ employee.last_activity_theme if employee.last_activity_theme else '' }}" placeholder="Contoh: Pengurangan Defect Area A">
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">LAST ACTIVITY THEME</label>
+            <input type="text" name="last_activity_theme" class="form-input-dark" value="{{ employee.last_activity_theme if employee.last_activity_theme else '' }}" placeholder="Example: Defect Reduction Area A">
 
             <button type="submit" style="width: 100%; background: linear-gradient(135deg, #0A74FF 0%, #0356C5 100%); color: #fff; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                SIMPAN PERUBAHAN
+                SAVE CHANGES
             </button>
         </form>
     </div>
@@ -438,20 +438,21 @@
         
         // Default ke 0 jika data evaluasi belum ada
         const dataValues = [
-            {{ latest_eval.score_genba if latest_eval else 0 }},
-            {{ latest_eval.score_problem_solving if latest_eval else 0 }},
-            {{ latest_eval.score_observasi if latest_eval else 0 }},
-            {{ latest_eval.score_kaizen if latest_eval else 0 }},
-            {{ latest_eval.score_implementation if latest_eval else 0 }},
-            {{ latest_eval.score_presentation if latest_eval else 0 }}
+            {{ latest_eval.ws_1 if latest_eval else 0 }},
+            {{ latest_eval.ws_2 if latest_eval else 0 }},
+            {{ latest_eval.ws_3 if latest_eval else 0 }},
+            {{ latest_eval.ws_4 if latest_eval else 0 }},
+            {{ latest_eval.ws_5 if latest_eval else 0 }},
+            {{ latest_eval.ws_6 if latest_eval else 0 }},
+            {{ latest_eval.ws_7 if latest_eval else 0 }}
         ];
 
         new Chart(ctx, {
             type: 'radar',
             data: {
-                labels: ['Genba', 'Prob. Solving', 'Observation', 'Kaizen', 'Implementation', 'Presentation'],
+                labels: ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4', 'Workshop 5', 'Workshop 6', 'Workshop 7'],
                 datasets: [{
-                    label: 'Skor Saya',
+                    label: 'My Score',
                     data: dataValues,
                     backgroundColor: 'rgba(0, 210, 255, 0.2)',
                     borderColor: '#00d2ff',

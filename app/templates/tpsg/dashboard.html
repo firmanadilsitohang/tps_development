@@ -33,8 +33,8 @@
         display: flex;
         flex-direction: column;
         /* Mengatur elemen di dalamnya tersusun atas-bawah */
-        gap: 20px;
-        /* Jarak antara Ticker dan Judul */
+        gap: 10px;
+        /* Jarak antara Ticker dan Judul dikurangi agar lebih rapat */
     }
 
     /* --- NEW RUNNING TEXT (TICKER) MENYERUPAI GAMBAR REFERENSI --- */
@@ -56,9 +56,9 @@
         color: #000;
         font-family: 'Oswald', sans-serif;
         font-weight: 700;
-        padding: 4px 15px;
+        padding: 2px 12px;
         border-radius: 4px;
-        margin-right: 15px;
+        margin-right: 12px;
         white-space: nowrap;
         letter-spacing: 1px;
         box-shadow: 0 0 10px var(--neon-blue);
@@ -77,8 +77,9 @@
         padding-left: 100%;
         animation: ticker 35s linear infinite;
         font-family: 'Inter', sans-serif;
-        font-size: 14px;
+        font-size: 20px;
         color: #ccd6f6;
+        font-weight: 700;
     }
 
     .ticker-text:hover {
@@ -181,6 +182,100 @@
     .col-12 {
         grid-column: span 12;
     }
+
+    /* --- NEW PREMIUM STAT CARDS --- */
+    .stat-card-premium {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(0, 210, 255, 0.05);
+        border: 2px solid rgba(0, 210, 255, 0.2);
+        border-radius: 12px;
+        padding: 15px 20px;
+        transition: all 0.3s ease;
+        width: 250px; /* Fixed width to prevent stretching */
+        flex-shrink: 0;
+    }
+
+    .stat-card-premium:hover {
+        background: rgba(0, 210, 255, 0.1);
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .stat-card-pending {
+        background: rgba(255, 159, 67, 0.05);
+        border: 2px solid rgba(255, 159, 67, 0.3);
+    }
+
+    .stat-card-pending:hover {
+        background: rgba(255, 159, 67, 0.1);
+        border-color: #FF9F43;
+        box-shadow: 0 0 20px rgba(255, 159, 67, 0.2);
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: #8b949e;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        line-height: 1.2;
+    }
+
+    .stat-value {
+        font-family: 'Oswald', sans-serif;
+        font-size: 32px;
+        color: #fff;
+        line-height: 1;
+    }
+
+    /* --- UNIFIED CLOCK CONTAINER --- */
+    .unified-clock-container {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 210, 255, 0.2);
+        border-radius: 15px;
+        padding: 15px 30px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        margin-top: 10px;
+        width: fit-content; /* Make it compact */
+        max-width: 100%;
+    }
+
+    .clock-icon-box {
+        background: rgba(0, 210, 255, 0.1);
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+    }
+
+    .clock-info-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+    .stat-mini-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        padding: 8px 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        min-width: 180px;
+    }
 </style>
 {% endblock %}
 
@@ -195,49 +290,66 @@
             </div>
             <div class="ticker-wrapper">
                 <div class="ticker-text">
-                    <span class="tag-tpsg">[TPS-G]</span> Selamat kepada Batch 11 atas pencapaian persentase kelulusan
-                    95% pada sertifikasi KP 3. Terus tingkatkan performa!
+                    <span class="tag-tpsg">[TPS-G]</span> Congratulations to Batch 11 for achieving a 95% passing rate in KP 3 certification. Keep up the performance!
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <span class="tag-omdd">[OMDD]</span> PERHATIAN: Persiapan Audit Eksternal akan dilaksanakan pada
-                    minggu ke-3 bulan depan. Mohon setiap Plant Area mempersiapkan dokumen standar 5R.
+                    <span class="tag-omdd">[OMDD]</span> ATTENTION: External Audit preparation will be held in the 3rd week of next month. Please ensure each Plant Area prepares standard 5S documents.
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <span class="tag-tpsg">[TPS-G]</span> Jadwal Workshop TPS Advance untuk level Supervisor akan dibuka
-                    pendaftarannya mulai Senin depan melalui portal Internal.
+                    <span class="tag-tpsg">[TPS-G]</span> TPS Advance Workshop schedule for Supervisor level will be open for registration starting next Monday through the Internal portal.
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <span class="tag-omdd">[OMDD]</span> Pencapaian target produksi keseluruhan Plant Area mencapai 102%
-                    dari rencana bulan ini. Excellent Work!
+                    <span class="tag-omdd">[OMDD]</span> Overall production target achievement for all Plant Areas reached 102% of this month's plan. Excellent Work!
                 </div>
             </div>
         </div>
 
-        <!-- COMPACT STAT CARDS (TOTAL & PENDING) RIGHT-ALIGNED -->
-        <div style="display: flex; flex-direction: row; justify-content: flex-end; gap: 15px; width: 100%; margin-top: -5px;">
-            <div style="display: flex; align-items: center; gap: 10px; background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 8px; padding: 6px 16px;">
-                <span style="font-size: 10px; color: #8b949e; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">TOTAL PARTICIPANTS</span>
-                <span style="font-family: 'Oswald'; font-size: 18px; color: #fff; line-height: 1;">{{ total_count }}</span>
+        <!-- ROW 2: UNIFIED CLOCK + STATS INTEGRATED -->
+        <div class="unified-clock-container" style="margin-top: 5px; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 30px !important;">
+            
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="clock-icon-box">
+                    <i class="fas fa-clock" style="font-size: 28px; color: var(--neon-blue);"></i>
+                </div>
+                <div class="clock-info-box" style="min-width: 200px;">
+                    <div id="liveClock" style="font-family: 'Oswald'; font-size: 48px; color: var(--neon-green); letter-spacing: 4px; line-height: 1; text-shadow: 0 0 20px rgba(57, 255, 20, 0.4);">00:00:00</div>
+                    <div id="liveDate" style="font-size: 14px; font-weight: 700; color: #ccd6f6; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; opacity: 0.9;">LOADING...</div>
+                </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px; background: rgba(255, 159, 67, 0.05); border: 1px solid rgba(255, 159, 67, 0.3); border-radius: 8px; padding: 6px 16px;">
-                <span style="font-size: 10px; color: #8b949e; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">PENDING APPROVAL</span>
-                <span style="font-family: 'Oswald'; font-size: 18px; color: #FF9F43; line-height: 1;">{{ pending_count }}</span>
+
+            <!-- Integrated Stats (Strictly Horizontal Row) -->
+            <div style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 15px !important; margin-left: auto;">
+                
+                <div class="stat-mini-card" style="display: flex !important; flex-direction: row !important; align-items: center !important;">
+                    <div class="clock-icon-box" style="width: 35px; height: 35px; background: rgba(0, 210, 255, 0.05); flex-shrink: 0;">
+                        <i class="fas fa-users" style="font-size: 14px; color: var(--neon-blue);"></i>
+                    </div>
+                    <div style="margin-left: 12px;">
+                        <div class="stat-label" style="font-size: 9px; letter-spacing: 1px; white-space: nowrap;">TOTAL PARTICIPANTS</div>
+                        <div class="stat-value" style="font-size: 22px;">{{ total_count }}</div>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('tpsg.employees', status='pending') }}" class="stat-mini-card" style="text-decoration: none; border-color: rgba(255, 159, 67, 0.3); display: flex !important; flex-direction: row !important; align-items: center !important;">
+                    <div class="clock-icon-box" style="width: 35px; height: 35px; background: rgba(255, 159, 67, 0.05); border-color: rgba(255, 159, 67, 0.2); flex-shrink: 0;">
+                        <i class="fas fa-user-clock" style="font-size: 14px; color: #FF9F43;"></i>
+                    </div>
+                    <div style="margin-left: 12px;">
+                        <div class="stat-label" style="font-size: 9px; letter-spacing: 1px; color: #FF9F43; white-space: nowrap;">PENDING APPROVAL</div>
+                        <div class="stat-value" style="font-size: 22px; color: #FF9F43;">{{ pending_count }}</div>
+                    </div>
+                    <i class="fas fa-chevron-right ms-2" style="color: #FF9F43; font-size: 10px; opacity: 0.5;"></i>
+                </a>
+
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center w-100 flex-wrap mt-1">
-            <!-- Title Section -->
-            <div class="d-flex align-items-center gap-3">
-                <div class="header-icon">
-                    <i class="fas fa-radar" style="font-size: 28px; color: var(--neon-blue);"></i>
-                </div>
+        <!-- ROW 3: PAGE TITLES (Condensed) -->
+        <div class="w-100" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+            <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="page-title">EXECUTIVE COMMAND CENTER</h1>
-                    <p class="text-secondary m-0" style="font-size: 12px; letter-spacing: 2px;">STRATEGIC MANPOWER DISTRIBUTION & RISK ANALYTICS</p>
+                    <h1 class="page-title" style="font-size: 24px; margin: 0; color: #fff; opacity: 0.9;">TPS-G OPERATIONAL HUB</h1>
                 </div>
-            </div>
-
-            <!-- Clock Section -->
-            <div class="text-end ps-2">
-                <div id="liveClock" style="font-family: 'Oswald'; font-size: 24px; color: var(--neon-green); letter-spacing: 2px; line-height: 1;">00:00:00</div>
-                <div id="liveDate" class="text-secondary mt-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; line-height: 1;">MEMUAT...</div>
+                <div class="d-none d-lg-block text-end">
+                    <span class="badge bg-primary px-3 py-1" style="font-family: 'Oswald'; letter-spacing: 1px; font-size: 10px;">TPS G-ADMIN MODE</span>
+                </div>
             </div>
         </div>
 
@@ -273,27 +385,65 @@
     </style>
 
     <div class="dashboard-grid">
-        <!-- WELCOME BANNER -->
+        <!-- WELCOME BANNER ULTIMATE DESIGN -->
         <div class="col-12">
-            <div class="glass-panel" style="min-height: 550px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(0, 210, 255, 0.05), rgba(11, 16, 25, 0.95)); border: 1px solid rgba(0, 210, 255, 0.2); text-align: center; position: relative; overflow: hidden;">
-                <!-- Decorative background elements -->
-                <div style="position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,210,255,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-                <div style="position: absolute; bottom: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,210,255,0.05) 0%, transparent 70%); border-radius: 50%;"></div>
+            <div class="glass-panel" style="min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), rgba(11, 16, 25, 0.99)); border: 1px solid rgba(0, 210, 255, 0.3); text-align: center; position: relative; overflow: hidden; margin-top: -10px; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.8);">
                 
-                <h1 class="welcome-title">WELCOME TO TPS-G</h1>
-                <p class="welcome-subtitle">
-                    With Hitozukuri & Monozukuri for Best Company
-                </p>
-                <div style="margin-top: 60px; opacity: 0.8; animation: fadeInUp 1s ease-out 0.6s forwards;">
-                    <i class="fas fa-network-wired" style="font-size: 4rem; color: rgba(0, 210, 255, 0.6);"></i>
+                <!-- Advanced Background Effects -->
+                <div style="position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,210,255,0.2) 0%, transparent 70%); border-radius: 50%; filter: blur(60px); animation: float 10s infinite alternate;"></div>
+                <div style="position: absolute; bottom: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,0,160,0.1) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); animation: float 15s infinite alternate-reverse;"></div>
+
+                <div style="z-index: 5;">
+                    <div style="font-family: 'Inter'; font-weight: 800; font-size: 18px; color: var(--neon-blue); letter-spacing: 12px; text-transform: uppercase; margin-bottom: 20px; animation: fadeInUp 0.8s ease-out both; text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);">
+                        WELCOME to
+                    </div>
+                    
+                    <h1 style="font-family: 'Oswald'; font-size: 6.5rem; color: #fff; letter-spacing: 8px; margin-bottom: 10px; line-height: 0.9; animation: fadeInUp 1s ease-out 0.2s both; text-shadow: 0 0 30px rgba(255,255,255,0.2);">
+                        TPS<span style="color: #FF0000; text-shadow: 0 0 25px rgba(255,0,0,0.8);">-</span><span style="color: #FF0000; text-shadow: 0 0 30px rgba(255,0,0,0.9); font-weight: 800;">G</span>
+                    </h1>
+                    
+                    <div style="height: 4px; width: 160px; background: linear-gradient(90deg, transparent, var(--neon-blue), transparent); margin: 30px auto; animation: expandWidth 1.5s ease-out 0.5s both;"></div>
+
+                    <h2 style="font-family: 'Oswald'; font-size: 4.8rem; color: #fff; letter-spacing: 1px; font-weight: 500; margin-bottom: 25px; text-transform: uppercase; animation: fadeInUp 1.2s ease-out 0.4s both; line-height: 1; white-space: nowrap;">
+                        <span style="color: var(--neon-green); font-weight: 800; text-shadow: 0 0 30px rgba(57, 255, 20, 0.7);">HITOZUKURI</span> FIRST, 
+                        <span style="color: var(--neon-blue); font-weight: 800; text-shadow: 0 0 30px rgba(0, 210, 255, 0.7);">MONOZUKURI</span> ALWAYS
+                    </h2>
+
+                    <p style="font-family: 'Inter'; font-size: 1.8rem; font-weight: 600; color: #ccd6f6; letter-spacing: 5px; font-style: italic; opacity: 0.9; animation: fadeInUp 1.4s ease-out 0.6s both;">
+                        "Refining People, Mastering Processes"
+                    </p>
                 </div>
+
+                <!-- Glass Reflection Effect -->
+                <div style="position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(120deg, transparent, rgba(255,255,255,0.05), transparent); transform: skewX(-25deg); animation: shimmer 6s infinite;"></div>
             </div>
         </div>
+
+        <style>
+            @keyframes float {
+                from { transform: translate(0, 0); }
+                to { transform: translate(30px, 30px); }
+            }
+            @keyframes expandWidth {
+                from { width: 0; opacity: 0; }
+                to { width: 120px; opacity: 1; }
+            }
+            @keyframes shimmer {
+                0% { left: -100%; }
+                20% { left: 150%; }
+                100% { left: 150%; }
+            }
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        </style>
+
+
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
 <script>
     // --- LIVE CLOCK SCRIPT ---
@@ -302,10 +452,12 @@
         const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
         const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-        document.getElementById('liveClock').textContent = now.toLocaleTimeString('id-ID', optionsTime);
-        document.getElementById('liveDate').textContent = now.toLocaleDateString('id-ID', optionsDate);
+        document.getElementById('liveClock').textContent = now.toLocaleTimeString('en-US', optionsTime);
+        document.getElementById('liveDate').textContent = now.toLocaleDateString('en-US', optionsDate);
     }
     setInterval(updateClock, 1000);
     updateClock();
 </script>
+
+
 {% endblock %}

@@ -316,8 +316,8 @@
 {% block content %}
 <div id="loadingOverlay">
     <div class="loader-rings"></div>
-    <div class="loading-text">MEMPROSES DATA EXCEL</div>
-    <div class="loading-subtext">Menyinkronkan Database Sistem... Mohon Tunggu.</div>
+    <div class="loading-text">PROCESSING EXCEL DATA</div>
+    <div class="loading-subtext">Synchronizing System Database... Please Wait.</div>
 </div>
 
 <div class="upload-card">
@@ -325,16 +325,16 @@
         <div class="icon-container">
             <i class="fas fa-file-excel"></i>
         </div>
-        <h2 class="card-title">IMPORT DATA MASSAL</h2>
-        <p style="color: #8b949e; font-size: 14px; margin-top: 8px;">Upload file mentahan (.xlsx / .csv) untuk
-            mendaftarkan partisipan ke dalam sistem.</p>
+        <h2 class="card-title">BULK DATA IMPORT</h2>
+        <p style="color: #8b949e; font-size: 14px; margin-top: 8px;">Upload raw files (.xlsx / .csv) to
+            register participants into the system.</p>
     </div>
 
     <form id="importForm" action="{{ url_for('tpsg.import_excel') }}" method="POST" enctype="multipart/form-data">
 
         <div class="file-drop-area" id="dropArea">
-            <span class="fake-btn"><i class="fas fa-search me-2"></i> Pilih File Excel</span>
-            <span class="file-msg" id="fileMessage">atau drag & drop file ke area ini</span>
+            <span class="fake-btn"><i class="fas fa-search me-2"></i> Select Excel File</span>
+            <span class="file-msg" id="fileMessage">or drag & drop file to this area</span>
             <input type="file" name="file" id="fileInput" class="file-input"
                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                 required>
@@ -343,14 +343,14 @@
         <div class="alert-automation">
             <i class="fas fa-robot text-warning"
                 style="font-size: 18px; margin-right: 12px; color: var(--neon-gold);"></i>
-            <span><strong>Otomasi Sistem:</strong> Akun login akan dibuatkan otomatis dengan password standard:
+            <span><strong>System Automation:</strong> Login accounts will be automatically created with a standard password:
                 <code>tmmin123</code></span>
         </div>
 
         <div class="btn-action-group">
-            <a href="{{ url_for('tpsg.employees') }}" class="btn-cancel">BATAL</a>
+            <a href="{{ url_for('tpsg.employees') }}" class="btn-cancel">CANCEL</a>
             <button type="submit" class="btn-submit" id="submitBtn">
-                <i class="fas fa-cloud-upload-alt"></i> EKSEKUSI IMPORT
+                <i class="fas fa-cloud-upload-alt"></i> EXECUTE IMPORT
             </button>
         </div>
     </form>
@@ -370,10 +370,10 @@
         fileInput.addEventListener('change', function () {
             if (fileInput.files.length > 0) {
                 const fileName = fileInput.files[0].name;
-                fileMessage.innerHTML = `<span style="color: #10b981; font-weight: 700;"><i class="fas fa-file-check me-1"></i> File terpilih: ${fileName}</span>`;
+                fileMessage.innerHTML = `<span style="color: #10b981; font-weight: 700;"><i class="fas fa-file-check me-1"></i> Selected file: ${fileName}</span>`;
                 dropArea.classList.add('active');
             } else {
-                fileMessage.innerHTML = "atau drag & drop file ke area ini";
+                fileMessage.innerHTML = "or drag & drop file to this area";
                 dropArea.classList.remove('active');
             }
         });
@@ -386,7 +386,7 @@
                 document.getElementById('loadingOverlay').style.display = 'flex';
 
                 // Ubah state tombol
-                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> MENGUNGGAH...';
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> UPLOADING...';
                 submitBtn.style.opacity = '0.8';
                 submitBtn.style.pointerEvents = 'none';
 

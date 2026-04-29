@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Database Partisipan | Management{% endblock %}
+{% block title %}Participant Database | Management{% endblock %}
 
 {% block extra_css %}
 <link
@@ -410,29 +410,29 @@
     <div class="premium-header">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="page-title"><i class="fas fa-users-cog me-2 text-info"></i> DATABASE PARTISIPAN (MONITORING)
+                <h1 class="page-title"><i class="fas fa-users-cog me-2 text-info"></i> PARTICIPANT DATABASE (MONITORING)
                 </h1>
-                <p class="text-muted small mt-2">Executive Overview: Organisasi, Kualifikasi, dan Risiko Pensiun</p>
+                <p class="text-muted small mt-2">Executive Overview: Organization, Qualification, and Retirement Risk</p>
             </div>
             <div class="text-end">
-                <div class="text-muted small">Total Partisipan</div>
+                <div class="text-muted small">Total Participants</div>
                 <div class="fs-4 fw-bold text-white" id="totalCount">{{ employees|length }}</div>
             </div>
         </div>
 
         <div class="filter-section">
-            <input type="text" id="nameSearch" class="filter-box" placeholder="Cari Nama atau NIK...">
+            <input type="text" id="nameSearch" class="filter-box" placeholder="Search Name or NIK...">
             <select id="filterArea" class="filter-box">
-                <option value="">-- Semua Area --</option>
+                <option value="">-- All Areas --</option>
             </select>
             <select id="filterDivisi" class="filter-box">
-                <option value="">-- Semua Divisi --</option>
+                <option value="">-- All Divisions --</option>
             </select>
             <select id="filterDept" class="filter-box">
-                <option value="">-- Semua Departemen --</option>
+                <option value="">-- All Departments --</option>
             </select>
             <select id="filterLevel" class="filter-box">
-                <option value="">-- Semua Level --</option>
+                <option value="">-- All Levels --</option>
                 <option value="4">TPS KP 4</option>
                 <option value="3">TPS KP 3</option>
                 <option value="ADVANCE">TPS ADVANCE</option>
@@ -455,13 +455,13 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th class="text-center">FOTO</th>
-                        <th>PROFIL PARTISIPAN</th>
-                        <th>ORGANISASI</th>
+                        <th class="text-center">PHOTO</th>
+                        <th>PARTICIPANT PROFILE</th>
+                        <th>ORGANIZATION</th>
                         <th class="text-center">TPS LEVEL</th>
-                        <th class="text-center">UMUR</th>
-                        <th class="text-center">PENSIUN</th>
-                        <th class="text-center">AKSI</th>
+                        <th class="text-center">AGE</th>
+                        <th class="text-center">RETIREMENT</th>
+                        <th class="text-center">ACTION</th>
                     </tr>
                 </thead>
                 <tbody id="empTableBody">
@@ -544,36 +544,36 @@
         <button class="close-panel" onclick="closeDetail()"><i class="fas fa-times"></i></button>
     </div>
     <div class="detail-body">
-        <div class="section-label mb-3">Informasi Pribadi</div>
+        <div class="section-label mb-3">Personal Information</div>
         <div class="info-card">
             <div class="info-grid">
-                <div class="info-item"><label>Umur</label><span id="detAge">-</span></div>
-                <div class="info-item"><label>Tahun Pensiun</label><span id="detRet">-</span></div>
-                <div class="info-item"><label>Jabatan</label><span id="detPos">-</span></div>
-                <div class="info-item"><label>Level TPS</label><span id="detLevel">-</span></div>
+                <div class="info-item"><label>Age</label><span id="detAge">-</span></div>
+                <div class="info-item"><label>Retirement Year</label><span id="detRet">-</span></div>
+                <div class="info-item"><label>Position</label><span id="detPos">-</span></div>
+                <div class="info-item"><label>TPS Level</label><span id="detLevel">-</span></div>
             </div>
             <hr style="border-color: var(--border-dark); margin: 15px 0;">
             <div class="info-grid">
                 <div class="info-item"><label>Plant / Area</label><span id="detPlant">-</span></div>
-                <div class="info-item"><label>Divisi</label><span id="detDiv">-</span></div>
-                <div class="info-item"><label>Departemen</label><span id="detDept">-</span></div>
+                <div class="info-item"><label>Division</label><span id="detDiv">-</span></div>
+                <div class="info-item"><label>Department</label><span id="detDept">-</span></div>
             </div>
         </div>
 
-        <div class="section-label mb-3">Evaluasi OMDD (Workshop)</div>
+        <div class="section-label mb-3">OMDD Evaluation (Workshop)</div>
         <div id="detAssessment" class="info-card">
             <!-- Assessment scores will be injected here -->
-            <div class="text-center text-muted py-3 small">Tidak ada data evaluasi OMDD</div>
+            <div class="text-center text-muted py-3 small">No OMDD evaluation data</div>
         </div>
 
-        <div class="section-label mb-3 mt-4">Historis Tema (Pass Theme)</div>
+        <div class="section-label mb-3 mt-4">Theme History (Pass Theme)</div>
         <div id="detPassThemes" class="theme-container mb-4">
-            <div class="text-muted small">Belum ada history tema</div>
+            <div class="text-muted small">No theme history</div>
         </div>
 
-        <div class="section-label mb-3">Tema Activity (Current Theme)</div>
+        <div class="section-label mb-3">Theme Activity (Current Theme)</div>
         <div id="detCurrentThemes" class="theme-container mb-4">
-            <div class="text-muted small">Tidak ada activity berjalan</div>
+            <div class="text-muted small">No active activities</div>
         </div>
     </div>
 </div>
@@ -665,7 +665,7 @@
                 .then(data => {
                     if (data.error) {
                         console.error("Server error:", data.error);
-                        alert("Gagal memuat data: " + data.error);
+                        alert("Failed to load data: " + data.error);
                         return;
                     }
                     // ✅ Set onerror BEFORE src to guarantee fallback works
@@ -674,7 +674,7 @@
                     photoEl.src = getPhotoUrl(data.photo);
                     document.getElementById('detName').textContent = data.name;
                     document.getElementById('detNIK').textContent = data.username;
-                    document.getElementById('detAge').textContent = data.age + ' Tahun';
+                    document.getElementById('detAge').textContent = data.age + ' Years';
                     document.getElementById('detRet').textContent = data.retirement_year;
                     document.getElementById('detPos').textContent = data.position;
                     document.getElementById('detLevel').textContent = data.level;
@@ -699,8 +699,8 @@
                                 ${hasData
                                     ? `<span class="badge ${ws.decision === 'PASS' ? 'bg-success' : 'bg-danger'}">${ws.decision}</span>
                                        <span class="small text-muted">${ws.date}</span>`
-                                    : `<span class="small text-muted">Belum ada data evaluasi OMDD</span>
-                                       <span class="small text-muted" style="font-style:italic;">Spider chart kosong</span>`
+                                    : `<span class="small text-muted">No OMDD evaluation data available</span>
+                                       <span class="small text-muted" style="font-style:italic;">Empty spider chart</span>`
                                 }
                             </div>
                             <div id="detSpiderChartWrap">
@@ -759,7 +759,7 @@
 
                         // Pass Themes
                         const passDiv = document.getElementById('detPassThemes');
-                        passDiv.innerHTML = data.pass_themes.length ? '' : '<div class="text-muted small">Belum ada history tema</div>';
+                        passDiv.innerHTML = data.pass_themes.length ? '' : '<div class="text-muted small">No theme history available</div>';
                         data.pass_themes.forEach(t => {
                             passDiv.innerHTML += `
                                 <div class="theme-item pass">
@@ -774,7 +774,7 @@
 
                         // Current Themes
                         const currDiv = document.getElementById('detCurrentThemes');
-                        currDiv.innerHTML = data.current_themes.length ? '' : '<div class="text-muted small">Tidak ada activity berjalan</div>';
+                        currDiv.innerHTML = data.current_themes.length ? '' : '<div class="text-muted small">No active activities found</div>';
                         data.current_themes.forEach(t => {
                             currDiv.innerHTML += `
                                 <div class="theme-item current">

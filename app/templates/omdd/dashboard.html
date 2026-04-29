@@ -800,7 +800,7 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;♦&nbsp;&nbsp;&nbsp;&nbsp;
                     TOTAL PARTICIPANTS: {{ stats.total_karyawan }} — ACTIVE KAIZEN: {{ stats.total_kaizen }}
                     &nbsp;&nbsp;&nbsp;&nbsp;♦&nbsp;&nbsp;&nbsp;&nbsp;
-                    TUGAS MENUNGGU PENILAIAN: {{ stats.pending_review }}
+                    TASKS AWAITING EVALUATION: {{ stats.pending_review }}
                 </div>
             </div>
         </div>
@@ -831,7 +831,7 @@
             <!-- Clock Section -->
             <div class="text-end ps-2">
                 <div id="liveClock" style="font-family: 'Oswald'; font-size: 24px; color: var(--neon-green); letter-spacing: 2px; line-height: 1;">00:00:00</div>
-                <div id="liveDate" class="text-secondary mt-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; line-height: 1;">MEMUAT...</div>
+                <div id="liveDate" class="text-secondary mt-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; line-height: 1;">LOADING...</div>
             </div>
         </div>
 
@@ -905,8 +905,8 @@
     // ============================================================
     function updateClock() {
         const now = new Date();
-        document.getElementById('liveClock').textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-        document.getElementById('liveDate').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('liveClock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        document.getElementById('liveDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }
     setInterval(updateClock, 1000); updateClock();
 

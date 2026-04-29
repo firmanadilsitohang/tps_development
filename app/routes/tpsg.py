@@ -1,10 +1,12 @@
 import os
 import pandas as pd
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from functools import wraps
 from app import db
-from app.models.employee import Employee, Plant, Division, Department, BatchStat
+from app.models.employee import Employee, Plant, Division, Department, BatchStat, WorkshopEvaluation
+from app.models.module import LearningModule
+from app.models.development import News, Training, Activity
 from app.models.user import User 
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
@@ -89,6 +91,13 @@ def dashboard():
     total_count = Employee.query.count()
     data_health = int(((total_count - incomplete_count) / total_count * 100)) if total_count > 0 else 0
 
+    # PROYEKSI TARGET DEVELOPMENT DATA (Hardcoded Example - bisa di-update via database)
+    # Format: [2023, 2024, 2025, 2026]
+    proyeksi_labels = ['2023', '2024', '2025', '2026']
+    proyeksi_target_cumulative = [20, 45, 70, 100]
+    proyeksi_target_tahunan = [20, 25, 25, 30]
+    proyeksi_realisasi = [20, 35, 65, 85]  # Contoh data dummy
+
     return render_template('tpsg/dashboard.html', 
         kp_labels=['TPS KP 4', 'TPS KP 3', 'TPS ADVANCE'], kp_values=[kp4, kp3, adv],
         plant_labels=[p[0] for p in plant_stats], plant_values=[p[1] for p in plant_stats],
@@ -97,6 +106,8 @@ def dashboard():
         forecast_labels=list(pension_forecast.keys()), forecast_values=list(pension_forecast.values()),
         age_labels=['Produktif (<50)', 'Risk Area (>=50)'], age_values=[prod, risk],
         batch_labels=r_batch_labels, batch_kp3=r_batch_kp3, batch_kp4=r_batch_kp4,
+        proyeksi_labels=proyeksi_labels, proyeksi_target_cumulative=proyeksi_target_cumulative,
+        proyeksi_target_tahunan=proyeksi_target_tahunan, proyeksi_realisasi=proyeksi_realisasi,
         # Operational Data
         pending_count=pending_count,
         incomplete_count=incomplete_count,
@@ -111,7 +122,12 @@ def dashboard():
 @login_required
 @tpsg_required
 def employees():
-    all_participants = Employee.query.order_by(Employee.name.asc()).all()
+    status_filter = request.args.get('status')
+    query = Employee.query
+    if status_filter:
+        query = query.filter_by(status=status_filter)
+    
+    all_participants = query.order_by(Employee.name.asc()).all()
     return render_template('tpsg/employees.html', employees=all_participants)
 
 # =======================================================
@@ -234,7 +250,7 @@ def import_excel():
                 # Upsert Karyawan
                 emp = Employee.query.filter_by(username=noreg).first()
                 if not emp:
-                    emp = Employee(username=noreg, name=nama)
+                    emp = Employee(username=noreg, name=nama, status='active')
                     db.session.add(emp)
                     db.session.flush() 
                 else:
@@ -362,6 +378,11 @@ def reset_all_employees():
 def detail_employee(id):
     employee = Employee.query.get_or_404(id)
     
+    umur = 0
+    if employee.birth_date:
+        today = date.today()
+        umur = today.year - employee.birth_date.year - ((today.month, today.day) < (employee.birth_date.month, employee.birth_date.day))
+
     if request.method == 'POST':
         employee.name = request.form.get('name')
         new_username = request.form.get('username')
@@ -434,16 +455,99 @@ def detail_employee(id):
             
         return redirect(url_for('tpsg.detail_employee', id=id))
 
-    return render_template('tpsg/detail_employee.html', employee=employee, emp=employee)
+    return render_template('tpsg/detail_employee.html', employee=employee, emp=employee, umur=umur)
+
+# ==========================================
+# EVALUASI WORKSHOP (SPIDER CHART TPSG)
+# ==========================================
+@tpsg.route('/evaluate-workshop/<int:emp_id>', methods=['POST'])
+@login_required
+@tpsg_required
+def submit_workshop_evaluation(emp_id):
+    employee = Employee.query.get_or_404(emp_id)
+
+    # Ambil atau buat evaluasi baru
+    evaluation = WorkshopEvaluation.query.filter_by(employee_id=emp_id).first()
+    if not evaluation:
+        evaluation = WorkshopEvaluation(employee_id=emp_id)
+        db.session.add(evaluation)
+
+    try:
+        evaluation.ws_1 = int(request.form.get('score_genba', 0))
+        evaluation.ws_2 = int(request.form.get('score_problem_solving', 0))
+        evaluation.ws_3 = int(request.form.get('score_observasi', 0))
+        evaluation.ws_4 = int(request.form.get('score_kaizen', 0))
+        evaluation.ws_5 = int(request.form.get('score_implementation', 0))
+        evaluation.ws_6 = int(request.form.get('score_presentation', 0))
+        evaluation.ws_7 = int(request.form.get('score_skillgap', 0))
+        evaluation.final_decision = request.form.get('final_decision', 'PASS')
+        evaluation.notes = request.form.get('notes', '')
+        evaluation.evaluated_by = current_user.username
+        evaluation.evaluated_at = datetime.utcnow()
+
+        db.session.commit()
+        flash(f'Evaluasi Workshop untuk {employee.name} berhasil disimpan!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Terjadi kesalahan: {str(e)}', 'danger')
+
+    return redirect(url_for('tpsg.detail_employee', id=emp_id))
 
 # =======================================================
 # 6. RUTE LAINNYA (MANAGE NEWS & DUMMY)
 # =======================================================
-@tpsg.route('/manage-news')
+# =======================================================
+# 6. BROADCAST CENTER (NEWS & ANNOUNCEMENTS)
+# =======================================================
+@tpsg.route('/manage-news', methods=['GET', 'POST'])
 @login_required
 @tpsg_required
 def manage_news(): 
-    return render_template('tpsg/manage_news.html')
+    if request.method == 'POST':
+        title = request.form.get('title')
+        category = request.form.get('category')
+        content = request.form.get('content')
+        target_type = request.form.get('target_type', 'all')
+        
+        target_users_list = request.form.getlist('target_users')
+        target_users_str = ",".join(target_users_list) if target_type == 'specific' else ""
+
+        new_news = News(
+            title=title,
+            category=category,
+            content=content,
+            target_type=target_type,
+            target_users=target_users_str
+        )
+        db.session.add(new_news)
+        try:
+            db.session.commit()
+            flash('Pengumuman berhasil diterbitkan!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Gagal menerbitkan pengumuman: {str(e)}', 'danger')
+        
+        return redirect(url_for('tpsg.manage_news'))
+
+    all_news = News.query.order_by(News.created_at.desc()).all()
+    employees = Employee.query.order_by(Employee.name.asc()).all()
+    modules = LearningModule.query.order_by(LearningModule.created_at.desc()).all()
+    
+    return render_template('tpsg/manage_news.html', all_news=all_news, employees=employees, modules=modules)
+
+@tpsg.route('/delete-news/<int:id>', methods=['POST'])
+@login_required
+@tpsg_required
+def delete_news(id):
+    news_item = News.query.get_or_404(id)
+    try:
+        db.session.delete(news_item)
+        db.session.commit()
+        flash('Pengumuman telah dihapus.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Gagal menghapus: {str(e)}', 'danger')
+    return redirect(url_for('tpsg.manage_news'))
 
 @tpsg.route('/generate-dummy')
 @login_required
@@ -490,3 +594,45 @@ def manage_charts():
 
     batch_stats = BatchStat.query.all()
     return render_template('tpsg/manage_charts.html', batch_stats=batch_stats)
+
+# =======================================================
+# 8. KELOLA MODUL E-LEARNING (MIGRASI OMDD)
+# =======================================================
+@tpsg.route('/manage-modules', methods=['GET', 'POST'])
+@login_required
+@tpsg_required
+def manage_modules():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        tps_level = request.form.get('tps_level')
+        file = request.files.get('file')
+
+        if not file or file.filename == '':
+            flash('Gagal: Tidak ada file dokumen/video yang dipilih.', 'danger')
+            return redirect(request.url)
+
+        if file:
+            filename = secure_filename(file.filename)
+            upload_folder = os.path.join(current_app.root_path, 'static/uploads/modules')
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            file_path = os.path.join(upload_folder, filename)
+            file.save(file_path)
+
+            new_module = LearningModule(
+                title=title, description=description, tps_level=tps_level, file_name=filename
+            )
+            db.session.add(new_module)
+            
+            try:
+                db.session.commit()
+                flash('Modul berhasil diunggah dan disimpan ke sistem!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('Terjadi kesalahan saat menyimpan data ke database.', 'danger')
+                
+            return redirect(url_for('tpsg.manage_news'))
+
+    modules = LearningModule.query.order_by(LearningModule.created_at.desc()).all()
+    return render_template('tpsg/manage_modules.html', modules=modules)

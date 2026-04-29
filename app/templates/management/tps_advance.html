@@ -29,7 +29,9 @@
         color: #0A74FF;
     }
     .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
     .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
 
     .btn-back {
         display: inline-flex;
@@ -46,31 +48,54 @@
     #custom-tooltip {
         position: absolute;
         display: none;
-        background: rgba(5, 10, 20, 0.95);
+        background: rgba(10, 15, 25, 0.98);
         border: 1px solid #0A74FF;
-        border-radius: 12px;
-        padding: 15px;
+        border-radius: 15px;
+        padding: 0;
         z-index: 1000;
-        width: 250px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        pointer-events: none;
+        width: 300px;
+        max-height: 400px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .tooltip-header {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        font-weight: 700;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: #0A74FF;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .tooltip-body {
+        padding: 15px;
+        overflow-y: auto;
+        flex: 1;
+    }
+    .tooltip-close {
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--text-muted);
     }
     .emp-item {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        gap: 12px;
+        padding: 8px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        transition: background 0.2s;
     }
+    .emp-item:hover { background: rgba(255, 255, 255, 0.05); }
     .emp-img {
-        width: 40px; height: 40px;
+        width: 35px; height: 35px;
         border-radius: 50%;
-        border: 2px solid #0A74FF;
         object-fit: cover;
     }
-    .emp-info .name { font-size: 13px; font-weight: 600; }
-    .emp-info .theme { font-size: 11px; color: var(--accent-gold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 160px; }
+    .emp-info .name { font-size: 12px; font-weight: 600; }
+    .emp-info .theme { font-size: 10px; color: var(--accent-gold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 180px; }
 
     /* BOTTOM SHEET PANEL */
     #bottom-sheet {
@@ -144,58 +169,47 @@
 </a>
 
 <div class="dashboard-header mb-4">
-    <h2 class="mb-1 text-blue">TPS ADVANCE</h2>
-    <p class="text-muted">Mapping and Demographics of TPS Advance Level</p>
+    <h2 class="mb-1 text-blue" style="font-family: 'Oswald'; letter-spacing: 2px;">TPS ADVANCE</h2>
+    <p class="text-muted">Analytical Mapping & Distribution of TPS Advance Level</p>
 </div>
 
 <div class="module-container">
-    <!-- 1. TPS Advance Mapping -->
-    <div class="stat-card col-8">
-        <div class="card-title"><i class="fas fa-layer-group"></i> Advance per Division</div>
-        <div style="height: 400px;">
-            <canvas id="advBarChart"></canvas>
+    <!-- 1. Plant Mapping -->
+    <div class="stat-card col-4">
+        <div class="card-title"><i class="fas fa-industry"></i> Plant Distribution</div>
+        <div style="height: 350px;">
+            <canvas id="plantBarChart"></canvas>
         </div>
     </div>
 
-    <!-- 2. Demographics -->
-    <div class="stat-card col-4">
-        <div class="card-title"><i class="fas fa-users-cog"></i> Advance Demographics (Risk @ 50+)</div>
-        <div id="demoContainer" style="display: flex; flex-direction: column; gap: 15px;">
-            {% for level, data in demo_data.items() %}
-            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 700;">
-                    <span>{{ level }}</span>
-                    <span style="color: var(--text-muted);">Total: {{ data.prod + data.non }}</span>
-                </div>
-                <div class="demo-bar-container" style="height: 25px; display: flex; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,0.1); cursor: help;">
-                    {% if data.prod + data.non > 0 %}
-                    <div class="demo-bar-segment" 
-                         data-label="TPS Advance - Productive" 
-                         data-participants='{{ data.prod_list | tojson }}'
-                         style="width:{{ (data.prod / (data.prod + data.non) * 100)|round }}%; background: #00D16B; display: flex; align-items: center; padding-left: 10px; font-size: 10px; font-weight: 800;">
-                        PROD {{ (data.prod / (data.prod + data.non) * 100)|round }}%
-                    </div>
-                    <div class="demo-bar-segment" 
-                         data-label="TPS Advance - Retirement Risk" 
-                         data-participants='{{ data.non_list | tojson }}'
-                         style="width:{{ (data.non / (data.prod + data.non) * 100)|round }}%; background: #E3000F; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-size: 10px; font-weight: 800;">
-                        RISK {{ (data.non / (data.prod + data.non) * 100)|round }}%
-                    </div>
-                    {% else %}
-                    <div style="width: 100%; text-align: center; line-height: 25px; font-size: 10px; color: var(--text-muted);">NO DATA</div>
-                    {% endif %}
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px; color: var(--text-muted);">
-                    <span>Prod (< 50): {{ data.prod }}</span>
-                    <span>Risk (≥ 50): {{ data.non }}</span>
-                </div>
-            </div>
-            {% endfor %}
+    <!-- 2. Division Mapping -->
+    <div class="stat-card col-8">
+        <div class="card-title"><i class="fas fa-sitemap"></i> Division Distribution</div>
+        <div style="height: 350px;">
+            <canvas id="divBarChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 3. Department Mapping -->
+    <div class="stat-card col-12">
+        <div class="card-title"><i class="fas fa-building"></i> Department Distribution</div>
+        <div style="height: 400px;">
+            <canvas id="deptBarChart"></canvas>
         </div>
     </div>
 </div>
 
-<div id="custom-tooltip"></div>
+<!-- Custom Tooltip -->
+<div id="custom-tooltip">
+    <div class="tooltip-header">
+        <span id="tooltip-title">Title</span>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span id="tooltip-count" class="badge bg-primary" style="font-size: 10px;">0</span>
+            <i class="fas fa-times tooltip-close" onclick="closeTooltip()"></i>
+        </div>
+    </div>
+    <div id="tooltip-body" class="tooltip-body"></div>
+</div>
 
 <!-- Bottom Sheet -->
 <div id="sheet-overlay" onclick="closeBottomSheet()"></div>
@@ -213,33 +227,67 @@
 
 {% block extra_js %}
 <script>
-    const advDetails = {{ adv_details | tojson }};
+    const plantDetails = {{ plant_details | tojson }};
+    const divDetails = {{ div_details | tojson }};
+    const deptDetails = {{ dept_details | tojson }};
+    let isTooltipPinned = false;
 
-    function showCustomTooltip(label, data, event) {
+    function getPhotoUrl(photo) {
+        if (!photo || photo === 'default.png') return '/static/uploads/photos/default.png';
+        if (photo.startsWith('http')) return photo;
+        return '/static/uploads/photos/' + photo;
+    }
+
+    function showCustomTooltip(label, data, event, isPersistent = false) {
+        if (isTooltipPinned && !isPersistent) return;
         const tooltipEl = document.getElementById('custom-tooltip');
+        const titleEl = document.getElementById('tooltip-title');
+        const countEl = document.getElementById('tooltip-count');
+        const bodyEl = document.getElementById('tooltip-body');
+
         if (!data || data.length === 0) {
-            tooltipEl.style.display = 'none';
+            if (!isTooltipPinned) tooltipEl.style.display = 'none';
             return;
         }
-        let html = `<div style="font-weight: 700; margin-bottom: 5px; color: #0A74FF; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">${label} (${data.length})</div>`;
-        html += `<div style="font-size:9px; color:#888; margin-bottom:10px; text-align:center;">Click to view full detail</div>`;
+
+        titleEl.innerText = label;
+        countEl.innerText = `${data.length} Pers`;
+        let html = '';
         data.forEach(item => {
             html += `
-                <div class="emp-item" style="cursor: pointer; pointer-events: auto;" onclick="openParticipantDetail(${item.id})">
-                    <img src="/static/uploads/photos/${item.photo}" class="emp-img" onerror="this.src='/static/uploads/photos/default.png'">
+                <div class="emp-item" style="cursor: pointer;" onclick="openParticipantDetail(${item.id})">
+                    <img src="${getPhotoUrl(item.photo)}" class="emp-img" onerror="this.src='/static/uploads/photos/default.png'">
                     <div class="emp-info">
                         <div class="name">${item.name}</div>
                         <div class="theme">${item.theme}</div>
                     </div>
                 </div>`;
         });
-        tooltipEl.innerHTML = html;
-        tooltipEl.style.display = 'block';
-        tooltipEl.style.pointerEvents = 'auto';
-        let x = event.pageX + 20;
-        if (x + 280 > window.innerWidth) x = event.pageX - 280;
-        tooltipEl.style.left = x + 'px';
-        tooltipEl.style.top = event.pageY + 'px';
+        bodyEl.innerHTML = html;
+        tooltipEl.style.display = 'flex';
+
+        if (!isTooltipPinned) {
+            let x = event.pageX + 20;
+            let y = event.pageY;
+            if (x + 300 > window.innerWidth) x = event.pageX - 320;
+            if (y + 400 > window.innerHeight + window.scrollY) y = window.innerHeight + window.scrollY - 420;
+            tooltipEl.style.left = x + 'px';
+            tooltipEl.style.top = y + 'px';
+        }
+
+        if (isPersistent) {
+            isTooltipPinned = true;
+            tooltipEl.style.borderWidth = '2px';
+            tooltipEl.style.boxShadow = '0 0 20px rgba(10, 116, 255, 0.5)';
+        }
+    }
+
+    function closeTooltip() {
+        isTooltipPinned = false;
+        const tooltipEl = document.getElementById('custom-tooltip');
+        tooltipEl.style.display = 'none';
+        tooltipEl.style.borderWidth = '1px';
+        tooltipEl.style.boxShadow = '0 15px 50px rgba(0, 0, 0, 0.8)';
     }
 
     async function openParticipantDetail(id) {
@@ -251,47 +299,35 @@
         try {
             const response = await fetch(`/management/participant_detail/${id}`);
             const data = await response.json();
-            // Pass Themes
-            let passThemesHtml = '';
-            if (data.pass_themes.length > 0) {
-                data.pass_themes.forEach(t => {
-                    passThemesHtml += `
-                        <div class="theme-item">
-                            <div><div style="font-weight:600;">${t.title}</div><div style="font-size:10px; color:#888;">${t.type} • ${t.date}</div></div>
-                            <div style="text-align:right;">
-                                <span class="status-badge status-completed">${t.status}</span>
-                                <div class="score-badge mt-1">${t.score || 0} pts</div>
-                            </div>
-                        </div>`;
-                });
-            } else { passThemesHtml = '<p class="text-muted small">No past themes found.</p>'; }
+            
+            let passThemesHtml = data.pass_themes.length > 0 ? data.pass_themes.map(t => `
+                <div class="theme-item">
+                    <div><div style="font-weight:600;">${t.title}</div><div style="font-size:10px; color:#888;">${t.type} • ${t.date}</div></div>
+                    <div style="text-align:right;">
+                        <span class="status-badge status-completed">${t.status}</span>
+                        <div class="score-badge mt-1">${t.score || 0} pts</div>
+                    </div>
+                </div>`).join('') : '<p class="text-muted small">No past themes found.</p>';
 
-            // Current Themes
-            let currentThemesHtml = '';
-            if (data.current_themes.length > 0) {
-                data.current_themes.forEach(t => {
-                    currentThemesHtml += `
-                        <div class="theme-item">
-                            <div><div style="font-weight:600;">${t.title}</div><div style="font-size:10px; color:#888;">${t.type} • ${t.date}</div></div>
-                            <div style="text-align:right;">
-                                <span class="status-badge status-ongoing">${t.status}</span>
-                                <div class="score-badge mt-1" style="background:#f59e0b; color:#000;">${t.progress || 0}%</div>
-                            </div>
-                        </div>`;
-                });
-            } else { currentThemesHtml = '<p class="text-muted small">No current themes in progress.</p>'; }
+            let currentThemesHtml = data.current_themes.length > 0 ? data.current_themes.map(t => `
+                <div class="theme-item">
+                    <div><div style="font-weight:600;">${t.title}</div><div style="font-size:10px; color:#888;">${t.type} • ${t.date}</div></div>
+                    <div style="text-align:right;">
+                        <span class="status-badge status-ongoing">${t.status}</span>
+                        <div class="score-badge mt-1" style="background:#f59e0b; color:#000;">${t.progress || 0}%</div>
+                    </div>
+                </div>`).join('') : '<p class="text-muted small">No current themes in progress.</p>';
 
             content.innerHTML = `
                 <div class="profile-grid">
                     <div class="profile-left">
-                        <img src="/static/uploads/photos/${data.photo}" class="profile-photo" onerror="this.src='/static/uploads/photos/default.png'">
+                        <img src="${getPhotoUrl(data.photo)}" class="profile-photo" onerror="this.src='/static/uploads/photos/default.png'">
                         <h3 class="mb-1">${data.name}</h3>
                         <div class="text-muted small mb-3">${data.username}</div>
                         <div class="badge" style="background:#0A74FF; color:#fff; font-weight:800; padding:5px 15px;">${data.level}</div>
-                        
                         <div class="mt-4 p-3" style="background:rgba(255,255,255,0.05); border-radius:12px; text-align:left;">
-                            <div class="mb-2"><span class="text-muted small">Umur:</span> <strong class="float-end">${data.age} Thn</strong></div>
-                            <div><span class="text-muted small">Tahun Pensiun:</span> <strong class="float-end">${data.retirement_year}</strong></div>
+                            <div class="mb-2"><span class="text-muted small">Age:</span> <strong class="float-end">${data.age} Yrs</strong></div>
+                            <div><span class="text-muted small">Retirement Year:</span> <strong class="float-end">${data.retirement_year}</strong></div>
                         </div>
                     </div>
                     <div class="profile-right">
@@ -305,60 +341,11 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-6">
-                                <div class="detail-section">
-                                    <div class="section-title"><i class="fas fa-check-circle"></i> Pass Theme</div>
-                                    <div class="theme-list">${passThemesHtml}</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="detail-section">
-                                    <div class="section-title"><i class="fas fa-spinner"></i> Current Theme</div>
-                                    <div class="theme-list">${currentThemesHtml}</div>
-                                </div>
-                            </div>
+                            <div class="col-6"><div class="detail-section"><div class="section-title"><i class="fas fa-check-circle"></i> Pass Theme</div><div class="theme-list">${passThemesHtml}</div></div></div>
+                            <div class="col-6"><div class="detail-section"><div class="section-title"><i class="fas fa-spinner"></i> Current Theme</div><div class="theme-list">${currentThemesHtml}</div></div></div>
                         </div>
-                        ${assessmentHtml}
                     </div>
                 </div>`;
-
-            if (data.assessment) {
-                setTimeout(() => {
-                    const spiderCtx = document.getElementById('spiderChart').getContext('2d');
-                    new Chart(spiderCtx, {
-                        type: 'radar',
-                        data: {
-                            labels: ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4', 'Workshop 5', 'Workshop 6', 'Workshop 7'],
-                            datasets: [{
-                                label: 'Score',
-                                data: [
-                                    data.assessment.ws_1, data.assessment.ws_2, data.assessment.ws_3,
-                                    data.assessment.ws_4, data.assessment.ws_5, data.assessment.ws_6,
-                                    data.assessment.ws_7
-                                ],
-                                backgroundColor: 'rgba(10, 116, 255, 0.2)',
-                                borderColor: '#0A74FF',
-                                pointBackgroundColor: '#0A74FF',
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                r: {
-                                    angleLines: { color: 'rgba(255,255,255,0.1)' },
-                                    grid: { color: 'rgba(255,255,255,0.1)' },
-                                    pointLabels: { color: '#8bb4d8', font: { size: 10 } },
-                                    ticks: { display: false, stepSize: 20 },
-                                    suggestedMin: 0, suggestedMax: 100
-                                }
-                            },
-                            plugins: { legend: { display: false } }
-                        }
-                    });
-                }, 100);
-            }
         } catch (err) { content.innerHTML = '<div class="text-center p-5"><p>Error loading details.</p></div>'; }
     }
 
@@ -367,72 +354,61 @@
         document.getElementById('bottom-sheet').classList.remove('active');
     }
 
-    // Interactive Demographics Event Listeners
-    document.addEventListener('mouseover', function(e) {
-        if (e.target.classList.contains('demo-bar-segment')) {
-            const label = e.target.getAttribute('data-label');
-            const participants = JSON.parse(e.target.getAttribute('data-participants'));
-            showCustomTooltip(label, participants, e);
-        }
-    });
-
-    document.addEventListener('mousemove', function(e) {
-        if (e.target.classList.contains('demo-bar-segment')) {
-            const tooltipEl = document.getElementById('custom-tooltip');
-            let x = e.pageX + 20;
-            if (x + 280 > window.innerWidth) x = e.pageX - 280;
-            tooltipEl.style.left = x + 'px';
-            tooltipEl.style.top = e.pageY + 'px';
-        }
-    });
-
-    document.addEventListener('mouseout', function(e) {
-        if (e.target.classList.contains('demo-bar-segment')) {
-            document.getElementById('custom-tooltip').style.display = 'none';
-        }
-    });
-
-    new Chart(document.getElementById('advBarChart'), {
-        type: 'bar',
-        data: {
-            labels: {{ adv_div_labels | tojson }},
-            datasets: [{
-                label: 'Employees',
-                data: {{ adv_div_values | tojson }},
-                backgroundColor: 'rgba(0, 229, 255, 0.4)',
-                borderColor: '#00E5FF',
-                borderWidth: 2,
-                borderRadius: 5
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } },
-                y: { grid: { display: false }, ticks: { color: '#fff' } }
+    function createChart(ctxId, labels, data, details, color = '#0A74FF') {
+        return new Chart(document.getElementById(ctxId), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Employees',
+                    data: data,
+                    backgroundColor: color + '66',
+                    borderColor: color,
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
             },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    enabled: false,
-                    external: function(context) {
-                        const tooltipEl = document.getElementById('custom-tooltip');
-                        if (context.tooltip.opacity === 0) {
-                            tooltipEl.style.display = 'none';
-                            return;
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                onClick: (e, elements, chart) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const label = chart.data.labels[index];
+                        const data = details[label] || [];
+                        showCustomTooltip(label, data, e.native, true);
+                    }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8' } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8bb4d8', stepSize: 1 } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: false,
+                        external: function(context) {
+                            if (isTooltipPinned) return;
+                            const tooltipEl = document.getElementById('custom-tooltip');
+                            if (context.tooltip.opacity === 0) {
+                                tooltipEl.style.display = 'none';
+                                return;
+                            }
+                            const label = context.tooltip.dataPoints[0].label;
+                            const data = details[label] || [];
+                            showCustomTooltip(label, data, {
+                                pageX: context.chart.canvas.getBoundingClientRect().left + window.pageXOffset + context.tooltip.caretX,
+                                pageY: context.chart.canvas.getBoundingClientRect().top + window.pageYOffset + context.tooltip.caretY
+                            });
                         }
-                        const label = context.tooltip.dataPoints[0].label;
-                        const data = advDetails[label] || [];
-                        showCustomTooltip(label, data, {
-                            pageX: context.chart.canvas.getBoundingClientRect().left + window.pageXOffset + context.tooltip.caretX,
-                            pageY: context.chart.canvas.getBoundingClientRect().top + window.pageYOffset + context.tooltip.caretY
-                        });
                     }
                 }
             }
-        }
-    });
+        });
+    }
+
+    createChart('plantBarChart', {{ plant_labels | tojson }}, {{ plant_values | tojson }}, plantDetails, '#00D16B');
+    createChart('divBarChart', {{ div_labels | tojson }}, {{ div_values | tojson }}, divDetails, '#0A74FF');
+    createChart('deptBarChart', {{ dept_labels | tojson }}, {{ dept_values | tojson }}, deptDetails, '#FF8A00');
 </script>
 {% endblock %}

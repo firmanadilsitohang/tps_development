@@ -370,9 +370,9 @@
     <div class="premium-header">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
             <div>
-                <h1 class="page-title"><i class="fas fa-users-cog me-3 text-info"></i> DATABASE PARTISIPAN</h1>
+                <h1 class="page-title"><i class="fas fa-users-cog me-3 text-info"></i> PARTICIPANT DATABASE</h1>
                 <p class="text-secondary m-0 mt-2 small" style="font-size: 13px;">
-                    Manajemen Profil, Level, dan Monitoring Risiko Pensiun Manpower
+                    Profile Management, Levels, and Manpower Retirement Risk Monitoring
                 </p>
             </div>
         </div>
@@ -380,19 +380,19 @@
         <div class="filter-section">
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" class="filter-box" placeholder="Cari Nama, NIK, atau Jabatan...">
+                <input type="text" id="searchInput" class="filter-box" placeholder="Search Name, NIK, or Position...">
             </div>
             <select id="filterArea" class="filter-box">
-                <option value="">-- Semua Area --</option>
+                <option value="">-- All Areas --</option>
             </select>
             <select id="filterDivisi" class="filter-box" disabled>
-                <option value="">-- Semua Divisi --</option>
+                <option value="">-- All Divisions --</option>
             </select>
             <select id="filterDept" class="filter-box" disabled>
-                <option value="">-- Semua Departemen --</option>
+                <option value="">-- All Departments --</option>
             </select>
             <select id="filterLevel" class="filter-box">
-                <option value="">-- Semua Level --</option>
+                <option value="">-- All Levels --</option>
             </select>
         </div>
     </div>
@@ -401,16 +401,16 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-3 gap-3">
             <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
                 <button type="submit" class="btn btn-delete-mass mb-4"
-                    onclick="return confirm('PERINGATAN: Yakin ingin menghapus data partisipan yang dipilih secara permanen?')">
-                    <i class="fas fa-trash-alt me-2"></i> HAPUS TERPILIH
+                    onclick="return confirm('WARNING: Are you sure you want to permanently delete the selected participants?')">
+                    <i class="fas fa-trash-alt me-2"></i> DELETE SELECTED
                 </button>
                 <span class="text-secondary mb-4 small d-none d-sm-inline">
-                    <i class="fas fa-info-circle mb-4 me-1"></i> Centang kotak di tabel untuk menyeleksi data.
+                    <i class="fas fa-info-circle mb-4 me-1"></i> Check the boxes in the table to select data.
                 </span>
             </div>
             <div class="info-box text-secondary small fw-bold">
-                Total Menampilkan: <span id="rowCountDisplay" class="text-white mx-2 fs-6">{{ employees|length }}</span>
-                Partisipan
+                Total Displayed: <span id="rowCountDisplay" class="text-white mx-2 fs-6">{{ employees|length }}</span>
+                Participants
             </div>
         </div>
 
@@ -420,14 +420,14 @@
                     <thead>
                         <tr>
                             <th class="text-center" style="width: 60px;">
-                                <input class="form-check-input" type="checkbox" id="selectAll" title="Pilih Semua">
+                                <input class="form-check-input" type="checkbox" id="selectAll" title="Select All">
                             </th>
-                            <th style="width: 100px; text-align: center;">FOTO</th>
-                            <th>PROFIL PARTISIPAN</th>
-                            <th>ORGANISASI</th>
-                            <th>KUALIFIKASI / LEVEL TPS</th>
-                            <th class="text-center">USIA & PENSIUN</th>
-                            <th class="text-center" style="width: 120px;">AKSI</th>
+                            <th style="width: 100px; text-align: center;">PHOTO</th>
+                            <th>PARTICIPANT PROFILE</th>
+                            <th>ORGANIZATION</th>
+                            <th>QUALIFICATION / TPS LEVEL</th>
+                            <th class="text-center">AGE & RETIREMENT</th>
+                            <th class="text-center" style="width: 120px;">ACTION</th>
                         </tr>
                     </thead>
                     <tbody id="employeeTableBody">
@@ -527,8 +527,7 @@
                                     {% endif %}
                                     {% endfor %}
                                     {% else %}
-                                    <span class="badge-level bg-dark text-secondary border border-secondary">BELUM ADA
-                                        LEVEL</span>
+                                    <span class="badge-level badge-jis">NO LEVEL ASSIGNED</span>
                                     {% endif %}
                                 </div>
                             </td>
@@ -538,10 +537,10 @@
                                 <div class="fw-bold mb-1 {% if age >= 50 %}text-neon-red{% else %}text-neon-green{% endif %}"
                                     style="font-size: 17px;">
                                     {% if age >= 50 %}<i class="fas fa-exclamation-triangle me-1"></i>{% endif %}{{ age
-                                    }} Thn
+                                    }} Yrs
                                 </div>
                                 <div class="text-secondary" style="font-size: 12px;">
-                                    Pensiun: <span class="fw-bold" style="color: #c9d1d9;">{{ pension }}</span>
+                                    Retirement: <span class="fw-bold" style="color: #c9d1d9;">{{ pension }}</span>
                                 </div>
                                 {% else %}
                                 <div class="text-secondary">-</div>
@@ -560,8 +559,8 @@
             </div>
             <div id="noResultsMsg" class="text-center py-5" style="display: none; background: #0d1117;">
                 <i class="fas fa-search fa-3x text-secondary mb-3 opacity-50"></i>
-                <h4 class="text-white mt-2">Tidak Ada Data Ditemukan</h4>
-                <p class="text-secondary">Cobalah mengubah filter pencarian atau kata kunci.</p>
+                <h4 class="text-white mt-2">No Data Found</h4>
+                <p class="text-secondary">Try changing the search filters or keywords.</p>
             </div>
         </div>
     </form>
@@ -618,8 +617,8 @@
         });
 
         function populateDivisi(selectedArea) {
-            filterDivisi.innerHTML = '<option value="">-- Semua Divisi --</option>';
-            filterDept.innerHTML = '<option value="">-- Semua Departemen --</option>';
+            filterDivisi.innerHTML = '<option value="">-- All Divisions --</option>';
+            filterDept.innerHTML = '<option value="">-- All Departments --</option>';
             filterDept.disabled = true;
 
             if (!selectedArea) {
@@ -645,7 +644,7 @@
         }
 
         function populateDept(selectedDivisi) {
-            filterDept.innerHTML = '<option value="">-- Semua Departemen --</option>';
+            filterDept.innerHTML = '<option value="">-- All Departments --</option>';
 
             if (!selectedDivisi) {
                 filterDept.disabled = true;

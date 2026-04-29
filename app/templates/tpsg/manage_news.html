@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Kelola Pengumuman | TPS-G Admin{% endblock %}
+{% block title %}Broadcast Center | TPS-G Admin{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Tab Styling */
+    .nav-tabs {
+        display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;
+    }
+    .tab-link {
+        padding: 10px 20px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 13px;
+        font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; cursor: pointer;
+    }
+    .tab-link.active { background: rgba(10, 116, 255, 0.15); color: var(--accent-cyan); box-shadow: 0 0 15px rgba(10, 116, 255, 0.2); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
     /* Container Styling */
     .news-container { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
 
@@ -63,150 +75,226 @@
         padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.02); cursor: pointer;
     }
     .checkbox-item:hover { background: rgba(10, 116, 255, 0.1); }
+    
+    .badge-level { background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid #f59e0b; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div style="margin-bottom: 25px;">
     <h2 style="font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 1px; color: #fff;">Broadcast Center</h2>
-    <p style="color: var(--text-muted); font-size: 13px;">Kelola pengumuman berita dan jadwal kegiatan untuk partisipan.</p>
+    <p style="color: var(--text-muted); font-size: 13px;">Manage news announcements and learning materials (E-Learning) for participants.</p>
 </div>
 
-<div class="news-container">
-    <div class="glass-card">
-        <h3 class="card-title"><i class="fas fa-plus-circle"></i> Buat Baru</h3>
-        <form action="{{ url_for('tpsg.manage_news') }}" method="POST">
-            <div class="form-group">
-                <label class="title-label">Judul Pengumuman</label>
-                <input type="text" name="title" class="form-control" placeholder="Contoh: Jadwal Ujian Batch 5" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="title-label">Kategori</label>
-                <select name="category" class="form-control">
-                    <option value="News">Berita / Informasi</option>
-                    <option value="Schedule">Jadwal Kegiatan</option>
-                </select>
-            </div>
+<div class="nav-tabs">
+    <div class="tab-link active" onclick="switchTab('tab-news', this)"><i class="fas fa-bullhorn me-2"></i> Manage Announcements</div>
+    <div class="tab-link" onclick="switchTab('tab-modules', this)"><i class="fas fa-book me-2"></i> E-Learning Modules</div>
+</div>
 
-            <div class="form-group">
-                <label class="title-label">Target Penerima</label>
-                <div style="display: flex; gap: 20px; font-size: 12px; color: #fff; margin-top: 8px;">
-                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                        <input type="radio" name="target_type" value="all" checked onchange="toggleTarget()"> Semua Partisipan
-                    </label>
-                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                        <input type="radio" name="target_type" value="specific" onchange="toggleTarget()"> Partisipan Tertentu
-                    </label>
+<!-- TAB: PENGUMUMAN -->
+<div id="tab-news" class="tab-content active">
+    <div class="news-container">
+        <div class="glass-card">
+            <h3 class="card-title"><i class="fas fa-plus-circle"></i> Create New</h3>
+            <form action="{{ url_for('tpsg.manage_news') }}" method="POST">
+                <div class="form-group">
+                    <label class="title-label">Announcement Title</label>
+                    <input type="text" name="title" class="form-control" placeholder="Example: Batch 5 Exam Schedule" required>
                 </div>
-            </div>
-
-            <div class="form-group" id="participant-selection" style="display: none;">
-                <label class="title-label" style="color: #f59e0b;">Cari & Pilih Partisipan</label>
                 
-                <div class="search-participant-wrapper">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchParticipantInput" class="search-participant-input" placeholder="Ketik nama atau NPK..." onkeyup="filterParticipants()">
+                <div class="form-group">
+                    <label class="title-label">Category</label>
+                    <select name="category" class="form-control">
+                        <option value="News">News / Information</option>
+                        <option value="Schedule">Activity Schedule</option>
+                    </select>
                 </div>
 
-                <div class="checkbox-list" id="participantCheckboxList">
-                    {% for emp in employees %}
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="target_users" value="{{ emp.username }}">
-                        <span class="p-name">{{ emp.name }}</span> <span style="color: var(--text-muted); font-family: monospace;" class="p-nik">({{ emp.username }})</span>
-                    </label>
+                <div class="form-group">
+                    <label class="title-label">Target Audience</label>
+                    <div style="display: flex; gap: 20px; font-size: 12px; color: #fff; margin-top: 8px;">
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                            <input type="radio" name="target_type" value="all" checked onchange="toggleTarget()"> All Participants
+                        </label>
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                            <input type="radio" name="target_type" value="specific" onchange="toggleTarget()"> Specific Participants
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="participant-selection" style="display: none;">
+                    <label class="title-label" style="color: #f59e0b;">Search & Select Participants</label>
+                    <div class="search-participant-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchParticipantInput" class="search-participant-input" placeholder="Type name or NPK..." onkeyup="filterParticipants()">
+                    </div>
+                    <div class="checkbox-list" id="participantCheckboxList">
+                        {% for emp in employees %}
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="target_users" value="{{ emp.username }}">
+                            <span class="p-name">{{ emp.name }}</span> <span style="color: var(--text-muted); font-family: monospace;" class="p-nik">({{ emp.username }})</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="title-label">Content</label>
+                    <textarea name="content" class="form-control" rows="5" placeholder="Write announcement details here..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">Publish Now</button>
+            </form>
+        </div>
+
+        <div class="glass-card">
+            <h3 class="card-title"><i class="fas fa-list-ul"></i> Announcement History</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Info & Target</th>
+                        <th>Title & Content</th>
+                        <th style="text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in all_news %}
+                    <tr>
+                        <td style="width: 130px;">
+                            <span class="badge badge-{{ item.category | lower }}">{{ item.category }}</span>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px; margin-bottom: 5px;">
+                                {{ item.created_at.strftime('%d %b %Y') }}
+                            </div>
+                            {% if item.target_type == 'specific' %}
+                                <span style="font-size: 9px; color: #f59e0b; border: 1px dashed #f59e0b; padding: 2px 4px; border-radius: 3px;"><i class="fas fa-user-lock"></i> Private</span>
+                            {% else %}
+                                <span style="font-size: 9px; color: #10b981; border: 1px dashed #10b981; padding: 2px 4px; border-radius: 3px;"><i class="fas fa-globe"></i> Public</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong style="display: block; color: #fff; margin-bottom: 5px;">{{ item.title }}</strong>
+                            <div style="color: var(--text-muted); font-size: 12px; line-height: 1.4;">
+                                {{ item.content[:100] }}{% if item.content|length > 100 %}...{% endif %}
+                            </div>
+                        </td>
+                        <td style="text-align: center; width: 50px;">
+                            <form action="{{ url_for('tpsg.delete_news', id=item.id) }}" method="POST" onsubmit="return confirm('Delete this announcement?')">
+                                <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 40px;">No announcements have been published yet.</td>
+                    </tr>
                     {% endfor %}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="title-label">Isi Konten</label>
-                <textarea name="content" class="form-control" rows="5" placeholder="Tuliskan detail pengumuman di sini..." required></textarea>
-            </div>
-
-            <button type="submit" class="btn-submit">Terbitkan Sekarang</button>
-        </form>
+                </tbody>
+            </table>
+        </div>
     </div>
+</div>
 
-    <div class="glass-card">
-        <h3 class="card-title"><i class="fas fa-list-ul"></i> Riwayat Pengumuman</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Info & Target</th>
-                    <th>Judul & Konten</th>
-                    <th style="text-align: center;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in all_news %}
-                <tr>
-                    <td style="width: 130px;">
-                        <span class="badge badge-{{ item.category | lower }}">{{ item.category }}</span>
-                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px; margin-bottom: 5px;">
-                            {{ item.created_at.strftime('%d %b %Y') }}
-                        </div>
-                        {% if item.target_type == 'specific' %}
-                            <span style="font-size: 9px; color: #f59e0b; border: 1px dashed #f59e0b; padding: 2px 4px; border-radius: 3px;"><i class="fas fa-user-lock"></i> Private</span>
-                        {% else %}
-                            <span style="font-size: 9px; color: #10b981; border: 1px dashed #10b981; padding: 2px 4px; border-radius: 3px;"><i class="fas fa-globe"></i> Publik</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <strong style="display: block; color: #fff; margin-bottom: 5px;">{{ item.title }}</strong>
-                        <div style="color: var(--text-muted); font-size: 12px; line-height: 1.4;">
-                            {{ item.content[:100] }}{% if item.content|length > 100 %}...{% endif %}
-                        </div>
-                    </td>
-                    <td style="text-align: center; width: 50px;">
-                        <form action="{{ url_for('tpsg.delete_news', id=item.id) }}" method="POST" onsubmit="return confirm('Hapus pengumuman ini?')">
-                            <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 40px;">Belum ada pengumuman yang diterbitkan.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<!-- TAB: MODUL E-LEARNING -->
+<div id="tab-modules" class="tab-content">
+    <div class="news-container">
+        <div class="glass-card">
+            <h3 class="card-title" style="color: #10b981;"><i class="fas fa-upload"></i> Upload Module</h3>
+            <form action="{{ url_for('tpsg.manage_modules') }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="title-label">Material / Module Title</label>
+                    <input type="text" name="title" class="form-control" required placeholder="Example: Yamazumi Creation Standard">
+                </div>
+                <div class="form-group">
+                    <label class="title-label">Target TPS Level (Filter)</label>
+                    <select name="tps_level" class="form-control" required>
+                        <option value="All Level">All Levels (Public)</option>
+                        <option value="TPS BASIC">TPS BASIC</option>
+                        <option value="TPS SW">TPS SW</option>
+                        <option value="TPS STEP UP">TPS STEP UP</option>
+                        <option value="TPS ADVANCE">TPS ADVANCE</option>
+                        <option value="TPS KEY PERSON 3">TPS KEY PERSON 3</option>
+                        <option value="TPS KEY PERSON 4">TPS KEY PERSON 4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="title-label">Short Description</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Explain the short content of this module..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="title-label">Select File (PDF, PPT, DOC)</label>
+                    <input type="file" name="file" class="form-control" required style="padding: 9px 15px;">
+                </div>
+                <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Save & Publish Module</button>
+            </form>
+        </div>
+
+        <div class="glass-card">
+            <h3 class="card-title"><i class="fas fa-book-open"></i> Module List</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title & Description</th>
+                        <th>Target Level</th>
+                        <th style="text-align: center;">File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for module in modules %}
+                    <tr>
+                        <td>
+                            <strong style="color: #fff; font-size: 14px;">{{ module.title }}</strong><br>
+                            <span style="color: #64748b; font-size: 12px;">{{ module.description[:100] }}...</span>
+                        </td>
+                        <td><span class="badge-level">{{ module.tps_level }}</span></td>
+                        <td style="text-align: center; width: 100px;">
+                            <a href="{{ url_for('static', filename='uploads/modules/' + module.file_name) }}" target="_blank" style="color: #10b981; text-decoration: none; font-weight: bold; font-size: 12px;"><i class="fas fa-external-link-alt"></i> View</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 40px;">No modules have been uploaded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    // Menyembunyikan/memunculkan daftar partisipan
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+        
+        // Simpan state tab ke localStorage jika perlu
+        localStorage.setItem('activeTpsgTab', tabId);
+    }
+
+    // Auto load tab dari localStorage atau URL
+    document.addEventListener('DOMContentLoaded', function() {
+        const activeTab = localStorage.getItem('activeTpsgTab');
+        if (activeTab) {
+            const tabEl = document.querySelector(`.tab-link[onclick*="${activeTab}"]`);
+            if (tabEl) switchTab(activeTab, tabEl);
+        }
+    });
+
     function toggleTarget() {
         const specificRadio = document.querySelector('input[name="target_type"][value="specific"]');
         const participantBox = document.getElementById('participant-selection');
-        const searchInput = document.getElementById('searchParticipantInput');
-        
-        if (specificRadio.checked) {
-            participantBox.style.display = 'block';
-        } else {
-            participantBox.style.display = 'none';
-            // Bersihkan input pencarian dan uncheck semua jika kembali ke "Semua"
-            searchInput.value = '';
-            filterParticipants(); // Reset filter
-            const checkboxes = document.querySelectorAll('input[name="target_users"]');
-            checkboxes.forEach(box => box.checked = false);
-        }
+        if (specificRadio.checked) participantBox.style.display = 'block';
+        else participantBox.style.display = 'none';
     }
 
-    // Fungsi pencarian partisipan
     function filterParticipants() {
         let input = document.getElementById('searchParticipantInput').value.toUpperCase();
         let labels = document.querySelectorAll('.checkbox-item');
-
         labels.forEach(label => {
-            // Ambil teks dari nama dan NPK yang ada di dalam label
             let text = label.textContent.toUpperCase();
-            
-            if (text.includes(input)) {
-                label.style.display = 'flex'; // Munculkan jika cocok
-            } else {
-                label.style.display = 'none'; // Sembunyikan jika tidak cocok
-            }
+            label.style.display = text.includes(input) ? 'flex' : 'none';
         });
     }
 </script>

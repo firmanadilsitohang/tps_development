@@ -20,7 +20,7 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted small mb-4">
-                        Edit persentase kelulusan untuk setiap batch. Data ini akan langsung tercermin pada grafik "Management Dashboard".
+                        Edit passing percentage for each batch. This data will be directly reflected on the "Management Dashboard".
                     </p>
                     
                     <form action="{{ url_for('tpsg.manage_charts') }}" method="POST">
@@ -79,7 +79,7 @@
                         
                         <div class="text-end mt-3">
                             <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save me-1"></i> Simpan & Update Grafik
+                                <i class="fas fa-save me-1"></i> Save & Update Chart
                             </button>
                         </div>
                     </form>
@@ -90,13 +90,13 @@
         <div class="col-md-4">
             <div class="card bg-dark text-white border-secondary">
                 <div class="card-header border-secondary">
-                    <h5 class="mb-0">Petunjuk Penggunaan</h5>
+                    <h5 class="mb-0">Usage Instructions</h5>
                 </div>
                 <div class="card-body small">
                     <ul class="ps-3 mb-0">
-                        <li class="mb-2">Masukkan angka saja (misal: 85) atau sertakan simbol % jika perlu.</li>
-                        <li class="mb-2">Perubahan di sini bersifat global dan akan mempengaruhi semua dashboard yang menampilkan grafik batch.</li>
-                        <li>Pastikan total persentase logis (biasanya 0-100%).</li>
+                        <li class="mb-2">Enter numbers only (e.g., 85) or include the % symbol if necessary.</li>
+                        <li class="mb-2">Changes here are global and will affect all dashboards displaying batch charts.</li>
+                        <li>Ensure the total percentage is logical (usually 0-100%).</li>
                     </ul>
                 </div>
             </div>

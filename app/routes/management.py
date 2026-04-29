@@ -175,40 +175,106 @@ def utilized_kp():
 @login_required
 @management_required
 def tps_advance():
-    this_year = 2026
-    adv_by_div = db.session.query(Division.name, func.count(Employee.id))\
-        .join(Employee).filter(Employee.current_tps_level.ilike('%ADVANCE%'))\
-        .group_by(Division.name).all()
+    level_filter = '%ADVANCE%'
     
-    adv_employees = Employee.query.filter(Employee.current_tps_level.ilike('%ADVANCE%')).all()
-    adv_details = {}
+    # Mapping Data
+    plant_results = db.session.query(Plant.name, func.count(Employee.id))\
+        .join(Employee).filter(Employee.current_tps_level.ilike(level_filter))\
+        .group_by(Plant.name).all()
+        
+    div_results = db.session.query(Division.name, func.count(Employee.id))\
+        .join(Employee).filter(Employee.current_tps_level.ilike(level_filter))\
+        .group_by(Division.name).all()
+        
+    dept_results = db.session.query(Department.name, func.count(Employee.id))\
+        .join(Employee).filter(Employee.current_tps_level.ilike(level_filter))\
+        .group_by(Department.name).all()
+
+    # Tooltip Details
+    adv_employees = Employee.query.filter(Employee.current_tps_level.ilike(level_filter)).all()
+    plant_details = {}
+    div_details = {}
+    dept_details = {}
+    
     for emp in adv_employees:
+        p_data = {
+            'id': emp.id,
+            'name': emp.name,
+            'photo': emp.photo or 'default.png',
+            'theme': emp.last_activity_theme or 'No Theme Activity',
+            'level': emp.current_tps_level
+        }
+        p_name = emp.plant.name if emp.plant else "No Plant"
+        if p_name not in plant_details: plant_details[p_name] = []
+        plant_details[p_name].append(p_data)
+        
         div_name = emp.division.name if emp.division else "No Division"
-        if div_name not in adv_details: adv_details[div_name] = []
-        adv_details[div_name].append({
-            'name': emp.name, 'photo': emp.photo or 'default.png', 'theme': emp.last_activity_theme or 'No Theme Activity'
-        })
-    demo_data = get_demo_data(['ADVANCE'], this_year)
+        if div_name not in div_details: div_details[div_name] = []
+        div_details[div_name].append(p_data)
+        
+        dept_name = emp.department.name if emp.department else "No Department"
+        if dept_name not in dept_details: dept_details[dept_name] = []
+        dept_details[dept_name].append(p_data)
+
     return render_template('management/tps_advance.html',
-        adv_div_labels=[d[0] for d in adv_by_div], adv_div_values=[d[1] for d in adv_by_div],
-        adv_details=adv_details, demo_data=demo_data
+        plant_labels=[r[0] for r in plant_results], plant_values=[r[1] for r in plant_results],
+        div_labels=[r[0] for r in div_results], div_values=[r[1] for r in div_results],
+        dept_labels=[r[0] for r in dept_results], dept_values=[r[1] for r in dept_results],
+        plant_details=plant_details, div_details=div_details, dept_details=dept_details,
+        total_count=len(adv_employees)
     )
 
 @management.route('/jishuken_office')
 @login_required
 @management_required
 def jishuken_office():
-    this_year = 2026
-    jishuken_by_dept = db.session.query(Department.name, func.count(Employee.id))\
-        .join(Employee).filter(Employee.current_tps_level.ilike('%JISHUKEN%'))\
+    level_filter = '%JISHUKEN%'
+    
+    # Mapping Data
+    plant_results = db.session.query(Plant.name, func.count(Employee.id))\
+        .join(Employee).filter(Employee.current_tps_level.ilike(level_filter))\
+        .group_by(Plant.name).all()
+        
+    div_results = db.session.query(Division.name, func.count(Employee.id))\
+        .join(Employee).filter(Employee.current_tps_level.ilike(level_filter))\
+        .group_by(Division.name).all()
+        
+    dept_results = db.session.query(Department.name, func.count(Employee.id))\
+        .join(Employee).filter(Employee.current_tps_level.ilike(level_filter))\
         .group_by(Department.name).all()
-    has_theme = Employee.query.filter(Employee.last_activity_theme != None, Employee.last_activity_theme != "").count()
-    no_theme = Employee.query.filter((Employee.last_activity_theme == None) | (Employee.last_activity_theme == "")).count()
-    demo_data = get_demo_data(['JISHUKEN'], this_year)
+
+    # Tooltip Details
+    jis_employees = Employee.query.filter(Employee.current_tps_level.ilike(level_filter)).all()
+    plant_details = {}
+    div_details = {}
+    dept_details = {}
+    
+    for emp in jis_employees:
+        p_data = {
+            'id': emp.id,
+            'name': emp.name,
+            'photo': emp.photo or 'default.png',
+            'theme': emp.last_activity_theme or 'No Theme Activity',
+            'level': emp.current_tps_level
+        }
+        p_name = emp.plant.name if emp.plant else "No Plant"
+        if p_name not in plant_details: plant_details[p_name] = []
+        plant_details[p_name].append(p_data)
+        
+        div_name = emp.division.name if emp.division else "No Division"
+        if div_name not in div_details: div_details[div_name] = []
+        div_details[div_name].append(p_data)
+        
+        dept_name = emp.department.name if emp.department else "No Department"
+        if dept_name not in dept_details: dept_details[dept_name] = []
+        dept_details[dept_name].append(p_data)
+
     return render_template('management/jishuken_office.html',
-        dept_labels=[d[0] for d in jishuken_by_dept], dept_values=[d[1] for d in jishuken_by_dept],
-        util_labels=['With Theme', 'No Theme'], util_values=[has_theme, no_theme],
-        demo_data=demo_data
+        plant_labels=[r[0] for r in plant_results], plant_values=[r[1] for r in plant_results],
+        div_labels=[r[0] for r in div_results], div_values=[r[1] for r in div_results],
+        dept_labels=[r[0] for r in dept_results], dept_values=[r[1] for r in dept_results],
+        plant_details=plant_details, div_details=div_details, dept_details=dept_details,
+        total_count=len(jis_employees)
     )
 
 @management.route('/participants')
