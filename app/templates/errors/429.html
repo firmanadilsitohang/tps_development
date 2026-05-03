@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}429 - Rate Limit | TPS-G{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 40px;">
+    <div style="font-size: 100px; font-weight: bold; color: var(--accent-gold); font-family: 'Oswald', sans-serif; text-shadow: 0 0 30px rgba(245, 158, 11, 0.3);">429</div>
+    <h2 style="color: #fff; margin: 20px 0;">Terlalu Banyak Permintaan</h2>
+    <p style="color: var(--text-muted); max-width: 400px; margin-bottom: 30px;">
+        Anda telah melakukan terlalu banyak permintaan dalam waktu singkat. Silakan tunggu beberapa saat sebelum mencoba lagi.
+    </p>
+    <a href="javascript:history.back()" style="background: var(--accent-cyan); color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+        <i class="fas fa-redo"></i> Coba Lagi
+    </a>
+</div>
+{% endblock %}

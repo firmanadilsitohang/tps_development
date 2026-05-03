@@ -8,3 +8,4 @@ from .user import User
 from .employee import Employee, Plant, Division, Department, BatchStat, WorkshopEvaluation
 from .module import LearningModule
 from .development import Training, Activity
+from .stams import UserSTAMS, Project, Department as STAMSDepartment, Section as STAMSSection, WorkshopProgress

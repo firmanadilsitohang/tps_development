@@ -1,5 +1,8 @@
 from . import db
-from datetime import datetime
+from datetime import datetime, timezone
+
+def utc_now():
+    return datetime.now(timezone.utc)
 
 class Plant(db.Model):
     __tablename__ = 'plants'
@@ -35,7 +38,7 @@ class Employee(db.Model):
     last_activity_theme = db.Column(db.String(200))
     last_activity_type = db.Column(db.String(50))
     batch = db.Column(db.String(50), nullable=True)
-    registration_year = db.Column(db.Integer, default=lambda: datetime.utcnow().year)
+    registration_year = db.Column(db.Integer, default=lambda: datetime.now(timezone.utc).year)
     status = db.Column(db.String(20), default='pending')
     plant_id = db.Column(db.Integer, db.ForeignKey('plants.id'))
     division_id = db.Column(db.Integer, db.ForeignKey('divisions.id'))
@@ -50,7 +53,7 @@ class WorkshopActivity(db.Model):
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
     theme_title = db.Column(db.String(200), nullable=False)
     participant_file = db.Column(db.String(255), nullable=True)
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    submitted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     status = db.Column(db.String(20), default='pending') 
     score = db.Column(db.Integer, default=0)
     feedback = db.Column(db.Text, nullable=True)
@@ -72,7 +75,7 @@ class WorkshopEvaluation(db.Model):
     final_decision = db.Column(db.String(20), default='PASS')
     notes = db.Column(db.Text, nullable=True)
     evaluated_by = db.Column(db.String(100), nullable=True)
-    evaluated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    evaluated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 class BatchStat(db.Model):
     __tablename__ = 'batch_stats'

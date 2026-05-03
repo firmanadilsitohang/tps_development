@@ -1,36 +1,252 @@
 {% extends "base.html" %}
 
-{% block title %}Manage Chart Data - TPS-G Admin{% endblock %}
+{% block title %}Chart Data Management | TPS-G Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 24px 30px;
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 4px;
+    }
+
+    /* Card */
+    .content-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    /* Form */
+    .form-control {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 8px 12px;
+        font-size: 14px;
+        color: var(--gray-800);
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(31, 78, 159, 0.1);
+        background: white;
+    }
+
+    /* Table */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: var(--gray-50);
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 14px;
+        color: var(--gray-700);
+        vertical-align: middle;
+    }
+
+    tbody tr:hover td {
+        background: var(--gray-50);
+    }
+
+    /* Input Group */
+    .input-group-sm {
+        display: flex;
+        align-items: center;
+        gap: 0;
+    }
+
+    .input-group-sm .form-control {
+        border-radius: var(--radius) 0 0 var(--radius);
+        max-width: 80px;
+    }
+
+    .input-suffix {
+        background: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        border-left: none;
+        padding: 6px 12px;
+        font-size: 12px;
+        color: var(--gray-500);
+        border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    /* Info Card */
+    .info-card {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 20px;
+    }
+
+    .info-card-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-list li {
+        font-size: 13px;
+        color: var(--gray-600);
+        padding: 6px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .info-list li i {
+        color: var(--primary);
+        margin-top: 3px;
+        font-size: 12px;
+    }
+
+    /* New Row */
+    .new-row td {
+        background: rgba(31, 78, 159, 0.03);
+    }
+
+    .new-row input {
+        border-color: var(--primary);
+    }
+
+    /* Buttons */
+    .btn-save {
+        background: var(--success);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-save:hover {
+        background: #15803d;
+        transform: translateY(-1px);
+    }
+
+    .btn-back {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-back:hover {
+        background: var(--gray-200);
+        color: var(--gray-800);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-edit me-2"></i> Manage Global Chart Data</h2>
-        <a href="{{ url_for('tpsg.dashboard') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
-        </a>
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="page-title"><i class="fas fa-chart-bar me-2" style="color: var(--primary);"></i> Chart Data Management</h1>
+                <p style="color: var(--gray-500); font-size: 13px; margin-bottom: 0;">Manage batch success rate data for dashboard charts</p>
+            </div>
+            <a href="{{ url_for('tpsg.dashboard') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
     </div>
 
     <div class="row">
-        <div class="col-md-8">
-            <div class="card bg-dark text-white border-secondary mb-4">
-                <div class="card-header border-secondary d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Batch Success Rate Data</h5>
-                    <span class="badge bg-primary">Manual Overide</span>
+        <div class="col-lg-8">
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">Batch Success Rate Data</h3>
+                    <span class="badge badge-primary">Manual Override</span>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted small mb-4">
-                        Edit passing percentage for each batch. This data will be directly reflected on the "Management Dashboard".
+                    <p style="color: var(--gray-500); font-size: 13px; margin-bottom: 20px;">
+                        Edit passing percentage for each batch. Changes will be reflected directly on the dashboard charts.
                     </p>
-                    
+
                     <form action="{{ url_for('tpsg.manage_charts') }}" method="POST">
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover align-middle">
-                                <thead class="table-secondary text-dark">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="table-container">
+                            <table>
+                                <thead>
                                     <tr>
                                         <th>Batch Name</th>
-                                        <th>KP 4 (%)</th>
-                                        <th>KP 3 (%)</th>
+                                        <th style="width: 160px;">KP 4 (%)</th>
+                                        <th style="width: 160px;">KP 3 (%)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,48 +254,48 @@
                                     <tr>
                                         <td>
                                             <input type="hidden" name="batch_id" value="{{ bs.id }}">
-                                            <input type="text" name="batch_name_{{ bs.id }}" value="{{ bs.batch_name }}" class="form-control form-control-sm bg-dark text-white border-secondary font-weight-bold">
+                                            <input type="text" name="batch_name_{{ bs.id }}" value="{{ bs.batch_name }}"
+                                                   class="form-control" style="font-weight: 600;">
                                         </td>
                                         <td>
-                                            <div class="input-group input-group-sm">
-                                                <input type="text" name="kp4_pct_{{ bs.id }}" value="{{ bs.kp4_percent }}" class="form-control bg-dark text-white border-secondary">
-                                                <span class="input-group-text bg-dark border-secondary text-muted">%</span>
+                                            <div class="input-group-sm">
+                                                <input type="text" name="kp4_pct_{{ bs.id }}" value="{{ bs.kp4_percent }}" class="form-control">
+                                                <span class="input-suffix">%</span>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="input-group input-group-sm">
-                                                <input type="text" name="kp3_pct_{{ bs.id }}" value="{{ bs.kp3_percent }}" class="form-control bg-dark text-white border-secondary">
-                                                <span class="input-group-text bg-dark border-secondary text-muted">%</span>
+                                            <div class="input-group-sm">
+                                                <input type="text" name="kp3_pct_{{ bs.id }}" value="{{ bs.kp3_percent }}" class="form-control">
+                                                <span class="input-suffix">%</span>
                                             </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
-                                    
-                                    <!-- New Batch Row -->
-                                    <tr class="table-info text-dark">
+
+                                    <tr class="new-row">
                                         <td>
-                                            <input type="text" name="new_batch_name" placeholder="Add New Batch (e.g. B-12)" class="form-control form-control-sm border-info">
+                                            <input type="text" name="new_batch_name" placeholder="Add New Batch (e.g. B-12)" class="form-control">
                                         </td>
                                         <td>
-                                            <div class="input-group input-group-sm">
-                                                <input type="text" name="new_kp4_pct" placeholder="0" class="form-control border-info">
-                                                <span class="input-group-text border-info">%</span>
+                                            <div class="input-group-sm">
+                                                <input type="text" name="new_kp4_pct" placeholder="0" class="form-control">
+                                                <span class="input-suffix">%</span>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="input-group input-group-sm">
-                                                <input type="text" name="new_kp3_pct" placeholder="0" class="form-control border-info">
-                                                <span class="input-group-text border-info">%</span>
+                                            <div class="input-group-sm">
+                                                <input type="text" name="new_kp3_pct" placeholder="0" class="form-control">
+                                                <span class="input-suffix">%</span>
                                             </div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        
-                        <div class="text-end mt-3">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save me-1"></i> Save & Update Chart
+
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i> Save & Update Chart
                             </button>
                         </div>
                     </form>
@@ -87,17 +303,24 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card bg-dark text-white border-secondary">
-                <div class="card-header border-secondary">
-                    <h5 class="mb-0">Usage Instructions</h5>
+        <div class="col-lg-4">
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">Usage Instructions</h3>
                 </div>
-                <div class="card-body small">
-                    <ul class="ps-3 mb-0">
-                        <li class="mb-2">Enter numbers only (e.g., 85) or include the % symbol if necessary.</li>
-                        <li class="mb-2">Changes here are global and will affect all dashboards displaying batch charts.</li>
-                        <li>Ensure the total percentage is logical (usually 0-100%).</li>
-                    </ul>
+                <div class="card-body">
+                    <div class="info-card">
+                        <div class="info-card-title">
+                            <i class="fas fa-info-circle" style="color: var(--primary);"></i>
+                            How to Use
+                        </div>
+                        <ul class="info-list">
+                            <li><i class="fas fa-check"></i> Enter numbers only (e.g., 85) without the % symbol</li>
+                            <li><i class="fas fa-check"></i> Changes are global and affect all dashboards</li>
+                            <li><i class="fas fa-check"></i> Total percentage should be logical (usually 0-100%)</li>
+                            <li><i class="fas fa-check"></i> Leave "Add New Batch" row empty to skip adding</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

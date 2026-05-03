@@ -4,106 +4,378 @@
 
 {% block extra_css %}
 <style>
-    /* Tab Styling */
+    .page-header {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 24px 30px;
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Tab Navigation */
     .nav-tabs {
-        display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--gray-200);
+        padding-bottom: 12px;
     }
+
     .tab-link {
-        padding: 10px 20px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 13px;
-        font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; cursor: pointer;
+        padding: 9px 20px;
+        border-radius: var(--radius);
+        color: var(--gray-500);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
-    .tab-link.active { background: rgba(10, 116, 255, 0.15); color: var(--accent-cyan); box-shadow: 0 0 15px rgba(10, 116, 255, 0.2); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
 
-    /* Container Styling */
-    .news-container { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
-
-    /* Card Styling */
-    .glass-card {
-        background: rgba(5, 10, 20, 0.95); border: 1px solid var(--border-glass);
-        border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    .tab-link:hover {
+        background: var(--gray-100);
+        color: var(--gray-700);
     }
+
+    .tab-link.active {
+        background: var(--primary);
+        color: white;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Card */
+    .content-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
     .card-title {
-        font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px;
-        color: var(--accent-cyan); margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
-        padding-bottom: 10px; display: flex; align-items: center; gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gray-900);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    /* Form Elements */
-    .form-group { margin-bottom: 15px; }
-    .form-group label.title-label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; }
-    
+    /* Form */
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
     .form-control {
-        width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 8px; padding: 12px; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; transition: 0.3s;
+        width: 100%;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        font-size: 14px;
+        color: var(--gray-800);
+        transition: all 0.2s;
     }
-    .form-control:focus { border-color: var(--accent-cyan); outline: none; background: rgba(10, 116, 255, 0.05); }
 
-    .btn-submit {
-        width: 100%; background: linear-gradient(135deg, #0A74FF 0%, #0356C5 100%);
-        color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700;
-        text-transform: uppercase; cursor: pointer; transition: 0.3s; margin-top: 10px;
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(31, 78, 159, 0.1);
+        background: white;
     }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(10, 116, 255, 0.4); }
 
-    /* Table & Badges */
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th { text-align: left; font-size: 11px; color: var(--text-muted); text-transform: uppercase; padding: 12px; border-bottom: 2px solid rgba(255,255,255,0.05); }
-    td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; vertical-align: top; }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-    .badge-news { background: rgba(10, 116, 255, 0.15); color: #0A74FF; border: 1px solid #0A74FF; }
-    .badge-schedule { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
-    .btn-delete { color: var(--accent-red); background: none; border: none; cursor: pointer; font-size: 14px; transition: 0.3s; }
-    .btn-delete:hover { transform: scale(1.2); color: #ff4d4d; }
+    /* Buttons */
+    .btn-primary-custom {
+        width: 100%;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: var(--radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
 
-    /* Custom Checkbox Scroll Area & Search */
-    .search-participant-wrapper { position: relative; margin-bottom: 8px; }
-    .search-participant-wrapper i { position: absolute; left: 10px; top: 10px; color: #64748b; font-size: 12px; }
+    .btn-primary-custom:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-secondary-custom {
+        width: 100%;
+        background: linear-gradient(135deg, var(--success) 0%, #15803d 100%);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: var(--radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-secondary-custom:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+
+    /* Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: var(--gray-50);
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 13px;
+        color: var(--gray-700);
+        vertical-align: top;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: var(--gray-50);
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge-news {
+        background: rgba(31, 78, 159, 0.1);
+        color: var(--primary);
+    }
+
+    .badge-schedule {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    /* Scope Badges */
+    .scope-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        border: 1px solid;
+    }
+
+    .scope-public {
+        background: rgba(22, 163, 74, 0.08);
+        color: var(--success);
+        border-color: rgba(22, 163, 74, 0.3);
+    }
+
+    .scope-private {
+        background: rgba(245, 158, 11, 0.08);
+        color: var(--warning);
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    /* Search & Checkbox */
+    .search-participant-wrapper {
+        position: relative;
+        margin-bottom: 8px;
+    }
+
+    .search-participant-wrapper i {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        color: var(--gray-400);
+        font-size: 12px;
+    }
+
     .search-participant-input {
-        width: 100%; background: #0f172a; border: 1px solid #1e293b; padding: 8px 10px 8px 30px;
-        border-radius: 6px; color: #fff; font-size: 11px; outline: none; transition: 0.3s;
+        width: 100%;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        padding: 8px 10px 8px 32px;
+        border-radius: var(--radius);
+        font-size: 13px;
+        color: var(--gray-800);
+        transition: all 0.2s;
     }
-    .search-participant-input:focus { border-color: #0A74FF; }
+
+    .search-participant-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+    }
 
     .checkbox-list {
-        max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2);
-        padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+        max-height: 200px;
+        overflow-y: auto;
+        background: var(--gray-50);
+        padding: 10px;
+        border-radius: var(--radius);
+        border: 1px solid var(--gray-200);
     }
+
     .checkbox-item {
-        display: flex; align-items: center; gap: 10px; font-size: 12px; color: #e2e8f0;
-        padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.02); cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: var(--gray-700);
+        padding: 8px 6px;
+        border-bottom: 1px solid var(--gray-100);
+        cursor: pointer;
+        transition: background 0.15s;
     }
-    .checkbox-item:hover { background: rgba(10, 116, 255, 0.1); }
-    
-    .badge-level { background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid #f59e0b; }
+
+    .checkbox-item:last-child {
+        border-bottom: none;
+    }
+
+    .checkbox-item:hover {
+        background: var(--gray-100);
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 15px;
+        display: inline-block;
+        margin-right: 10px;
+        transition: color 0.2s;
+    }
+
+    .btn-action:hover {
+        color: var(--primary-dark);
+    }
+
+    .btn-delete {
+        color: var(--danger);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        display: inline;
+        padding: 0;
+    }
+
+    .btn-delete:hover {
+        color: #dc2626;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: var(--gray-400);
+    }
+
+    .empty-state i {
+        font-size: 36px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+
+    /* Grid Layout */
+    .news-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+        .news-container {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 25px;">
-    <h2 style="font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 1px; color: #fff;">Broadcast Center</h2>
-    <p style="color: var(--text-muted); font-size: 13px;">Manage news announcements and learning materials (E-Learning) for participants.</p>
+<div class="page-header">
+    <h1 class="page-title">Broadcast Center</h1>
+    <p style="color: var(--gray-500); font-size: 13px; margin-bottom: 0;">Manage announcements and E-Learning materials</p>
 </div>
 
 <div class="nav-tabs">
-    <div class="tab-link active" onclick="switchTab('tab-news', this)"><i class="fas fa-bullhorn me-2"></i> Manage Announcements</div>
-    <div class="tab-link" onclick="switchTab('tab-modules', this)"><i class="fas fa-book me-2"></i> E-Learning Modules</div>
+    <div class="tab-link active" onclick="switchTab('tab-news', this)">
+        <i class="fas fa-bullhorn"></i> Announcements
+    </div>
+    <div class="tab-link" onclick="switchTab('tab-modules', this)">
+        <i class="fas fa-book"></i> E-Learning Modules
+    </div>
 </div>
 
-<!-- TAB: PENGUMUMAN -->
+<!-- TAB: ANNOUNCEMENTS -->
 <div id="tab-news" class="tab-content active">
     <div class="news-container">
-        <div class="glass-card">
-            <h3 class="card-title"><i class="fas fa-plus-circle"></i> Create New</h3>
+        <div class="content-card">
+            <h3 class="card-title"><i class="fas fa-plus-circle" style="color: var(--primary);"></i> Create New</h3>
             <form action="{{ url_for('tpsg.manage_news') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group">
-                    <label class="title-label">Announcement Title</label>
+                    <label class="form-label">Announcement Title</label>
                     <input type="text" name="title" class="form-control" placeholder="Example: Batch 5 Exam Schedule" required>
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="title-label">Category</label>
+                    <label class="form-label">Category</label>
                     <select name="category" class="form-control">
                         <option value="News">News / Information</option>
                         <option value="Schedule">Activity Schedule</option>
@@ -111,48 +383,52 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="title-label">Target Audience</label>
-                    <div style="display: flex; gap: 20px; font-size: 12px; color: #fff; margin-top: 8px;">
-                        <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <label class="form-label">Target Audience</label>
+                    <div style="display: flex; gap: 16px; font-size: 13px; color: var(--gray-700); margin-top: 6px;">
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
                             <input type="radio" name="target_type" value="all" checked onchange="toggleTarget()"> All Participants
                         </label>
-                        <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                            <input type="radio" name="target_type" value="specific" onchange="toggleTarget()"> Specific Participants
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <input type="radio" name="target_type" value="specific" onchange="toggleTarget()"> Specific
                         </label>
                     </div>
                 </div>
 
                 <div class="form-group" id="participant-selection" style="display: none;">
-                    <label class="title-label" style="color: #f59e0b;">Search & Select Participants</label>
+                    <label class="form-label" style="color: var(--warning);">Search & Select Participants</label>
                     <div class="search-participant-wrapper">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="searchParticipantInput" class="search-participant-input" placeholder="Type name or NPK..." onkeyup="filterParticipants()">
+                        <input type="text" id="searchParticipantInput" class="search-participant-input"
+                            placeholder="Type name or NPK..." onkeyup="filterParticipants()">
                     </div>
                     <div class="checkbox-list" id="participantCheckboxList">
                         {% for emp in employees %}
                         <label class="checkbox-item">
                             <input type="checkbox" name="target_users" value="{{ emp.username }}">
-                            <span class="p-name">{{ emp.name }}</span> <span style="color: var(--text-muted); font-family: monospace;" class="p-nik">({{ emp.username }})</span>
+                            <span>{{ emp.name }}</span>
+                            <span style="color: var(--gray-400); font-family: monospace; font-size: 11px;">({{ emp.username }})</span>
                         </label>
                         {% endfor %}
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="title-label">Content</label>
-                    <textarea name="content" class="form-control" rows="5" placeholder="Write announcement details here..." required></textarea>
+                    <label class="form-label">Content</label>
+                    <textarea name="content" class="form-control" rows="4" placeholder="Write announcement details here..." required></textarea>
                 </div>
 
-                <button type="submit" class="btn-submit">Publish Now</button>
+                <button type="submit" class="btn-primary-custom">
+                    <i class="fas fa-paper-plane"></i> Publish Now
+                </button>
             </form>
         </div>
 
-        <div class="glass-card">
-            <h3 class="card-title"><i class="fas fa-list-ul"></i> Announcement History</h3>
+        <div class="content-card">
+            <h3 class="card-title"><i class="fas fa-list-ul" style="color: var(--gray-600);"></i> Announcement History</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Info & Target</th>
+                        <th>Category & Date</th>
                         <th>Title & Content</th>
                         <th style="text-align: center;">Action</th>
                     </tr>
@@ -160,32 +436,39 @@
                 <tbody>
                     {% for item in all_news %}
                     <tr>
-                        <td style="width: 130px;">
+                        <td style="width: 140px;">
                             <span class="badge badge-{{ item.category | lower }}">{{ item.category }}</span>
-                            <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px; margin-bottom: 5px;">
+                            <div style="font-size: 11px; color: var(--gray-400); margin-top: 8px;">
                                 {{ item.created_at.strftime('%d %b %Y') }}
                             </div>
                             {% if item.target_type == 'specific' %}
-                                <span style="font-size: 9px; color: #f59e0b; border: 1px dashed #f59e0b; padding: 2px 4px; border-radius: 3px;"><i class="fas fa-user-lock"></i> Private</span>
+                            <span class="scope-badge scope-private"><i class="fas fa-lock"></i> Private</span>
                             {% else %}
-                                <span style="font-size: 9px; color: #10b981; border: 1px dashed #10b981; padding: 2px 4px; border-radius: 3px;"><i class="fas fa-globe"></i> Public</span>
+                            <span class="scope-badge scope-public"><i class="fas fa-globe"></i> Public</span>
                             {% endif %}
                         </td>
                         <td>
-                            <strong style="display: block; color: #fff; margin-bottom: 5px;">{{ item.title }}</strong>
-                            <div style="color: var(--text-muted); font-size: 12px; line-height: 1.4;">
+                            <strong style="display: block; color: var(--gray-900); margin-bottom: 4px; font-size: 14px;">{{ item.title }}</strong>
+                            <div style="color: var(--gray-500); font-size: 12px; line-height: 1.4;">
                                 {{ item.content[:100] }}{% if item.content|length > 100 %}...{% endif %}
                             </div>
                         </td>
-                        <td style="text-align: center; width: 50px;">
-                            <form action="{{ url_for('tpsg.delete_news', id=item.id) }}" method="POST" onsubmit="return confirm('Delete this announcement?')">
+                        <td style="text-align: center; width: 100px;">
+                            <a href="{{ url_for('tpsg.edit_news', id=item.id) }}" class="btn-action" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('tpsg.delete_news', id=item.id) }}" method="POST" onsubmit="return confirm('Delete this announcement?')" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i></button>
                             </form>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 40px;">No announcements have been published yet.</td>
+                        <td colspan="3" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No announcements have been published yet.</p>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -194,20 +477,21 @@
     </div>
 </div>
 
-<!-- TAB: MODUL E-LEARNING -->
+<!-- TAB: E-LEARNING MODULES -->
 <div id="tab-modules" class="tab-content">
     <div class="news-container">
-        <div class="glass-card">
-            <h3 class="card-title" style="color: #10b981;"><i class="fas fa-upload"></i> Upload Module</h3>
+        <div class="content-card">
+            <h3 class="card-title"><i class="fas fa-upload" style="color: var(--success);"></i> Upload Module</h3>
             <form action="{{ url_for('tpsg.manage_modules') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group">
-                    <label class="title-label">Material / Module Title</label>
+                    <label class="form-label">Material Title</label>
                     <input type="text" name="title" class="form-control" required placeholder="Example: Yamazumi Creation Standard">
                 </div>
                 <div class="form-group">
-                    <label class="title-label">Target TPS Level (Filter)</label>
+                    <label class="form-label">Target TPS Level</label>
                     <select name="tps_level" class="form-control" required>
-                        <option value="All Level">All Levels (Public)</option>
+                        <option value="All Level">All Levels</option>
                         <option value="TPS BASIC">TPS BASIC</option>
                         <option value="TPS SW">TPS SW</option>
                         <option value="TPS STEP UP">TPS STEP UP</option>
@@ -217,42 +501,62 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="title-label">Short Description</label>
-                    <textarea name="description" class="form-control" rows="3" placeholder="Explain the short content of this module..."></textarea>
+                    <label class="form-label">Short Description</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Brief description of this module..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="title-label">Select File (PDF, PPT, DOC)</label>
-                    <input type="file" name="file" class="form-control" required style="padding: 9px 15px;">
+                    <label class="form-label">Select File (PDF, PPT, DOC)</label>
+                    <input type="file" name="file" class="form-control" required style="padding: 8px 12px;">
                 </div>
-                <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Save & Publish Module</button>
+                <button type="submit" class="btn-secondary-custom">
+                    <i class="fas fa-cloud-upload-alt"></i> Save & Publish
+                </button>
             </form>
         </div>
 
-        <div class="glass-card">
-            <h3 class="card-title"><i class="fas fa-book-open"></i> Module List</h3>
+        <div class="content-card">
+            <h3 class="card-title"><i class="fas fa-book-open" style="color: var(--gray-600);"></i> Module List</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Title & Description</th>
                         <th>Target Level</th>
                         <th style="text-align: center;">File</th>
+                        <th style="text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for module in modules %}
                     <tr>
                         <td>
-                            <strong style="color: #fff; font-size: 14px;">{{ module.title }}</strong><br>
-                            <span style="color: #64748b; font-size: 12px;">{{ module.description[:100] }}...</span>
+                            <strong style="color: var(--gray-900); font-size: 13px;">{{ module.title }}</strong><br>
+                            <span style="color: var(--gray-400); font-size: 12px;">{{ module.description[:80] }}...</span>
                         </td>
-                        <td><span class="badge-level">{{ module.tps_level }}</span></td>
+                        <td>
+                            <span class="badge badge-news">{{ module.tps_level }}</span>
+                        </td>
+                        <td style="text-align: center; width: 80px;">
+                            <a href="{{ url_for('static', filename='uploads/modules/' + module.file_name) }}" target="_blank"
+                               style="color: var(--success); text-decoration: none; font-size: 12px; font-weight: 600;">
+                                <i class="fas fa-external-link-alt me-1"></i> View
+                            </a>
+                        </td>
                         <td style="text-align: center; width: 100px;">
-                            <a href="{{ url_for('static', filename='uploads/modules/' + module.file_name) }}" target="_blank" style="color: #10b981; text-decoration: none; font-weight: bold; font-size: 12px;"><i class="fas fa-external-link-alt"></i> View</a>
+                            <a href="{{ url_for('tpsg.edit_module', id=module.id) }}" class="btn-action" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('tpsg.delete_module', id=module.id) }}" method="POST" onsubmit="return confirm('Delete this module?')" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i></button>
+                            </form>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 40px;">No modules have been uploaded yet.</td>
+                        <td colspan="4" class="empty-state">
+                            <i class="fas fa-book-open"></i>
+                            <p>No modules have been uploaded yet.</p>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -262,40 +566,35 @@
 </div>
 
 <script>
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
-        
-        document.getElementById(tabId).classList.add('active');
-        el.classList.add('active');
-        
-        // Simpan state tab ke localStorage jika perlu
-        localStorage.setItem('activeTpsgTab', tabId);
-    }
+function switchTab(tabId, el) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    el.classList.add('active');
+    localStorage.setItem('activeTpsgTab', tabId);
+}
 
-    // Auto load tab dari localStorage atau URL
-    document.addEventListener('DOMContentLoaded', function() {
-        const activeTab = localStorage.getItem('activeTpsgTab');
-        if (activeTab) {
-            const tabEl = document.querySelector(`.tab-link[onclick*="${activeTab}"]`);
-            if (tabEl) switchTab(activeTab, tabEl);
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    const activeTab = localStorage.getItem('activeTpsgTab');
+    if (activeTab) {
+        const tabEl = document.querySelector(`.tab-link[onclick*="${activeTab}"]`);
+        if (tabEl) switchTab(activeTab, tabEl);
+    }
+});
+
+function toggleTarget() {
+    const specificRadio = document.querySelector('input[name="target_type"][value="specific"]');
+    const participantBox = document.getElementById('participant-selection');
+    participantBox.style.display = specificRadio.checked ? 'block' : 'none';
+}
+
+function filterParticipants() {
+    const input = document.getElementById('searchParticipantInput').value.toUpperCase();
+    const labels = document.querySelectorAll('.checkbox-item');
+    labels.forEach(label => {
+        const text = label.textContent.toUpperCase();
+        label.style.display = text.includes(input) ? 'flex' : 'none';
     });
-
-    function toggleTarget() {
-        const specificRadio = document.querySelector('input[name="target_type"][value="specific"]');
-        const participantBox = document.getElementById('participant-selection');
-        if (specificRadio.checked) participantBox.style.display = 'block';
-        else participantBox.style.display = 'none';
-    }
-
-    function filterParticipants() {
-        let input = document.getElementById('searchParticipantInput').value.toUpperCase();
-        let labels = document.querySelectorAll('.checkbox-item');
-        labels.forEach(label => {
-            let text = label.textContent.toUpperCase();
-            label.style.display = text.includes(input) ? 'flex' : 'none';
-        });
-    }
+}
 </script>
 {% endblock %}

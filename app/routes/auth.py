@@ -5,6 +5,7 @@ from datetime import datetime
 from app.models.user import User
 from app.models.employee import Employee, Plant, Division, Department
 from app import db
+from app import limiter
 
 # TAMBAHKAN url_prefix='/auth' agar alamatnya jadi /auth/login
 auth = Blueprint('auth', __name__, url_prefix='/auth')
@@ -14,39 +15,25 @@ auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @auth.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     if current_user.is_authenticated:
-        # Redirect cerdas berdasarkan ROLE
-        if current_user.role == 'tpsg':
-            return redirect(url_for('tpsg.dashboard'))
-        elif current_user.role == 'management':
-            return redirect(url_for('management.dashboard'))
-        elif current_user.role == 'omdd':
-            return redirect(url_for('omdd.dashboard'))
-        else:
-            return redirect(url_for('participant.dashboard'))
+        return redirect(url_for('tpsg.dashboard'))
 
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
-        
+
         if user and user.check_password(password):
             login_user(user)
-            # Redirect setelah berhasil login
-            if user.role == 'tpsg':
-                return redirect(url_for('tpsg.dashboard'))
-            elif user.role == 'management':
-                return redirect(url_for('management.dashboard'))
-            elif user.role == 'omdd':
-                return redirect(url_for('omdd.dashboard'))
-            else:
-                return redirect(url_for('participant.dashboard'))
-        
+            return redirect(url_for('tpsg.dashboard'))
+
         flash('NIK atau Password salah. Silakan coba lagi.', 'danger')
     return render_template('auth/login.html')
 
 @auth.route('/register', methods=['GET', 'POST'])
+@limiter.limit("3 per hour")
 def register():
     if request.method == 'POST':
         name = request.form.get('name')

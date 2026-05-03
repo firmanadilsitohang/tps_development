@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Internal Server Error | TPS-G{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 40px;">
+    <div style="font-size: 120px; font-weight: bold; color: var(--accent-red); font-family: 'Oswald', sans-serif; text-shadow: 0 0 30px rgba(255, 0, 85, 0.3);">500</div>
+    <h2 style="color: #fff; margin: 20px 0;">Terjadi Kesalahan Server</h2>
+    <p style="color: var(--text-muted); max-width: 400px; margin-bottom: 30px;">
+        Maaf, terjadi kesalahan pada server. Tim kami telah diberitahu dan sedang bekerja memperbaikinya. Silakan coba lagi beberapa saat lagi.
+    </p>
+    <a href="javascript:history.back()" style="background: rgba(255,255,255,0.1); color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-right: 15px;">
+        <i class="fas fa-arrow-left"></i> Kembali
+    </a>
+    <a href="{{ url_for('auth.login') }}" style="background: var(--accent-cyan); color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+        <i class="fas fa-home"></i> Login
+    </a>
+</div>
+{% endblock %}

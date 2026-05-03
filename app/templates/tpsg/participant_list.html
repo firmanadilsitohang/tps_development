@@ -1,0 +1,564 @@
+{% extends "base.html" %}
+
+{% block title %}Participant Database | TPS-G Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .main-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        padding: 24px;
+    }
+
+    .card-header-stams {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .list-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--gray-900);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .count-badge {
+        background: rgba(31, 78, 159, 0.1);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .search-input-wrapper {
+        position: relative;
+        margin-bottom: 16px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+    }
+
+    .stams-input {
+        width: 100%;
+        padding: 12px 16px 12px 45px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        font-size: 14px;
+        background: var(--gray-50);
+    }
+
+    .stams-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(31, 78, 159, 0.1);
+        background: white;
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .stams-select {
+        min-width: 160px;
+        padding: 10px 12px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        font-size: 14px;
+        color: var(--gray-700);
+        background: white;
+    }
+
+    .stams-select:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .stams-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+    .stams-table th {
+        background: var(--gray-50);
+        padding: 14px 16px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .stams-table td {
+        padding: 16px;
+        font-size: 14px;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: middle;
+    }
+
+    .stams-table tr:hover td {
+        background: var(--gray-50);
+    }
+
+    .profile-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .avatar-wrapper {
+        width: 52px;
+        height: 52px;
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        flex-shrink: 0;
+    }
+
+    .avatar-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .name-text {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gray-900);
+        display: block;
+        line-height: 1.2;
+        margin-bottom: 2px;
+    }
+
+    .sub-text {
+        font-size: 12px;
+        color: var(--gray-500);
+        display: block;
+    }
+
+    .nik-text {
+        font-family: monospace;
+        font-size: 11px;
+        color: var(--gray-400);
+    }
+
+    .org-main {
+        font-weight: 600;
+        color: var(--gray-800);
+        display: block;
+    }
+
+    .org-sub {
+        font-size: 11px;
+        color: var(--gray-400);
+        display: block;
+        line-height: 1.4;
+    }
+
+    .badge-stams {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        display: inline-block;
+        margin: 2px;
+    }
+
+    .badge-kp3 {
+        background: rgba(22, 163, 74, 0.1);
+        color: var(--success);
+    }
+
+    .badge-kp4 {
+        background: rgba(245, 158, 11, 0.1);
+        color: #b45309;
+    }
+
+    .badge-adv {
+        background: rgba(31, 78, 159, 0.1);
+        color: var(--primary);
+    }
+
+    .badge-jis {
+        background: rgba(124, 58, 237, 0.1);
+        color: #7C3AED;
+    }
+
+    .age-val {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .age-risk {
+        color: var(--danger);
+    }
+
+    .age-safe {
+        color: var(--success);
+    }
+
+    .retirement-text {
+        font-size: 11px;
+        color: var(--gray-400);
+        display: block;
+        margin-top: 2px;
+    }
+
+    .stams-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .btn-action {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--radius);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: all 0.2s;
+        border: 1px solid var(--gray-200);
+        background: white;
+        color: var(--gray-500);
+        text-decoration: none;
+    }
+
+    .btn-action:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .btn-delete-stams {
+        color: var(--danger);
+    }
+
+    .btn-delete-stams:hover {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+    }
+
+    .bulk-action-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        padding: 12px 20px;
+        background: var(--warning-light);
+        border: 1px solid var(--warning);
+        border-radius: var(--radius);
+        font-size: 14px;
+        display: none;
+    }
+
+    .bulk-action-bar.show {
+        display: flex;
+    }
+
+    .export-btn {
+        background: var(--gray-50);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+        padding: 8px 16px;
+        border-radius: var(--radius);
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .export-btn:hover {
+        background: var(--gray-100);
+        color: var(--gray-800);
+    }
+
+    .export-btn.primary {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .export-btn.primary:hover {
+        background: var(--primary-dark);
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 50px;
+        color: var(--gray-400);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <form action="{{ url_for('tpsg.bulk_delete_employees') }}" method="POST" id="mainForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="main-card">
+            <div class="card-header-stams">
+                <div class="list-title">
+                    <i class="fas fa-users-cog" style="color: var(--primary);"></i>
+                    Participant Database
+                </div>
+                <div class="d-flex gap-3 align-items-center flex-wrap">
+                    <span class="count-badge"><span id="visibleCount">{{ employees|length }}</span> Participants</span>
+                    <a href="{{ url_for('tpsg.import_excel') }}" class="export-btn primary">
+                        <i class="fas fa-plus"></i> Add New
+                    </a>
+                    <button type="button" class="export-btn">
+                        <i class="fas fa-file-export"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="stams-input" placeholder="Search by name, NIK, or position...">
+            </div>
+
+            <div class="filter-row">
+                <select id="filterArea" class="stams-select"><option value="">-- All Areas --</option></select>
+                <select id="filterDivisi" class="stams-select" disabled><option value="">-- All Divisions --</option></select>
+                <select id="filterDept" class="stams-select" disabled><option value="">-- All Departments --</option></select>
+                <select id="filterLevel" class="stams-select"><option value="">-- All Levels --</option></select>
+                <button type="button" id="resetFilters" class="export-btn">Reset</button>
+            </div>
+
+            <div id="bulkBar" class="bulk-action-bar">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="fas fa-info-circle text-warning"></i>
+                    <span><strong id="selectedCount">0</strong> Items Selected</span>
+                </div>
+                <button type="submit" class="export-btn" style="background: var(--danger); color: white; border-color: var(--danger);"
+                    onclick="return confirm('Permanently delete selected participants?')">
+                    <i class="fas fa-trash-alt me-2"></i> Delete Selected
+                </button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="stams-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox" id="selectAll" class="stams-checkbox"></th>
+                            <th>Participant Profile</th>
+                            <th>Organization</th>
+                            <th>TPS Level</th>
+                            <th class="text-center">Age & Retirement</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        {% for emp in employees %}
+                        {% set age = 2026 - emp.birth_date.year if emp.birth_date else 0 %}
+                        {% set pension = emp.birth_date.year + 55 if emp.birth_date else 0 %}
+                        {% set area = emp.plant.name if emp.plant else 'N/A' %}
+                        {% set div = emp.division.name if emp.division else 'N/A' %}
+                        {% set dept = emp.department.name if emp.department else 'N/A' %}
+
+                        <tr class="employee-row" data-area="{{ area }}" data-divisi="{{ div }}" data-dept="{{ dept }}" data-level="{{ emp.current_tps_level | default('') }}">
+                            <td><input type="checkbox" name="employee_ids" value="{{ emp.id }}" class="stams-checkbox row-check"></td>
+                            <td>
+                                <div class="profile-container">
+                                    <div class="avatar-wrapper">
+                                        {% if emp.photo %}
+                                        <img src="{{ emp.photo }}" onerror="this.src='https://ui-avatars.com/api/?name={{ emp.name | urlencode }}&background=1F4E9F&color=fff&size=100'">
+                                        {% else %}
+                                        <img src="https://ui-avatars.com/api/?name={{ emp.name | urlencode }}&background=1F4E9F&color=fff&size=100">
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="name-text">{{ emp.name }}</span>
+                                        <span class="sub-text">{{ emp.position or 'No Position' }}</span>
+                                        <span class="nik-text">NPK: {{ emp.username }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="org-main">{{ area }}</span>
+                                <span class="org-sub">Div: {{ div }}</span>
+                                <span class="org-sub">Dept: {{ dept }}</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 180px;">
+                                    {% set level_str = emp.current_tps_level | default('') | upper %}
+                                    {% if level_str %}
+                                        {% for lvl in level_str.split(',') %}
+                                            {% set clvl = lvl | trim %}
+                                            {% if '3' in clvl %}<span class="badge-stams badge-kp3">{{ clvl }}</span>
+                                            {% elif '4' in clvl %}<span class="badge-stams badge-kp4">{{ clvl }}</span>
+                                            {% elif 'ADV' in clvl %}<span class="badge-stams badge-adv">{{ clvl }}</span>
+                                            {% elif 'JIS' in clvl %}<span class="badge-stams badge-jis">{{ clvl }}</span>
+                                            {% else %}<span class="badge-stams" style="background: var(--gray-100); color: var(--gray-600);">{{ clvl }}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <span style="color: var(--gray-400); font-size: 12px;">No Level</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                {% if age > 0 %}
+                                    <div class="age-val {% if age >= 50 %}age-risk{% else %}age-safe{% endif %}">
+                                        {% if age >= 50 %}<i class="fas fa-exclamation-circle me-1"></i>{% endif %}{{ age }} Yrs
+                                    </div>
+                                    <span class="retirement-text">Retire: {{ pension }}</span>
+                                {% else %}-{% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="{{ url_for('tpsg.detail_employee', id=emp.id) }}" class="btn-action" title="View Detail"><i class="fas fa-external-link-alt"></i></a>
+                                    {% set emp_id_str = emp.id|string %}
+                                    <button type="button" class="btn-action btn-delete-stams" title="Delete" onclick="deleteSingle('{{ emp_id_str }}')"><i class="fas fa-trash-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noData" class="no-data" style="display: none;">
+                <i class="fas fa-search fa-3x mb-3" style="opacity: 0.3;"></i>
+                <h5 style="color: var(--gray-500);">No Matching Data Found</h5>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById('searchInput');
+    const filterArea = document.getElementById('filterArea');
+    const filterDivisi = document.getElementById('filterDivisi');
+    const filterDept = document.getElementById('filterDept');
+    const filterLevel = document.getElementById('filterLevel');
+    const rows = Array.from(document.querySelectorAll('.employee-row'));
+    const visibleCount = document.getElementById('visibleCount');
+    const noData = document.getElementById('noData');
+
+    const areas = new Set();
+    const levels = new Set();
+    rows.forEach(r => {
+        if(r.dataset.area && r.dataset.area != 'N/A') areas.add(r.dataset.area);
+        (r.dataset.level || "").split(',').forEach(l => { if(l.trim()) levels.add(l.trim()); });
+    });
+
+    Array.from(areas).sort().forEach(a => filterArea.add(new Option(a, a)));
+    Array.from(levels).sort().forEach(l => filterLevel.add(new Option(l, l)));
+
+    function applyFilters() {
+        const s = searchInput.value.toLowerCase();
+        const a = filterArea.value;
+        const d = filterDivisi.value;
+        const dp = filterDept.value;
+        const l = filterLevel.value.toLowerCase();
+
+        let count = 0;
+        rows.forEach(r => {
+            const mS = r.textContent.toLowerCase().includes(s);
+            const mA = !a || r.dataset.area === a;
+            const mD = !d || r.dataset.divisi === d;
+            const mDp = !dp || r.dataset.dept === dp;
+            const mL = !l || r.dataset.level.toLowerCase().includes(l);
+
+            if(mS && mA && mD && mDp && mL) { r.style.display = ''; count++; }
+            else { r.style.display = 'none'; }
+        });
+
+        visibleCount.textContent = count;
+        noData.style.display = count === 0 ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+    filterArea.addEventListener('change', () => { populateDivisi(); applyFilters(); });
+    filterDivisi.addEventListener('change', () => { populateDept(); applyFilters(); });
+    filterDept.addEventListener('change', applyFilters);
+    filterLevel.addEventListener('change', applyFilters);
+    document.getElementById('resetFilters').addEventListener('click', () => { location.reload(); });
+
+    function populateDivisi() {
+        const sel = filterArea.value;
+        filterDivisi.innerHTML = '<option value="">-- All Divisions --</option>';
+        filterDivisi.disabled = !sel;
+        if(sel) {
+            const divs = new Set();
+            rows.forEach(r => { if(r.dataset.area === sel) divs.add(r.dataset.divisi); });
+            Array.from(divs).sort().forEach(v => filterDivisi.add(new Option(v, v)));
+        }
+    }
+
+    function populateDept() {
+        const sel = filterDivisi.value;
+        filterDept.innerHTML = '<option value="">-- All Departments --</option>';
+        filterDept.disabled = !sel;
+        if(sel) {
+            const depts = new Set();
+            rows.forEach(r => { if(r.dataset.divisi === sel) depts.add(r.dataset.dept); });
+            Array.from(depts).sort().forEach(v => filterDept.add(new Option(v, v)));
+        }
+    }
+
+    const selectAll = document.getElementById('selectAll');
+    const checks = document.querySelectorAll('.row-check');
+    const bulkBar = document.getElementById('bulkBar');
+    const selCount = document.getElementById('selectedCount');
+
+    function updateBulk() {
+        const count = document.querySelectorAll('.row-check:checked').length;
+        bulkBar.classList.toggle('show', count > 0);
+        selCount.textContent = count;
+        selectAll.checked = count === checks.length && count > 0;
+    }
+
+    selectAll.addEventListener('change', () => {
+        checks.forEach(c => { if(c.closest('tr').style.display != 'none') c.checked = selectAll.checked; });
+        updateBulk();
+    });
+
+    checks.forEach(c => c.addEventListener('change', updateBulk));
+});
+
+function deleteSingle(id) {
+    if(confirm('Delete this participant?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{{ url_for('tpsg.bulk_delete_employees') }}";
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden'; csrf.name = 'csrf_token'; csrf.value = '{{ csrf_token() }}';
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden'; idInput.name = 'employee_ids'; idInput.value = id;
+        form.appendChild(csrf); form.appendChild(idInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

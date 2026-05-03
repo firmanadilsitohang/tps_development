@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}403 - Access Forbidden | TPS-G{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 40px;">
+    <div style="font-size: 120px; font-weight: bold; color: var(--accent-gold); font-family: 'Oswald', sans-serif; text-shadow: 0 0 30px rgba(245, 158, 11, 0.3);">403</div>
+    <h2 style="color: #fff; margin: 20px 0;">Akses Ditolak</h2>
+    <p style="color: var(--text-muted); max-width: 400px; margin-bottom: 30px;">
+        Anda tidak memiliki izin untuk mengakses halaman ini. Silakan hubungi administrator jika Anda merasa seharusnya memiliki akses.
+    </p>
+    <a href="javascript:history.back()" style="background: rgba(255,255,255,0.1); color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+        <i class="fas fa-arrow-left"></i> Kembali
+    </a>
+</div>
+{% endblock %}

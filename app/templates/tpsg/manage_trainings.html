@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Training Schedule Management | TPS-G Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 24px 30px;
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 4px;
+    }
+
+    /* Card */
+    .content-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gray-900);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Form */
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        width: 100%;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        font-size: 14px;
+        color: var(--gray-800);
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(31, 78, 159, 0.1);
+        background: white;
+    }
+
+    /* Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: var(--gray-50);
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 13px;
+        color: var(--gray-700);
+        vertical-align: top;
+    }
+
+    tbody tr:hover td {
+        background: var(--gray-50);
+    }
+
+    /* Badge Date */
+    .badge-date {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-block;
+    }
+
+    /* Buttons */
+    .btn-primary-custom {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: var(--radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-primary-custom:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-back {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+        padding: 8px 16px;
+        border-radius: var(--radius);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-back:hover {
+        background: var(--gray-200);
+        color: var(--gray-800);
+    }
+
+    .btn-action {
+        color: var(--primary);
+        font-size: 15px;
+        display: inline-block;
+        margin-right: 10px;
+        transition: color 0.2s;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .btn-action:hover {
+        color: var(--primary-dark);
+    }
+
+    .btn-delete {
+        color: var(--danger);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        display: inline;
+        padding: 0;
+    }
+
+    .btn-delete:hover {
+        color: #dc2626;
+    }
+
+    /* Grid */
+    .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+        .two-col {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: var(--gray-400);
+    }
+
+    .empty-state i {
+        font-size: 36px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fas fa-calendar-alt me-2" style="color: var(--primary);"></i> Training Schedule Management</h1>
+        <p style="color: var(--gray-500); font-size: 13px; margin-bottom: 0;">Add, edit, and manage training schedules for participants</p>
+    </div>
+    <a href="{{ url_for('tpsg.dashboard') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="two-col">
+    <div class="content-card">
+        <h3 class="card-title"><i class="fas fa-plus-circle" style="color: var(--primary);"></i> Add New Schedule</h3>
+        <form action="{{ url_for('tpsg.manage_trainings') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label class="form-label">Training Title</label>
+                <input type="text" name="title" class="form-control" placeholder="Example: Jishuken Leader Bootcamp" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Date & Time</label>
+                <input type="datetime-local" name="training_date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" name="location" class="form-control" placeholder="Example: Plant 1 Karawang - Room A" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Participant Quota</label>
+                <input type="number" name="quota" class="form-control" placeholder="Example: 20" min="1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3" placeholder="Training details..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary-custom">
+                <i class="fas fa-save"></i> Save Schedule
+            </button>
+        </form>
+    </div>
+
+    <div class="content-card">
+        <h3 class="card-title"><i class="fas fa-list" style="color: var(--gray-600);"></i> Training Schedule List</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title & Description</th>
+                    <th>Date & Location</th>
+                    <th>Quota</th>
+                    <th style="text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for training in trainings %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--gray-900);">{{ training.title }}</strong>
+                        <div style="color: var(--gray-400); font-size: 12px; margin-top: 4px;">
+                            {{ training.description[:60] }}{% if training.description|length > 60 %}...{% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-date">
+                            <i class="fas fa-calendar"></i>
+                            {{ training.training_date.strftime('%d %b %Y, %H:%M') }}
+                        </span>
+                        <div style="color: var(--gray-500); font-size: 12px; margin-top: 5px;">
+                            <i class="fas fa-map-marker-alt" style="color: var(--danger);"></i>
+                            {{ training.location }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if training.quota > 0 %}
+                            <span style="color: var(--success); font-weight: 700;">{{ training.quota }}</span>
+                        {% else %}
+                            <span style="color: var(--gray-400);">-</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{{ url_for('tpsg.edit_training', id=training.id) }}" class="btn-action" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ url_for('tpsg.delete_training', id=training.id) }}" method="POST" onsubmit="return confirm('Delete this training schedule?')" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn-delete" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>No training schedules yet.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

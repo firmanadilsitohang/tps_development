@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(venv/Scripts/python -c ' *)",
+      "Bash(venv/Scripts/pip install *)",
+      "Bash(curl -L -o dashboard_ref.png \"https://minimax-algeng-chat-tts-us.oss-us-east-1.aliyuncs.com/ccv2%2F2026-05-01%2FMiniMax-M2.7%2F2039473791322567034%2Ff086be6afdbccff31535e3e903420bb720225fdf9b6a2598beeb82a73820c49a..png?Expires=1777733500&OSSAccessKeyId=LTAI5tCpJNKCf5EkQHSuL9xg&Signature=Vbr4RerHIMbLpS4Tfb3AlsT5SCY%3D\")",
+      "Bash(curl -L -o ref_dashboard.png \"https://minimax-algeng-chat-tts-us.oss-us-east-1.aliyuncs.com/ccv2%2F2026-05-01%2FMiniMax-M2.7%2F2039473791322567034%2Fa3621f11916266ed1288f068da672fba5d7b8df27a7a670f932cbeed357e00ee..png?Expires=1777734106&OSSAccessKeyId=LTAI5tCpJNKCf5EkQHSuL9xg&Signature=JvLzFtuoCSbsRA1hnk5yTKboN2Y%3D\")",
+      "Bash(venv/Scripts/python)",
+      "Bash(curl -L -o tpsg_ref.png \"https://minimax-algeng-chat-tts-us.oss-us-east-1.aliyuncs.com/ccv2%2F2026-05-02%2FMiniMax-M2.7%2F2039473791322567034%2F2939c3b4abe1146f3937aa81838b43a7926c4e7b7e4a0b9c81333d6a8ee29b58..png?Expires=1777769537&OSSAccessKeyId=LTAI5tCpJNKCf5EkQHSuL9xg&Signature=wPioHU1g2I0%2BN0Z6b5%2FmNZLyzGQ%3D\")",
+      "Bash(curl -s -L \"https://minimax-algeng-chat-tts-us.oss-us-east-1.aliyuncs.com/ccv2%2F2026-05-02%2FMiniMax-M2.7%2F2044935622187037182%2Fb047a9a875728d3ca256f435469a75d271cdf1ff60a5d414c23458fcfcf11a89..png?Expires=1777794797&OSSAccessKeyId=LTAI5tCpJNKCf5EkQHSuL9xg&Signature=Nlwm9z0QvVRQ3QY6lDOQDR5m%2F4U%3D\" -o temp_chart.png)",
+      "Bash(python)",
+      "Bash(python -c ' *)",
+      "Bash(chcp 65001)",
+      "Bash(python -c \"src=open\\('app/templates/tpsg/dashboard.html','r',encoding='utf-8'\\).read\\(\\);lines=src.split\\(chr\\(10\\)\\);si=src.find\\(\\\\\"new Chart\\(document.getElementById\\('projChart'\\)\\\\\"\\);sl=len\\(src[:si].split\\(chr\\(10\\)\\)\\);d=0;print\\('start line:',sl\\);exec\\(chr\\(106\\)+' for i in range\\(sl-1,sl+195\\): l=lines[i];ol=l.count\\(chr\\(123\\)\\);cl=l.count\\(chr\\(125\\)\\);print\\(i+1,chr\\(100\\)+chr\\(61\\)+str\\(d\\),l[:60]\\);d+=ol;d-=cl;if d<0:print\\(chr\\(78\\)+chr\\(69\\)+chr\\(71\\)\\);break' if False else ''\\)\")",
+      "Bash(python check_braces.py)"
+    ]
+  }
+}

@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Module | TPS-G Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .content-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 30px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gray-900);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        width: 100%;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        font-size: 14px;
+        color: var(--gray-800);
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(31, 78, 159, 0.1);
+        background: white;
+    }
+
+    .current-file {
+        background: rgba(22, 163, 74, 0.08);
+        border: 1px solid rgba(22, 163, 74, 0.3);
+        border-radius: var(--radius);
+        padding: 12px 15px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--success);
+    }
+
+    .info-text {
+        font-size: 11px;
+        color: var(--gray-400);
+        margin-top: 5px;
+        display: block;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .btn-primary-custom {
+        flex: 1;
+        background: var(--success);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: var(--radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-primary-custom:hover {
+        background: #15803d;
+    }
+
+    .btn-cancel {
+        flex: 1;
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+        padding: 14px;
+        border-radius: var(--radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .btn-cancel:hover {
+        background: var(--gray-200);
+        color: var(--gray-800);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-container">
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('tpsg.manage_news') }}" style="color: var(--gray-500); text-decoration: none; font-size: 13px; font-weight: 600;">
+            <i class="fas fa-arrow-left"></i> Back to Modules
+        </a>
+    </div>
+
+    <div class="content-card">
+        <h3 class="card-title">
+            <i class="fas fa-edit" style="color: var(--success);"></i> Edit E-Learning Module
+        </h3>
+
+        <form action="{{ url_for('tpsg.edit_module', id=module.id) }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label class="form-label">Material Title</label>
+                <input type="text" name="title" class="form-control" value="{{ module.title }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Target TPS Level</label>
+                <select name="tps_level" class="form-control" required>
+                    <option value="All Level" {% if module.tps_level == 'All Level' %}selected{% endif %}>All Levels (Public)</option>
+                    <option value="TPS BASIC" {% if module.tps_level == 'TPS BASIC' %}selected{% endif %}>TPS BASIC</option>
+                    <option value="TPS SW" {% if module.tps_level == 'TPS SW' %}selected{% endif %}>TPS SW</option>
+                    <option value="TPS STEP UP" {% if module.tps_level == 'TPS STEP UP' %}selected{% endif %}>TPS STEP UP</option>
+                    <option value="TPS ADVANCE" {% if module.tps_level == 'TPS ADVANCE' %}selected{% endif %}>TPS ADVANCE</option>
+                    <option value="TPS KEY PERSON 3" {% if module.tps_level == 'TPS KEY PERSON 3' %}selected{% endif %}>TPS KEY PERSON 3</option>
+                    <option value="TPS KEY PERSON 4" {% if module.tps_level == 'TPS KEY PERSON 4' %}selected{% endif %}>TPS KEY PERSON 4</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Short Description</label>
+                <textarea name="description" class="form-control" rows="3">{{ module.description }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Current File</label>
+                <div class="current-file">
+                    <i class="fas fa-file-alt"></i>
+                    <span>{{ module.file_name }}</span>
+                    <a href="{{ url_for('static', filename='uploads/modules/' + module.file_name) }}" target="_blank"
+                       style="margin-left: auto; color: var(--success); text-decoration: none; font-weight: 600;">
+                        <i class="fas fa-external-link-alt"></i> View
+                    </a>
+                </div>
+                <label class="form-label">Replace File (Optional)</label>
+                <input type="file" name="file" class="form-control" style="padding: 8px 12px;">
+                <span class="info-text">Leave empty to keep current file. Accepted formats: PDF, PPT, DOC, Excel</span>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-primary-custom">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a href="{{ url_for('tpsg.manage_news') }}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

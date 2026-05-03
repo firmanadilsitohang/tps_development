@@ -1,28 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Import Excel | TPS-G{% endblock %}
+
+{% block title %}Import Excel Data | TPS-G Admin{% endblock %}
 
 {% block extra_css %}
-<link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;700&display=swap"
-    rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    :root {
-        --bg-cyber: #04070d;
-        --panel-bg: #0d1117;
-        --neon-green: #10b981;
-        --neon-green-glow: rgba(16, 185, 129, 0.4);
-        --neon-gold: #f59e0b;
-        --border-dark: #30363d;
-    }
-
-    body {
-        background-color: var(--bg-cyber);
-        color: #c9d1d9;
-        font-family: 'Inter', sans-serif;
-    }
-
-    /* --- LOADING OVERLAY ANIMATION --- */
+    /* Loading Overlay */
     #loadingOverlay {
         display: none;
         position: fixed;
@@ -30,21 +12,19 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(4, 7, 13, 0.9);
+        background: rgba(255, 255, 255, 0.95);
         z-index: 9999;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(4px);
     }
 
-    /* Dual Ring Glowing Spinner */
     .loader-rings {
         position: relative;
         width: 80px;
         height: 80px;
-        margin-bottom: 25px;
+        margin-bottom: 24px;
     }
 
     .loader-rings:before,
@@ -56,174 +36,117 @@
     }
 
     .loader-rings:before {
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-top-color: var(--neon-green);
-        border-bottom-color: var(--neon-green);
-        animation: spin 1.5s linear infinite;
-        box-shadow: 0 0 20px var(--neon-green-glow);
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-top-color: var(--primary);
+        border-bottom-color: var(--primary);
+        animation: spin 1.2s linear infinite;
     }
 
     .loader-rings:after {
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        bottom: 15px;
-        border-left-color: #58a6ff;
-        border-right-color: #58a6ff;
-        animation: spin-reverse 1s linear infinite;
+        top: 15px; left: 15px; right: 15px; bottom: 15px;
+        border-left-color: var(--primary-light);
+        border-right-color: var(--primary-light);
+        animation: spin-reverse 0.8s linear infinite;
     }
 
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    @keyframes spin-reverse {
-        0% {
-            transform: rotate(360deg);
-        }
-
-        100% {
-            transform: rotate(0deg);
-        }
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes spin-reverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
 
     .loading-text {
-        color: #ffffff;
-        font-family: 'Oswald', sans-serif;
-        font-size: 22px;
-        letter-spacing: 2px;
-        animation: pulse-text 1.5s ease-in-out infinite;
-        text-shadow: 0 0 10px var(--neon-green-glow);
-    }
-
-    @keyframes pulse-text {
-
-        0%,
-        100% {
-            opacity: 0.7;
-            transform: scale(1);
-        }
-
-        50% {
-            opacity: 1;
-            transform: scale(1.05);
-        }
-    }
-
-    .loading-subtext {
-        color: #8b949e;
-        font-size: 13px;
-        margin-top: 10px;
-        font-family: monospace;
+        color: var(--primary);
+        font-size: 18px;
+        font-weight: 700;
         letter-spacing: 1px;
     }
 
-    /* --- UPLOAD CARD STYLING --- */
-    .upload-card {
-        max-width: 550px;
-        margin: 60px auto;
-        background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
-        border: 1px solid var(--border-dark);
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
-        position: relative;
-        overflow: hidden;
+    .loading-subtext {
+        color: var(--gray-400);
+        font-size: 13px;
+        margin-top: 8px;
     }
 
-    /* Decorative Top Line */
-    .upload-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+    /* Card */
+    .upload-card {
+        max-width: 540px;
+        margin: 40px auto;
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        box-shadow: var(--shadow);
+    }
+
+    .icon-container {
+        text-align: center;
+        margin-bottom: 24px;
     }
 
     .icon-container i {
-        font-size: 55px;
-        color: var(--neon-green);
-        margin-bottom: 20px;
-        filter: drop-shadow(0 0 15px var(--neon-green-glow));
+        font-size: 52px;
+        color: var(--primary);
         animation: float 3s ease-in-out infinite;
     }
 
     @keyframes float {
-
-        0%,
-        100% {
-            transform: translateY(0);
-        }
-
-        50% {
-            transform: translateY(-10px);
-        }
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
     }
 
     .card-title {
-        font-family: 'Oswald', sans-serif;
-        color: #fff;
-        margin: 0;
-        font-size: 26px;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--gray-900);
+        text-align: center;
+        margin-bottom: 6px;
     }
 
-    /* File Input Zone */
+    .card-subtitle {
+        text-align: center;
+        color: var(--gray-400);
+        font-size: 13px;
+        margin-bottom: 28px;
+    }
+
+    /* File Drop Area */
     .file-drop-area {
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        border: 2px dashed #484f58;
-        border-radius: 12px;
-        padding: 40px 20px;
-        margin-bottom: 25px;
-        background: rgba(1, 4, 9, 0.5);
-        transition: all 0.3s ease;
+        border: 2px dashed var(--gray-300);
+        border-radius: var(--radius);
+        padding: 36px 20px;
+        margin-bottom: 20px;
+        background: var(--gray-50);
+        transition: all 0.2s;
         cursor: pointer;
     }
 
     .file-drop-area:hover,
     .file-drop-area.active {
-        border-color: var(--neon-green);
-        background: rgba(16, 185, 129, 0.05);
+        border-color: var(--primary);
+        background: rgba(31, 78, 159, 0.03);
     }
 
     .fake-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: var(--primary);
+        color: white;
         padding: 8px 16px;
-        border-radius: 8px;
-        color: #fff;
+        border-radius: var(--radius);
         font-size: 13px;
         font-weight: 600;
-        margin-bottom: 15px;
-        transition: 0.3s;
+        margin-bottom: 12px;
+        transition: all 0.2s;
     }
 
     .file-drop-area:hover .fake-btn {
-        background: var(--neon-green);
-        color: #04070d;
-        border-color: var(--neon-green);
+        background: var(--primary-dark);
     }
 
     .file-msg {
-        color: #8b949e;
+        color: var(--gray-400);
         font-size: 13px;
-        font-weight: 500;
         text-align: center;
     }
 
@@ -237,78 +160,78 @@
         opacity: 0;
     }
 
-    /* Info Alert */
+    /* Alert */
     .alert-automation {
-        background: rgba(245, 158, 11, 0.08);
-        border-left: 3px solid var(--neon-gold);
-        padding: 16px;
-        border-radius: 0 8px 8px 0;
+        background: var(--warning-light);
+        border-left: 3px solid var(--warning);
+        padding: 14px 16px;
+        border-radius: 0 var(--radius) var(--radius) 0;
         font-size: 13px;
-        color: #d1d5db;
-        margin-bottom: 30px;
+        color: var(--gray-700);
+        margin-bottom: 24px;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
+        gap: 12px;
     }
 
-    .alert-automation code {
-        background: rgba(0, 0, 0, 0.3);
-        padding: 2px 6px;
-        border-radius: 4px;
-        color: var(--neon-gold);
-        font-weight: bold;
-        margin-left: 5px;
+    .alert-automation i {
+        color: var(--warning);
+        font-size: 16px;
+        margin-top: 2px;
+        flex-shrink: 0;
     }
 
     /* Buttons */
-    .btn-action-group {
+    .btn-group {
         display: flex;
-        gap: 15px;
+        gap: 12px;
     }
 
     .btn-cancel {
         flex: 1;
-        padding: 14px;
+        padding: 13px;
         text-align: center;
-        background: #21262d;
-        color: #c9d1d9;
+        background: var(--gray-100);
+        color: var(--gray-600);
         text-decoration: none;
-        border-radius: 10px;
-        font-weight: 700;
+        border-radius: var(--radius);
+        font-weight: 600;
         font-size: 14px;
-        border: 1px solid var(--border-dark);
-        transition: 0.3s;
+        border: 1px solid var(--gray-200);
+        transition: all 0.2s;
     }
 
     .btn-cancel:hover {
-        background: #30363d;
-        color: #fff;
+        background: var(--gray-200);
+        color: var(--gray-800);
     }
 
     .btn-submit {
         flex: 2;
-        padding: 14px;
-        background: linear-gradient(135deg, var(--neon-green) 0%, #059669 100%);
-        color: #fff;
+        padding: 13px;
+        background: var(--success);
+        color: white;
         border: none;
-        border-radius: 10px;
-        font-weight: 700;
+        border-radius: var(--radius);
+        font-weight: 600;
         cursor: pointer;
-        font-size: 15px;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        font-size: 14px;
+        transition: all 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 8px;
     }
 
     .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        background: #15803d;
+        transform: translateY(-1px);
     }
 
-    .btn-submit i {
-        margin-right: 8px;
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
     }
 </style>
 {% endblock %}
@@ -317,40 +240,35 @@
 <div id="loadingOverlay">
     <div class="loader-rings"></div>
     <div class="loading-text">PROCESSING EXCEL DATA</div>
-    <div class="loading-subtext">Synchronizing System Database... Please Wait.</div>
+    <div class="loading-subtext">Synchronizing database... Please wait.</div>
 </div>
 
 <div class="upload-card">
-    <div style="text-align: center; margin-bottom: 35px;">
-        <div class="icon-container">
-            <i class="fas fa-file-excel"></i>
-        </div>
-        <h2 class="card-title">BULK DATA IMPORT</h2>
-        <p style="color: #8b949e; font-size: 14px; margin-top: 8px;">Upload raw files (.xlsx / .csv) to
-            register participants into the system.</p>
+    <div class="icon-container">
+        <i class="fas fa-file-excel"></i>
     </div>
+    <h2 class="card-title">Bulk Data Import</h2>
+    <p class="card-subtitle">Upload .xlsx or .csv files to register participants</p>
 
     <form id="importForm" action="{{ url_for('tpsg.import_excel') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div class="file-drop-area" id="dropArea">
-            <span class="fake-btn"><i class="fas fa-search me-2"></i> Select Excel File</span>
-            <span class="file-msg" id="fileMessage">or drag & drop file to this area</span>
+            <div class="fake-btn"><i class="fas fa-search me-2"></i> Select Excel File</div>
+            <span class="file-msg" id="fileMessage">or drag & drop file here</span>
             <input type="file" name="file" id="fileInput" class="file-input"
-                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                required>
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
         </div>
 
         <div class="alert-automation">
-            <i class="fas fa-robot text-warning"
-                style="font-size: 18px; margin-right: 12px; color: var(--neon-gold);"></i>
-            <span><strong>System Automation:</strong> Login accounts will be automatically created with a standard password:
-                <code>tmmin123</code></span>
+            <i class="fas fa-robot"></i>
+            <span><strong>Automation:</strong> Login accounts will be automatically created with a default password. Users should change it after first login.</span>
         </div>
 
-        <div class="btn-action-group">
-            <a href="{{ url_for('tpsg.employees') }}" class="btn-cancel">CANCEL</a>
+        <div class="btn-group">
+            <a href="{{ url_for('tpsg.employees') }}" class="btn-cancel">Cancel</a>
             <button type="submit" class="btn-submit" id="submitBtn">
-                <i class="fas fa-cloud-upload-alt"></i> EXECUTE IMPORT
+                <i class="fas fa-cloud-upload-alt"></i> Execute Import
             </button>
         </div>
     </form>
@@ -359,46 +277,31 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const importForm = document.getElementById('importForm');
-        const fileInput = document.getElementById('fileInput');
-        const fileMessage = document.getElementById('fileMessage');
-        const dropArea = document.getElementById('dropArea');
-        const submitBtn = document.getElementById('submitBtn');
+document.addEventListener("DOMContentLoaded", function () {
+    const importForm = document.getElementById('importForm');
+    const fileInput = document.getElementById('fileInput');
+    const fileMessage = document.getElementById('fileMessage');
+    const dropArea = document.getElementById('dropArea');
+    const submitBtn = document.getElementById('submitBtn');
 
-        // File Selection Event - Update Text
-        fileInput.addEventListener('change', function () {
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                fileMessage.innerHTML = `<span style="color: #10b981; font-weight: 700;"><i class="fas fa-file-check me-1"></i> Selected file: ${fileName}</span>`;
-                dropArea.classList.add('active');
-            } else {
-                fileMessage.innerHTML = "or drag & drop file to this area";
-                dropArea.classList.remove('active');
-            }
-        });
-
-        // Form Submit Event - Trigger Loading Animation
-        importForm.addEventListener('submit', function (e) {
-            // Pastikan file sudah dipilih
-            if (fileInput.files.length > 0) {
-                // Tampilkan overlay
-                document.getElementById('loadingOverlay').style.display = 'flex';
-
-                // Ubah state tombol
-                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> UPLOADING...';
-                submitBtn.style.opacity = '0.8';
-                submitBtn.style.pointerEvents = 'none';
-
-                // Sedikit delay visual agar animasi terasa smooth sebelum form benar-benar di-submit
-                // Hapus e.preventDefault() jika ini mengganggu flow backend Flask kamu
-                /* e.preventDefault();
-                setTimeout(() => {
-                    this.submit();
-                }, 500); 
-                */
-            }
-        });
+    fileInput.addEventListener('change', function () {
+        if (fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            fileMessage.innerHTML = `<span style="color: var(--success); font-weight: 600;"><i class="fas fa-check me-1"></i> Selected: ${fileName}</span>`;
+            dropArea.classList.add('active');
+        } else {
+            fileMessage.innerHTML = "or drag & drop file here";
+            dropArea.classList.remove('active');
+        }
     });
+
+    importForm.addEventListener('submit', function (e) {
+        if (fileInput.files.length > 0) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Uploading...';
+            submitBtn.disabled = true;
+        }
+    });
+});
 </script>
 {% endblock %}

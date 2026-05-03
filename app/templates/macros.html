@@ -1,0 +1,154 @@
+{# ============================================================================
+   TPS-G Global Macros - Reusable UI Components
+   ============================================================================ #}
+
+{# ----------------------------- FLASH MESSAGES ----------------------------- #}
+{%- macro flash_messages() -%}
+<div class="flash-messages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+{%- endmacro -%}
+
+{# ----------------------------- STAT / INFO CARDS ----------------------------- #}
+{%- macro stat_card(title, value, icon, color, subtitle='') -%}
+<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: radial-gradient(circle, {{ color }}22 0%, transparent 70%);"></div>
+    <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+        <div>
+            <p style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">{{ title }}</p>
+            <h3 style="font-family: 'Oswald', sans-serif; font-size: 32px; font-weight: 700; color: var(--text-main); line-height: 1;">{{ value }}</h3>
+            {% if subtitle %}
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">{{ subtitle }}</p>
+            {% endif %}
+        </div>
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: {{ color }}22; display: flex; align-items: center; justify-content: center;">
+            <i class="{{ icon }}" style="font-size: 22px; color: {{ color }};"></i>
+        </div>
+    </div>
+</div>
+{%- endmacro -%}
+
+{# ----------------------------- DATA TABLE ----------------------------- #}
+{%- macro data_table(headers, id='dataTable') -%}
+<div style="overflow-x: auto; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+    <table style="width: 100%; border-collapse: collapse;" id="{{ id }}">
+        <thead>
+            <tr style="background: rgba(10, 116, 255, 0.08);">
+                {% for header in headers %}
+                    <th style="padding: 14px 18px; text-align: left; font-size: 11px; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.08);">{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {{ caller() }}
+        </tbody>
+    </table>
+</div>
+{%- endmacro -%}
+
+{# ----------------------------- TABLE ROW ----------------------------- #}
+{%- macro table_row(cells, link='') -%}
+<tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;"
+    {% if link %}onclick="location.href='{{ link }}'" style="cursor:pointer;"{% endif %}>
+    {% for cell in cells %}
+        <td style="padding: 14px 18px; font-size: 13px; color: var(--text-main);">{{ cell }}</td>
+    {% endfor %}
+</tr>
+{%- endmacro -%}
+
+{# ----------------------------- BADGE ----------------------------- #}
+{%- macro badge(text, type='default') -%}
+{% set colors = {
+    'success': ('rgba(16, 185, 129, 0.15)', '#10b981'),
+    'danger': ('rgba(227, 0, 15, 0.15)', '#e3000f'),
+    'warning': ('rgba(245, 158, 11, 0.15)', '#f59e0b'),
+    'info': ('rgba(10, 116, 255, 0.15)', '#0a74ff'),
+    'default': ('rgba(139, 180, 216, 0.15)', '#8bb4d8')
+} %}
+{% set c = colors.get(type, colors['default']) %}
+<span style="display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: {{ c[0] }}; color: {{ c[1] }};">{{ text }}</span>
+{%- endmacro -%}
+
+{# ----------------------------- ACTION BUTTONS ----------------------------- #}
+{%- macro btn(text, icon='', color='primary', type='button', onclick='') -%}
+<button type="{{ type }}" {% if onclick %}onclick="{{ onclick }}"{% endif %}
+    style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s;
+    {% if color == 'primary' %}background: var(--accent-cyan); color: #fff;{% elif color == 'danger' %}background: var(--accent-red); color: #fff;{% elif color == 'warning' %}background: var(--accent-gold); color: #02060E;{% elif color == 'secondary' %}background: rgba(255,255,255,0.08); color: var(--text-main); border: 1px solid rgba(255,255,255,0.15);{% endif %}">
+    {% if icon %}<i class="{{ icon }}"></i>{% endif %}{{ text }}
+</button>
+{%- endmacro -%}
+
+{# ----------------------------- PAGE HEADER ----------------------------- #}
+{%- macro page_header(title, subtitle='', actions='') -%}
+<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h1 style="font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">{{ title }}</h1>
+        {% if subtitle %}
+            <p style="font-size: 13px; color: var(--text-muted);">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+    {% if actions %}
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">{{ actions }}</div>
+    {% endif %}
+</div>
+{%- endmacro -%}
+
+{# ----------------------------- EMPTY STATE ----------------------------- #}
+{%- macro empty_state(icon, message, action_text='', action_url='') -%}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center;">
+    <i class="{{ icon }}" style="font-size: 48px; color: rgba(139, 180, 216, 0.3); margin-bottom: 16px;"></i>
+    <p style="font-size: 14px; color: var(--text-muted); max-width: 300px;">{{ message }}</p>
+    {% if action_text and action_url %}
+        <a href="{{ action_url }}" style="margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--accent-cyan); color: #fff; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600;">
+            <i class="fas fa-plus"></i>{{ action_text }}
+        </a>
+    {% endif %}
+</div>
+{%- endmacro -%}
+
+{# ----------------------------- MODAL DIALOG ----------------------------- #}
+{%- macro modal(id, title, confirm_text='Confirm', confirm_color='primary') -%}
+<div id="{{ id }}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 14, 0.85); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: #0a1120; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; max-width: 450px; width: 90%;">
+        <h3 style="font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;">{{ title }}</h3>
+        <div style="margin-bottom: 24px; font-size: 14px; color: var(--text-muted);">{{ caller() }}</div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="document.getElementById('{{ id }}').style.display='none'" style="padding: 10px 20px; background: rgba(255,255,255,0.08); color: var(--text-main); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;">Cancel</button>
+            {{ caller('confirm') }}
+        </div>
+    </div>
+</div>
+{%- endmacro -%}
+
+{# ----------------------------- SEARCH BAR ----------------------------- #}
+{%- macro search_bar(placeholder='Search...', id='searchInput') -%}
+<div style="position: relative; margin-bottom: 20px;">
+    <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px;"></i>
+    <input type="text" id="{{ id }}" placeholder="{{ placeholder }}"
+        style="width: 100%; padding: 12px 16px 12px 44px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-main); font-size: 13px; outline: none;">
+</div>
+{%- endmacro -%}
+
+{# ----------------------------- SECTION CARD ----------------------------- #}
+{%- macro section_card(title, icon='', actions='') -%}
+<div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; overflow: hidden; margin-bottom: 24px;">
+    {% if title %}
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            {% if icon %}<i class="{{ icon }}" style="color: var(--accent-cyan); font-size: 16px;"></i>{% endif %}
+            <h3 style="font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px;">{{ title }}</h3>
+        </div>
+        {% if actions %}<div style="display: flex; gap: 8px;">{{ actions }}</div>{% endif %}
+    </div>
+    {% endif %}
+    <div style="padding: 24px;">
+        {{ caller() }}
+    </div>
+</div>
+{%- endmacro -%}

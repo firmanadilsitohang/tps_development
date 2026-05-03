@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Agent Dashboard | STAMS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .agent-header {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 30px;
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .agent-avatar {
+        width: 80px;
+        height: 80px;
+        background: var(--primary-light);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    .agent-info h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 4px;
+    }
+
+    .agent-meta {
+        display: flex;
+        gap: 16px;
+        color: var(--gray-500);
+        font-size: 14px;
+    }
+
+    .agent-meta span i {
+        margin-right: 6px;
+        color: var(--primary);
+    }
+
+    .spider-card {
+        height: 100%;
+    }
+
+    .project-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .project-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-on-progress { background: #e0f2fe; color: #0369a1; }
+    .status-completed { background: #dcfce7; color: #16a34a; }
+    .status-overdue { background: #fee2e2; color: #dc2626; }
+    .status-idle { background: #f1f5f9; color: #64748b; }
+
+    .impact-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        background: var(--gray-50);
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--gray-600);
+    }
+
+    .impact-pill i {
+        color: var(--success);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="agent-header">
+        <div class="agent-avatar">
+            {{ agent.name[0] | upper }}
+        </div>
+        <div class="agent-info">
+            <h1>{{ agent.name }}</h1>
+            <div class="agent-meta">
+                <span><i class="fas fa-id-card"></i> {{ agent.username }}</span>
+                <span><i class="fas fa-building"></i> {{ agent.stams_department.name if agent.stams_department else 'N/A' }}</span>
+                <span><i class="fas fa-user-tag"></i> {{ agent.role }}</span>
+            </div>
+        </div>
+        <div class="ms-auto">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newProjectModal">
+                <i class="fas fa-plus"></i> New Project
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Spider Chart -->
+        <div class="col-lg-5 mb-4">
+            <div class="card spider-card">
+                <div class="card-header">
+                    <h3 class="card-title">Workshop Proficiency (Spider Chart)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 350px;">
+                        <canvas id="spiderChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project List -->
+        <div class="col-lg-7 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Active Projects & Impact</h3>
+                    <div class="count-badge">{{ projects | length }} Projects</div>
+                </div>
+                <div class="card-body">
+                    {% if not projects %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-folder-open fa-3x mb-3 opacity-20"></i>
+                        <p>No projects found. Start your first improvement project!</p>
+                    </div>
+                    {% else %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Title & Category</th>
+                                    <th>Timeline</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in projects %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ project.title }}</div>
+                                        <div class="small text-primary">{{ project.category_4m }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="small text-muted">Target: {{ project.target_date.strftime('%d %b %Y') }}</div>
+                                        {% if project.actual_end_date %}
+                                        <div class="small text-success">End: {{ project.actual_end_date.strftime('%d %b %Y') }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-{{ project.status.lower().replace(' ', '-') }}">
+                                            {{ project.status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        {% if project.status != 'Completed' %}
+                                        <button class="btn btn-sm btn-primary" onclick="openSubmitModal({{ project.id }}, '{{ project.title }}')">
+                                            Submit Result
+                                        </button>
+                                        {% else %}
+                                        <div class="impact-pill">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span>{{ project.reduce_time_sec }}s | Rp{{ project.reduce_cost_rp }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Submit Result Modal -->
+<div class="modal fade" id="submitResultModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Submit Project Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p id="modalProjectTitle" class="text-primary fw-600 mb-4"></p>
+                <form id="submitResultForm">
+                    <input type="hidden" id="modalProjectId">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-gray-600">REDUCED TIME (SECONDS)</label>
+                        <input type="number" id="reduceTime" class="form-control" required placeholder="e.g. 3600">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-gray-600">REDUCED COST (RP)</label>
+                        <input type="number" id="reduceCost" class="form-control" required placeholder="e.g. 500000">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">COMMIT TO HOSHIN</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Spider Chart
+    const ctx = document.getElementById('spiderChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['WS 1', 'WS 2', 'WS 3', 'WS 4', 'WS 5', 'WS 6', 'WS 7'],
+            datasets: [{
+                label: 'Current Skill Level',
+                data: [
+                    {{ progress.ws_1 if progress else 0 }},
+                    {{ progress.ws_2 if progress else 0 }},
+                    {{ progress.ws_3 if progress else 0 }},
+                    {{ progress.ws_4 if progress else 0 }},
+                    {{ progress.ws_5 if progress else 0 }},
+                    {{ progress.ws_6 if progress else 0 }},
+                    {{ progress.ws_7 if progress else 0 }}
+                ],
+                fill: true,
+                backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                borderColor: '#0ea5e9',
+                pointBackgroundColor: '#0ea5e9',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#0ea5e9'
+            }]
+        },
+        options: {
+            elements: { line: { borderWidth: 3 } },
+            scales: {
+                r: {
+                    angleLines: { display: true },
+                    suggestedMin: 0,
+                    suggestedMax: 100
+                }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+});
+
+function openSubmitModal(id, title) {
+    document.getElementById('modalProjectId').value = id;
+    document.getElementById('modalProjectTitle').innerText = title;
+    new bootstrap.Modal(document.getElementById('submitResultModal')).show();
+}
+
+document.getElementById('submitResultForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('modalProjectId').value;
+    const data = {
+        reduce_time_sec: document.getElementById('reduceTime').value,
+        reduce_cost_rp: document.getElementById('reduceCost').value
+    };
+
+    fetch(`/agent/project/submit/${id}`, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    });
+});
+</script>
+{% endblock %}

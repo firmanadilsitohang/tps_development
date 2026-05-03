@@ -1,7 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timezone
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -21,7 +21,7 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), default='participant') 
     
     is_first_login = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     # RELASI KE EMPLOYEE
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'))

@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Management Dashboard | STAMS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hoshin-header {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .kpi-summary {
+        display: flex;
+        gap: 32px;
+    }
+
+    .kpi-item {
+        text-align: right;
+    }
+
+    .kpi-label {
+        font-size: 12px;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .kpi-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    .kpi-value.positive { color: var(--success); }
+    .kpi-value.negative { color: var(--danger); }
+
+    .dept-card {
+        padding: 20px;
+        border-radius: var(--radius);
+        background: var(--gray-50);
+        margin-bottom: 12px;
+        border: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .progress-track {
+        height: 8px;
+        background: var(--gray-200);
+        border-radius: 4px;
+        overflow: hidden;
+        width: 150px;
+        margin-top: 8px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="hoshin-header">
+        <div>
+            <h1 class="page-title">Hoshin Alignment Dashboard</h1>
+            <p class="page-subtitle">Strategic Talent Activation & Impact Monitoring</p>
+        </div>
+        <div class="kpi-summary">
+            <div class="kpi-item">
+                <div class="kpi-label">Actual Cost Savings</div>
+                <div class="kpi-value">Rp {{ "{:,.0f}".format(total_actual_cost) }}</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-label">Target Completion</div>
+                <div class="kpi-value {% if cost_performance >= 80 %}positive{% else %}negative{% endif %}">
+                    {{ "{:.1f}".format(cost_performance) }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Hoshin Alignment Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3 class="card-title">Hoshin Impact by Department (Target vs Actual)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 400px;">
+                        <canvas id="hoshinChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Breakdown -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3 class="card-title">Departmental Performance</h3>
+                </div>
+                <div class="card-body">
+                    {% for dept in departments %}
+                    <div class="dept-card">
+                        <div>
+                            <div class="fw-bold">{{ dept.name }}</div>
+                            <div class="small text-muted">{{ dept.actual_time }}s / {{ dept.target_time }}s Time Reduction</div>
+                            {% set pct = (dept.actual_cost / dept.target_cost * 100) if dept.target_cost > 0 else 0 %}
+                            <div class="progress-track">
+                                <div class="progress-bar" style="width: {{ pct }}%;"></div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold text-primary">Rp {{ "{:,.0f}".format(dept.actual_cost) }}</div>
+                            <div class="small text-success">+{{ "{:.1f}".format(pct) }}%</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Activity Radar -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Section Activity Heatmap</h3>
+        </div>
+        <div class="card-body">
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="sectionRadarChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Hoshin Alignment Chart (Grouped Bar)
+    const hoshinCtx = document.getElementById('hoshinChart').getContext('2d');
+    new Chart(hoshinCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for d in departments %}"{{ d.name }}",{% endfor %}],
+            datasets: [
+                {
+                    label: 'Target Cost (Rp)',
+                    data: [{% for d in departments %}{{ d.target_cost }},{% endfor %}],
+                    backgroundColor: '#e2e8f0',
+                    borderRadius: 6
+                },
+                {
+                    label: 'Actual Saving (Rp)',
+                    data: [{% for d in departments %}{{ d.actual_cost }},{% endfor %}],
+                    backgroundColor: '#0ea5e9',
+                    borderRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Section Radar Chart
+    fetch('/api/data/section-radar')
+        .then(res => res.json())
+        .then(data => {
+            const ctx = document.getElementById('sectionRadarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.section),
+                    datasets: [
+                        { label: 'Completed', data: data.map(d => d.completed), backgroundColor: '#10b981' },
+                        { label: 'On Progress', data: data.map(d => d.on_progress), backgroundColor: '#f59e0b' },
+                        { label: 'Overdue', data: data.map(d => d.overdue), backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    scales: { x: { stacked: true }, y: { stacked: true } },
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

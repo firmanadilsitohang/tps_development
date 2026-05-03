@@ -1,19 +1,22 @@
 from . import db
-from datetime import datetime
+from datetime import datetime, timezone
+
+def utc_now():
+    return datetime.now(timezone.utc)
 
 # ==========================================
 # MODEL 1: TRAINING WORKSHOP
 # ==========================================
 class Training(db.Model):
     __tablename__ = 'trainings'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text, nullable=True)
     training_date = db.Column(db.DateTime, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     quota = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 # ==========================================
 # MODEL 2: ACTIVITY PROGRESS (KAIZEN)
@@ -34,10 +37,10 @@ class Activity(db.Model):
     file_path = db.Column(db.String(255), nullable=True) 
     score = db.Column(db.Integer, nullable=True) 
     feedback = db.Column(db.Text, nullable=True) 
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow) 
+    submitted_at = db.Column(db.DateTime, default=utc_now)
     # --------------------------------------
     
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)
     
     # Relasi balik ke Employee
     employee = db.relationship('Employee', backref=db.backref('activities', lazy=True))
@@ -60,5 +63,5 @@ class News(db.Model):
     target_type = db.Column(db.String(50), default='all') # Isinya: 'all' atau 'specific'
     target_users = db.Column(db.Text, nullable=True) # Menyimpan NPK partisipan yang dipilih (pisahkan dengan koma)
     
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
+    updated_at = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)

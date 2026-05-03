@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found | TPS-G{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+        text-align: center;
+        padding: 40px;
+    }
+
+    .error-code {
+        font-size: 120px;
+        font-weight: 800;
+        color: var(--primary);
+        opacity: 0.15;
+        line-height: 1;
+        margin-bottom: -20px;
+    }
+
+    .error-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 12px;
+    }
+
+    .error-desc {
+        color: var(--gray-500);
+        max-width: 400px;
+        margin-bottom: 30px;
+        font-size: 14px;
+    }
+
+    .btn-home {
+        background: var(--primary);
+        color: white;
+        padding: 12px 30px;
+        border-radius: var(--radius);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-home:hover {
+        background: var(--primary-dark);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-code">404</div>
+    <h2 class="error-title">Page Not Found</h2>
+    <p class="error-desc">
+        Sorry, the page you're looking for doesn't exist. The URL may be incorrect or the page has been moved.
+    </p>
+    <a href="{{ url_for('tpsg.dashboard') }}" class="btn-home">
+        <i class="fas fa-home"></i> Back to Dashboard
+    </a>
+</div>
+{% endblock %}
